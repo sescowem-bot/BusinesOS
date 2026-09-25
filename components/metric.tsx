@@ -1,0 +1,2 @@
+import {ReactNode} from 'react';import {Card} from './ui';
+export function Metric({label,value,meta,icon}:{label:string;value:string;meta?:string;icon?:ReactNode}){return <Card className="card-pad metric"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><span className="metric-label">{label}</span>{icon}</div><div className="metric-value">{value}</div>{meta&&<div className="metric-meta">{meta}</div>}</Card>}

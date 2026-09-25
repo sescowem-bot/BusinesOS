@@ -1,0 +1,6 @@
+import {ReactNode} from 'react';
+export function Card({children,className=''}:{children:ReactNode;className?:string}){return <div className={`card ${className}`}>{children}</div>}
+export function Badge({children,tone='default'}:{children:ReactNode;tone?:'default'|'success'|'warning'|'danger'|'brand'}){return <span className={`badge ${tone==='success'?'badge-success':tone==='warning'?'badge-warning':tone==='danger'?'badge-danger':tone==='brand'?'badge-brand':''}`}>{children}</span>}
+export function Button({children,primary=false,type='button',className='',onClick}:{children:ReactNode;primary?:boolean;type?:'button'|'submit';className?:string;onClick?:()=>void;style?:React.CSSProperties}){return <button type={type} onClick={onClick} className={`btn ${primary?'btn-primary':''} ${className}`} style={style}>{children}</button>}
+export function PageHead({title,description,action}:{title:string;description?:string;action?:ReactNode}){return <div className="page-head"><div><h1>{title}</h1>{description&&<p>{description}</p>}</div>{action}</div>}
+export function Section({title,action,children}:{title:string;action?:ReactNode;children:ReactNode}){return <Card className="card-pad"><div className="subhead"><h2 className="section-title">{title}</h2>{action}</div>{children}</Card>}
