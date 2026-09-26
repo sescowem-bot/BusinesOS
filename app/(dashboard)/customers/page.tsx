@@ -1,2 +1,3 @@
+'use client';
 import {TablePage,statusBadge} from '@/components/table-page';import {customers} from '@/lib/demo';import {money} from '@/lib/format';
 export default function Customers(){return <TablePage title="Customers" description="Know who buys from you, what they have paid and what they still owe." rows={customers} addLabel="New customer" searchPlaceholder="Search name, phone..." columns={[{key:'name',label:'Customer'},{key:'phone',label:'Phone'},{key:'orders',label:'Orders'},{key:'total',label:'Purchases',render:v=>money(Number(v))},{key:'paid',label:'Paid',render:v=>money(Number(v))},{key:'balance',label:'Balance',render:v=>money(Number(v))},{key:'status',label:'Status',render:v=>statusBadge(String(v))}]}/>}
