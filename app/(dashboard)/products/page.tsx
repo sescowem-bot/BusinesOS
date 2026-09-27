@@ -1,2 +1,29 @@
-'use client';import Link from 'next/link';import {useEffect,useState} from 'react';import {PackagePlus,Plus,Trash2} from 'lucide-react';import {Card,PageHead,Button,Badge} from '@/components/ui';import {loadProducts,saveProducts,ProductRecord} from '@/lib/store';import {money} from '@/lib/format';
-export default function Products(){const[data,setData]=useState<ProductRecord[]>([]);useEffect(()=>setData(loadProducts()),[]);function remove(id:string){const next=data.filter(x=>x.id!==id);setData(next);saveProducts(next)}return <><PageHead title="Products & services" description="Manage what you sell, your prices, costs and stock." action={<Link href="/products/new" className="btn btn-primary"><Plus size={16}/> Add offering</Link>}/><Card><div className="table-wrap"><table className="table"><thead><tr><th>Name</th><th>Type</th><th>Category</th><th>Price</th><th>Cost</th><th>Stock</th><th></th></tr></thead><tbody>{data.map(p=><tr key={p.id}><td><b>{p.name}</b><div className="small muted">{p.description||'No description'}</div></td><td><Badge tone="brand">{p.type}</Badge></td><td>{p.category||'—'}</td><td>{money(p.price)}</td><td>{p.type==='Service'||p.type==='Package'?'—':money(p.cost)}</td><td>{p.type==='Service'||p.type==='Package'?'Not tracked':<Badge tone={p.stock<=p.minStock?'warning':'success'}>{p.stock}</Badge>}</td><td><button className="icon-btn danger" onClick={()=>remove(p.id)} aria-label={`Delete ${p.name}`}><Trash2 size={15}/></button></td></tr>)}</tbody></table>{!data.length&&<div className="empty"><PackagePlus size={28}/><h3>No products or services yet</h3><p>Add your first offering. It will belong to your business and can later be connected to orders, inventory and payments.</p><Link href="/products/new" className="btn btn-primary"><Plus size={15}/> Add first offering</Link></div>}</div></Card></>}
+'use client';
+import {useEffect,useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {TablePage,statusBadge} from '@/components/table-page';
+import {money} from '@/lib/format';
+import {useBusiness} from '@/lib/session';
+import {getSupabaseBrowser} from '@/lib/supabase';
+
+type Row={id:string;name:string;sku:string;category:string;price:number;cost:number;stock:number;status:string};
+
+export default function Products(){
+  const router=useRouter();
+  const{business,loading:bizLoading}=useBusiness();
+  const[rows,setRows]=useState<Row[]>([]);
+
+  useEffect(()=>{
+    if(bizLoading||!business)return;
+    (async()=>{
+      const supabase=getSupabaseBrowser();
+      if(!supabase)return;
+      const{data}=await supabase.from('products').select('id,name,sku,selling_price,cost_price,stock_quantity,minimum_stock,active,product_categories(name)').eq('business_id',business.id).order('created_at',{ascending:false});
+      setRows((data||[]).map((p:any)=>({id:p.id,name:p.name,sku:p.sku||'—',category:p.product_categories?.name||'Uncategorized',price:Number(p.selling_price),cost:Number(p.cost_price),stock:Number(p.stock_quantity),status:!p.active?'Inactive':(Number(p.stock_quantity)<=Number(p.minimum_stock)?'Low stock':'Active')})));
+    })();
+  },[business,bizLoading]);
+
+  if(!bizLoading&&!business)return <div className="empty">Set up your business in Settings before adding products.</div>;
+
+  return <TablePage title="Products & services" description="Manage what you sell, pricing, cost and stock levels." rows={rows} addLabel="Add offering" searchPlaceholder="Search products..." onAdd={()=>router.push('/products/new')} columns={[{key:'name',label:'Name'},{key:'sku',label:'SKU'},{key:'category',label:'Category'},{key:'price',label:'Price',render:v=>money(Number(v))},{key:'cost',label:'Cost',render:v=>money(Number(v))},{key:'stock',label:'Stock'},{key:'status',label:'Status',render:v=>statusBadge(String(v))}]}/>;
+}
