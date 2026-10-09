@@ -1,3 +1,0 @@
-'use server';import {getServerSupabase} from '@/lib/server/supabase';
-export type PasswordState={message:string};
-export async function changePassword(_s:PasswordState,form:FormData):Promise<PasswordState>{const password=String(form.get('password')||'');if(password.length<12)return {message:'Use at least 12 characters.'};const client=await getServerSupabase();if(!client)return {message:'Authentication is unavailable.'};const {data:{user}}=await client.auth.getUser();if(!user)return {message:'Reset session expired. Request another link.'};const {error}=await client.auth.updateUser({password});return {message:error?'Could not update password. Request another reset link.':'Password updated. You may now sign in.'};}

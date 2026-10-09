@@ -1,2 +1,0 @@
-import Link from 'next/link';import ForgotForm from './form';import {getPlatformBrand} from '@/lib/server/branding';
-export default async function Forgot(){const b=await getPlatformBrand();return <main className="auth"><div className="auth-card"><Link href="/" className="brand">{b.name}</Link><h1>Reset your password</h1><p className="muted">We will email you a secure reset link.</p><ForgotForm/><p className="small" style={{marginTop:18}}><Link href="/login">Back to sign in</Link></p></div></main>}
