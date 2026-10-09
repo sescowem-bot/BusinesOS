@@ -6,15 +6,6 @@ export async function createWorkspace(_s:OnboardState,form:FormData):Promise<Onb
  const client=await getServerSupabase();if(!client)return {error:'Authentication is not configured.'};
  const {data:{user}}=await client.auth.getUser();if(!user)return {error:'Sign in before creating a business.'};
  const {error}=await client.rpc('create_my_business_workspace',{p_name:name,p_category:category});
- if(error){
-  console.error('Workspace RPC failed', {code:error.code, message:error.message, details:error.details, hint:error.hint});
-  const label = error.code === 'PGRST202' ? 'The workspace function was not found. Check migration 004 and the Supabase project connection.'
-    : error.code === '42501' ? 'The database denied permission to create a workspace.'
-    : error.message?.includes('Profile not found') ? 'Your authentication profile is missing. The signup profile trigger may need repair.'
-    : error.message?.includes('Authentication required') ? 'Your session has expired. Please sign in again.'
-    : error.code === '23505' ? 'A unique database value already exists. Please retry.'
-    : 'Workspace creation failed. Please contact support with the database error code.';
-  return {error: `${label} (code: ${error.code || 'unknown'})`};
- }
+ if(error)return {error:'Unable to create workspace. Confirm that migration 004 is installed, or try a different business name.'};
  redirect('/dashboard');
 }
