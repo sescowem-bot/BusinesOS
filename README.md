@@ -1,23 +1,24 @@
-# BusinessOS
+# BusinessOS Phase 07
 
-Production-oriented small-business operating platform, built web-first and designed for a later React Native/Expo mobile app.
+Accounting foundation implementation. Read `docs/PHASE_07_IMPLEMENTATION.md` and migration `008_accounting_foundation.sql`. Production build/database integration not verified.
 
-## Stack
-- Next.js 16 + TypeScript
-- Supabase Postgres/Auth/RLS
-- Vercel-ready
-- Mobile-first responsive UI
+## Phase 08
+See `docs/PHASE_08_TAX.md`. Apply `009_tax_engine_foundation.sql` after earlier migrations. Tax calculator is an informational preview only.
 
-## Run
-1. `npm install`
-2. Copy `.env.example` to `.env.local` and fill Supabase values for production data.
-3. `npm run dev`
-4. Open `http://localhost:3000`.
 
-Without Supabase environment variables the UI runs in demo mode using safe local sample data. Do not treat demo data as production data.
+## Phase 09 financial reporting
+See `docs/PHASE_09_REPORTING.md`. Latest migration: `supabase/migrations/010_tax_reporting_reminders.sql`.
 
-## Database
-Apply `supabase/migrations/001_core.sql` to a fresh Supabase project. The migration includes multi-tenant tables, financial constraints, calculation functions, indexes and RLS policies.
 
-## Build roadmap
-The UI includes the complete Phase 1–10 information architecture. Payment-provider, WhatsApp API, automated notifications, subscription billing and partner API adapters should be connected through server-side modules before production launch.
+Phase 10: see docs/PHASE_10_COMMUNICATIONS.md; migration 011.
+
+
+## Phase 11
+Campaigns & Automations UI and database preview-only foundations. See `docs/PHASE_11_AUTOMATION.md`. Apply `012_campaigns_automation.sql` after migration 011. No real messages are sent.
+
+
+## Phase 12 additions
+See `docs/PHASE_12_GROWTH.md`; migration `013_business_growth.sql` and new `/growth` module.
+
+
+Phase 13 adds real-data business insights. See docs/PHASE_13_INTELLIGENCE.md.
