@@ -1,0 +1,2 @@
+import Link from 'next/link';import {getWorkspace} from '@/lib/server/workspace';import {ItemForm} from '../../catalog/forms';
+export default async function AddProduct(){await getWorkspace();return <div className="tax-page"><p className="muted small">CATALOG</p><h1>Add a product or service</h1><p><Link href="/products">← Back to catalogue</Link></p><section className="tax-panel"><ItemForm/></section></div>}

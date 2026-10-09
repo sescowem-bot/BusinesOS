@@ -1,11 +1,13 @@
 import Link from 'next/link';
+import {getPlatformBrand} from '@/lib/server/branding';
 import {ArrowRight, BarChart3, CreditCard, Users} from 'lucide-react';
 
-export default function Home(){
+export default async function Home(){
+  const brand=await getPlatformBrand();
   return <main>
     <section className="hero">
       <div className="hero-inner">
-        <div className="tag">BUSINESSOS · BUSINESS OPERATING PLATFORM</div>
+        <div className="tag">{brand.name.toUpperCase()} · BUSINESS OPERATING PLATFORM</div>
         <h1>Run the business. Understand the numbers. Move forward.</h1>
         <p>One polished workspace for customers, sales, orders, payments, expenses, inventory and business performance.</p>
         <div className="hero-actions">
