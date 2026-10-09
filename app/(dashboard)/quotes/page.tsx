@@ -1,3 +1,9 @@
-import {PageHead,Card,Button,Badge} from '@/components/ui';import {FileText,Plus,ArrowUpRight} from '@/components/icons';import {money} from '@/lib/format';
-const quotes=[{id:'QT-1004',customer:'Sarah Johnson',amount:400000,status:'Sent',date:'2026-09-25'},{id:'QT-1003',customer:'Mariam Bello',amount:215000,status:'Accepted',date:'2026-09-22'},{id:'QT-1002',customer:'Tunde Works',amount:180000,status:'Draft',date:'2026-09-20'}];
-export default function Quotes(){return <><PageHead title="Quotes" description="Prepare professional quotes and convert accepted quotes into orders." action={<Button primary><Plus size={16}/> New quote</Button>}/><Card><div className="table-wrap"><table className="table"><thead><tr><th>Quote</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>{quotes.map(q=><tr key={q.id}><td><b>{q.id}</b></td><td>{q.customer}</td><td>{money(q.amount)}</td><td><Badge tone={q.status==='Accepted'?'success':q.status==='Sent'?'brand':'default'}>{q.status}</Badge></td><td>{q.date}</td><td><Button><ArrowUpRight size={14}/> Open</Button></td></tr>)}</tbody></table></div></Card></>}
+import {getWorkspace} from '@/lib/server/workspace';
+import {money} from '@/lib/format';
+export const dynamic='force-dynamic';
+export default async function Quotes(){
+ const {client,businessId}=await getWorkspace();
+ const {data,error}=await client.from('quotes').select('id,quote_number,status,total,expires_at,created_at').eq('business_id',businessId).order('created_at',{ascending:false}).limit(200);
+ if(error)throw new Error('Unable to load quotes. Check database permissions.');
+ return <div className="tax-page"><p className="small muted">BUSINESS / SALES</p><h1>Quotes</h1><p className="muted">Your actual saved quotations. Quote creation and conversion are not enabled yet.</p><section className="tax-panel"><div className="table-wrap"><table className="table"><thead><tr><th>Quote</th><th>Total</th><th>Status</th><th>Expires</th><th>Created</th></tr></thead><tbody>{(data||[]).map(q=><tr key={q.id}><td>{q.quote_number}</td><td>{money(Number(q.total))}</td><td>{q.status}</td><td>{q.expires_at||'—'}</td><td>{new Date(q.created_at).toLocaleDateString('en-NG')}</td></tr>)}</tbody></table></div>{!data?.length&&<p className="muted">No quotations have been created yet.</p>}</section></div>;
+}
