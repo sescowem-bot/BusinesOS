@@ -8,7 +8,7 @@ export function PageEditor({page}:{page:PublicPage}){
  const [state,action,pending]=useActionState(saveCmsPage,initial);
  const [sections,setSections]=useState<Section[]>(()=>Array.isArray(page.sections)?page.sections.filter(s=>s&&typeof s.heading==='string'&&typeof s.body==='string'):[]);
  function editSection(index:number,field:keyof Section,value:string){setSections(old=>old.map((s,i)=>i===index?{...s,[field]:value}:s))}
- return <form action={action} className="cms-form"><h3>Editing /{page.slug}</h3><input type="hidden" name="slug" value={page.slug}/>
+ return <form action={action} className="cms-form"><h3>Editing /{page.slug}</h3>{['privacy','terms','cookies'].includes(page.slug)&&<p className="muted small" role="note">Legal document: have the content reviewed and approved before switching on publication. Saving a draft does not publish it unless the checkbox is selected.</p>}<input type="hidden" name="slug" value={page.slug}/>
   <label>Page heading<input name="title" defaultValue={page.title} maxLength={160} required/></label>
   <label>Eyebrow<input name="eyebrow" defaultValue={page.eyebrow} maxLength={2000}/></label>
   <label>Introduction<textarea name="description" rows={3} maxLength={2000} defaultValue={page.description}/></label>
