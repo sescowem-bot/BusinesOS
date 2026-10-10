@@ -53,6 +53,7 @@ jobs:
           npm run check:phase30m
           npm run check:dashboard-support
           npm run check:phase30n-ux
+          npm run check:free-pwa
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

@@ -478,3 +478,20 @@
 }
 @media(max-width:360px){.bo-creation-steps{grid-template-columns:1fr}.bo-creation-steps li{flex-direction:row;align-items:center}}
 @media(prefers-reduced-motion:reduce){.bo-getting-started *,.bo-guided-order *{scroll-behavior:auto!important;animation:none!important}}
+
+/* Phase 030N-B: Free plan acknowledgement and PWA installation */
+.plan-current-status{font-weight:750;font-size:1.1rem;color:#123b63}
+.install-page-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:clamp(20px,5vw,72px);align-items:start;padding-block:clamp(36px,7vw,100px)}
+.install-intro h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.15;max-width:14ch;margin:18px 0}
+.install-intro>p{line-height:1.75;max-width:54ch}
+.install-benefits{display:grid;gap:10px;margin:24px 0 32px;color:#236247;font-weight:600}
+.install-guide-panel{padding:clamp(20px,3vw,36px);border:1px solid #dde6ec;border-radius:22px;background:white;box-shadow:0 16px 46px rgba(18,59,99,.07);min-width:0}
+.install-guide-panel>img{border-radius:22px;box-shadow:0 8px 18px rgba(18,59,99,.14)}
+.install-guide-panel>h2{font-size:1.4rem;margin:18px 0 12px}
+.install-app-button{min-height:50px;width:100%;margin-bottom:14px}
+.install-guide .install-steps h2{font-size:1.05rem;margin:16px 0 12px}
+.install-guide .install-steps ol{padding-left:23px;line-height:1.85}
+.install-guide .install-steps li{margin-bottom:9px;padding-left:4px}
+.install-success{color:#115e39;background:#eaf8ee;border:1px solid #badfca;padding:14px;border-radius:12px;margin-bottom:14px}
+@media(max-width:760px){.install-page-layout{grid-template-columns:minmax(0,1fr);padding-block:34px;gap:24px}.install-guide-panel{border-radius:16px}.install-intro h1{max-width:19ch}}
+@media(prefers-reduced-motion:reduce){.install-app-button{transition:none!important}}

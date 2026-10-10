@@ -1,3 +1,5 @@
+> **Phase 030N-B — Free by default + installable BusinessOS web app.** Migration 043 auto-assigns the zero-cost Free plan to new workspaces and safely fills missing plans for existing businesses. A lightweight manifest and install guide are added. Read `MD/PHASE_030N_B_FREE_PLAN_AND_PWA.md`.
+
 > **Current prepared usability release:** Phase 030N-A — Mobile-first customer and business workflows. See `MD/PHASE_030N_A_USER_EXPERIENCE.md`. No additional SQL or environment variables; it requires the previous application database migrations to be installed.
 
 > **Latest prepared upgrade:** Phase 030M-C, **Professional Business Dashboard, Estimated Profit Evidence and Support/Role Controls** (SQL 042). See `MD/PHASE_030M_C_DASHBOARD_ADMIN_SUPPORT.md`. Run only after SQL 041 is installed, and test in staging before production.
