@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
-import {AdminNav} from '@/components/admin-nav';
 import {CreateMyBusinessForm} from './create-form';
 import {openMyBusiness} from './actions';
 
@@ -18,7 +17,7 @@ export default async function MyBusinessPage({searchParams}:PageProps){
  const businessMap=new Map((businessResult.data||[]).map(b=>[b.id,b]));
  const error=(await searchParams).error;
  return <main className="admin-area"><div className="admin-header"><div><span className="badge badge-brand">SYSTEM OWNER / MY BUSINESS</span><h1>My Business Workspace</h1><p>Run your own business with the same dashboard, customers, orders, products, payments and reports available to BusinessOS customers.</p></div><Link href="/admin" className="btn">Back to System Owner</Link></div>
- <AdminNav active="personal"/>
+ 
  <div className="owner-workspace-intro"><section className="card card-pad"><span className="badge badge-brand">YOUR OPERATIONS</span><h2>My Business</h2><p className="muted small">Open a business that you personally own or belong to. Its transactions stay separate from other BusinessOS customers.</p></section><section className="card card-pad"><span className="badge badge-brand">PLATFORM ADMINISTRATION</span><h2>Manage the Platform</h2><p className="muted small">Review all registered businesses, website content, approvals and platform settings.</p><Link className="btn" href="/admin">Go to Platform Management</Link></section></div>
  {error==='selection'&&<p className="negative" role="alert">You can only open a business workspace associated with your own account.</p>}
  {(membershipError||businessResult.error)&&<p className="negative" role="alert">Your memberships could not be loaded. Please try again. No other customer data has been opened.</p>}

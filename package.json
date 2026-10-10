@@ -16,7 +16,8 @@
     "check:website": "node scripts/verify-public-website.cjs",
     "check:plans": "node scripts/verify-dynamic-plans.cjs",
     "test:accounting": "node scripts/verify-phase25.cjs",
-    "organize:docs": "node scripts/organize-docs.cjs"
+    "organize:docs": "node scripts/organize-docs.cjs",
+    "check:admin-ui": "node scripts/verify-admin-redesign.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

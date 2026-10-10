@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
-import {AdminNav} from '@/components/admin-nav';
 import {paidCapabilities,type PaidFeature,type PlanRole} from '@/lib/plan-catalog';
 import {PlanPermissionEditor} from './permission-editor';
 export const dynamic='force-dynamic';
@@ -12,7 +11,7 @@ export default async function PlanAccessPage(){
   session.client.from('platform_plan_features').select('plan_id,feature_key,enabled'),
   session.client.from('platform_plan_role_features').select('plan_id,feature_key,role,enabled')
  ]);
- return <main className="admin-area plan-admin-area"><AdminNav active="website"/><header className="admin-header"><div><span className="badge badge-brand">SYSTEM OWNER / SUBSCRIPTIONS</span><h1>Plan access and staff roles</h1><p>Give each plan the modules it should unlock and control which business staff roles can use them.</p></div><Link href="/admin/plans" className="btn btn-primary">Manage pricing & create plan →</Link></header>
+ return <main className="admin-area plan-admin-area"><header className="admin-header"><div><span className="badge badge-brand">SYSTEM OWNER / SUBSCRIPTIONS</span><h1>Plan access and staff roles</h1><p>Give each plan the modules it should unlock and control which business staff roles can use them.</p></div><Link href="/admin/plans" className="btn btn-primary">Manage pricing & create plan →</Link></header>
  {(plansResult.error||accessResult.error||rolesResult.error)&&<section className="card card-pad" role="alert"><h2>Plan permissions are unavailable</h2><p>{plansResult.error?.message||accessResult.error?.message||rolesResult.error?.message}</p><p>Confirm migration 023 is installed; existing configurations have not been modified.</p></section>}
  {!plansResult.error&&!accessResult.error&&!rolesResult.error&&<>{(plansResult.data||[]).map(plan=>{
   const features=Object.fromEntries((accessResult.data||[]).filter(x=>x.plan_id===plan.id).map(x=>[x.feature_key,x.enabled])) as Partial<Record<PaidFeature,boolean>>;

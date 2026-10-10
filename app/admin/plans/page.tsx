@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import {AdminNav} from '@/components/admin-nav';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 import {PlanEditor} from '../cms-form';
 import {paidCapabilities,essentialCapabilities} from '@/lib/plan-catalog';
@@ -15,7 +14,7 @@ export default async function PlansAdmin(){
  ]);
  const plans=(plansResult.data||[]) as PublicPlan[];
  const enabled=(featuresResult.data||[]).filter(f=>f.enabled===true);
- return <main className="admin-area plan-admin-area"><AdminNav active="website"/>
+ return <main className="admin-area plan-admin-area">
   <header className="admin-header"><div><span className="badge badge-brand">SYSTEM OWNER / PLANS</span><h1>Subscription plans and pricing</h1><p>Create as many plans as your business requires, publish them individually, and define actual module and staff-role access.</p></div><div className="plan-heading-actions"><Link className="btn" href="/pricing">View pricing ↗</Link><Link className="btn btn-primary" href="/admin/plan-access">Set access & roles →</Link></div></header>
   {(plansResult.error||featuresResult.error)&&<section className="card card-pad" role="alert"><h2>Plan configuration unavailable</h2><p>{plansResult.error?.message||featuresResult.error?.message}. Check migrations 016, 019 and 023.</p></section>}
   {!plansResult.error&&<><section className="grid grid-3" aria-label="Plan summary"><div className="card card-pad"><p className="small muted">Total plans</p><h2>{plans.length}</h2></div><div className="card card-pad"><p className="small muted">Published plans</p><h2>{plans.filter(x=>x.published).length}</h2></div><div className="card card-pad"><p className="small muted">Available module types</p><h2>{paidCapabilities.length} + {essentialCapabilities.length} core</h2></div></section>
