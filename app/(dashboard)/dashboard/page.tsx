@@ -1,3 +1,4 @@
+import {Suspense} from 'react';
 import Link from 'next/link';
 import {loadBusinessInsights} from '@/lib/insights/server';
 import {money} from '@/lib/format';
@@ -6,7 +7,14 @@ export const dynamic='force-dynamic';
 const amount=(kobo:number)=>money(kobo/100);
 const safePercent=(current:number,previous:number)=>previous>0?Math.round((current-previous)/previous*100):null;
 const barWidth=(value:number,maximum:number)=>maximum>0?Math.max(0,Math.min(100,(Math.max(0,value)/maximum)*100)):0;
-export default async function Dashboard(){
+export default function Dashboard(){
+ return <Suspense fallback={<div className="business-home" aria-busy="true" aria-label="Loading private business analytics">
+  <div className="business-home-heading"><div><span className="business-eyebrow">WORKSPACE OVERVIEW</span><h1>Business dashboard</h1><p>Preparing your latest records…</p></div><div className="business-heading-actions"><Link href="/orders/new" className="btn btn-primary">New order</Link></div></div>
+  <div className="business-stat-grid" aria-hidden="true">{['Sales','Payments','Outstanding','Expenses'].map(x=><section className="business-stat" key={x}><div className="metric-label">{x}</div><div className="business-stat-number">—</div><div className="small muted">Loading secure totals…</div></section>)}</div>
+  <div className="business-quick-panel"><h2>Quick actions</h2><div className="business-quick-links"><Link href="/orders/new">Create order</Link><Link href="/customers/new">Add customer</Link><Link href="/payments">Payments</Link></div></div>
+ </div>}><DashboardContent/></Suspense>;
+}
+async function DashboardContent(){
  const {current:c,previous:p,insights}=await loadBusinessInsights();
  const metrics=[
   {label:'Sales this month',value:amount(c.sales),detail:'Recorded order value',icon:TrendingUp,change:safePercent(c.sales,p.sales)},

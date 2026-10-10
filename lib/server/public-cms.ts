@@ -1,5 +1,6 @@
 import 'server-only';
 import {createClient} from '@supabase/supabase-js';
+import {unstable_cache} from 'next/cache';
 export type PublicPage={slug:string;title:string;eyebrow:string;description:string;sections:{heading:string;body:string}[];published:boolean};
 export type PublicPlan={id:string;name:string;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
@@ -50,7 +51,7 @@ const legacyDescriptions:Record<string,string>={features:'Bring your records and
 const legacyEyebrows:Record<string,string>={features:'THE PLATFORM',solutions:'SOLUTIONS','how-it-works':'HOW IT WORKS',about:'ABOUT',resources:'RESOURCES',contact:'CONTACT'};
 const demoPlans:PublicPlan[]=[{id:'starter',name:'Starter',price_label:'Contact us',billing_label:'Pilot access',description:'For sole traders and small businesses starting to organise daily records.',features:['Customers and orders','Manual payment tracking','Basic stock and business records'],cta_label:'Request access',cta_url:'/contact',sort_order:1,published:true},{id:'growth',name:'Growth',price_label:'Contact sales',billing_label:'Pricing to be announced',description:'For growing businesses that need deeper visibility and team workflows.',features:['Advanced reporting foundations','Team management','Accounting and tax records'],cta_label:'Talk to sales',cta_url:'/contact',sort_order:2,published:true}];
 function publicClient(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;return url&&key?createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}):null}
-export async function getPublicPage(slug:string):Promise<(PublicPage & {reviewRequired?:boolean})|null>{
+export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPage & {reviewRequired?:boolean})|null>=>{
  const fallback=defaults[slug]||null;
  const legal=legalSlugs.has(slug);
  const draft=legal&&fallback?{...fallback,reviewRequired:true}:null;
@@ -71,17 +72,17 @@ export async function getPublicPage(slug:string):Promise<(PublicPage & {reviewRe
   }
   return {...data,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown)=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
  }catch{return draft||(fallback?.published?fallback:null)}
-}
-export async function getPublishedPlans():Promise<PublicPlan[]>{
+},['businessos-public-pages-v1'],{revalidate:60,tags:['businessos-public-pages']});
+export const getPublishedPlans=unstable_cache(async ():Promise<PublicPlan[]>=>{
  const client=publicClient();if(!client)return [];
  try{
   const {data,error}=await client.from('public_site_plans').select('id,name,price_label,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');
   if(error)return [];
   return (data||[]).map(p=>({...p,features:Array.isArray(p.features)?p.features.filter((f:unknown):f is string=>typeof f==='string'):[]})) as PublicPlan[];
  }catch{return []}
-}
+},['businessos-public-plans-v1'],{revalidate:60,tags:['businessos-public-plans']});
 /** Published feature lookup is intentionally limited to published plans and enabled modules. */
-export async function getPublishedPlanCapabilities():Promise<{byPlan:Record<string,string[]>;available:boolean}>{
+export const getPublishedPlanCapabilities=unstable_cache(async ():Promise<{byPlan:Record<string,string[]>;available:boolean}>=>{
  const client=publicClient();
  if(!client)return {byPlan:{},available:false};
  try{
@@ -93,6 +94,6 @@ export async function getPublishedPlanCapabilities():Promise<{byPlan:Record<stri
   }}
   return {byPlan,available:true};
  }catch{return {byPlan:{},available:false}}
-}
+},['businessos-published-capabilities-v1'],{revalidate:60,tags:['businessos-public-plans']});
 export const defaultPages=Object.values(defaults);
 export const defaultPlans=demoPlans;

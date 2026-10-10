@@ -40,7 +40,8 @@
     "check:phase30k": "node scripts/verify-phase30k.cjs",
     "check:branch-stock": "node scripts/verify-phase30k-branch.cjs",
     "check:phase30l": "node scripts/verify-phase30l.cjs",
-    "check:auth-ux": "node scripts/verify-auth-ux.cjs"
+    "check:auth-ux": "node scripts/verify-auth-ux.cjs",
+    "check:performance": "node scripts/verify-performance-hardening.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

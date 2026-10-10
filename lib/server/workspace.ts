@@ -1,10 +1,11 @@
 import 'server-only';
+import {cache} from 'react';
 import {cookies} from 'next/headers';
 import {redirect} from 'next/navigation';
 import {getServerSupabase} from './supabase';
 import {ACTIVE_BUSINESS_COOKIE} from './workspace-selection';
 
-export async function getWorkspace(){
+export const getWorkspace=cache(async ()=>{
  const client=await getServerSupabase();
  if(!client)redirect('/login');
  const {data:{user},error:authError}=await client.auth.getUser();
@@ -31,4 +32,4 @@ export async function getWorkspace(){
   redirect('/onboarding');
  }
  return {client,businessId:member.business_id,role:member.role,userId:user.id};
-}
+});

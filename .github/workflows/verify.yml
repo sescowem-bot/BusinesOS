@@ -49,6 +49,7 @@ jobs:
           npm run check:branch-stock
           npm run check:phase30l
           npm run check:auth-ux
+          npm run check:performance
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

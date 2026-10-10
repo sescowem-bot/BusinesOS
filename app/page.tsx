@@ -1,12 +1,11 @@
 import Link from 'next/link';
-import {getViewerAccess} from '@/lib/server/viewer-access';
 import {getPlatformBrand} from '@/lib/server/branding';
 import {getPublicPage} from '@/lib/server/public-cms';
 import PublicNav from '@/components/public-nav';
 import PublicFooter from '@/components/public-footer';
 import {PublicWorkspacePreview} from '@/components/public-workspace-preview';
 import {ArrowRight,ArrowUpRight,BarChart3,Boxes,CheckCircle2,ClipboardList,FileCheck2,MessageSquareText,Receipt,ShieldCheck,Users,Wallet,Store,Scissors,BriefcaseBusiness,TrendingUp} from 'lucide-react';
-export const dynamic='force-dynamic';
+export const revalidate=60;
 const features=[
  {icon:Users,title:'Customers, in context',description:'Find customer details, order histories and balances without searching through disconnected records.'},
  {icon:ClipboardList,title:'Sales you can follow',description:'Keep orders, payments and remaining balances connected from the first request to the final collection.'},
@@ -18,8 +17,9 @@ const features=[
 const solutions=[{icon:Store,name:'Retail & trading',text:'From products on the shelf to money still owed, keep the moving parts together.'},{icon:Scissors,name:'Creative & service teams',text:'Stay close to customer requests, deposits, deliverables and the work ahead.'},{icon:BriefcaseBusiness,name:'Professional businesses',text:'Connect client records, quotes, commercial invoices and incoming payments.'}];
 const steps=[{number:'01',title:'Set up your workspace',text:'Add your business details and make one place your source of truth.'},{number:'02',title:'Record work as it happens',text:'Bring in customers, products, sales, payments and everyday expenses.'},{number:'03',title:'See what needs attention',text:'Review balances, activity and available reports without starting from scratch.'}];
 export default async function Home(){
- const [brand,home,access]=await Promise.all([getPlatformBrand(),getPublicPage('home'),getViewerAccess()]);
- return <main id="site-main" className="marketing-site site-refresh"><PublicNav name={brand.name} logo={brand.logo_url} access={access}/>
+ const [brand,home]=await Promise.all([getPlatformBrand(),getPublicPage('home')]);
+ // Marketing content contains no private account data: redirect signed-in users via /login.
+ return <main id="site-main" className="marketing-site site-refresh"><PublicNav name={brand.name} logo={brand.logo_url} access={'guest'}/>
  <section className="marketing-hero site-hero"><div className="site-hero-art" aria-hidden="true"/><div className="marketing-container marketing-hero-grid"><div className="marketing-hero-copy site-hero-content">
   <div className="site-announcement"><span className="site-announcement-mark"><CheckCircle2 size={14}/></span>{home?.eyebrow||'Everything connected, from day one'}</div>
   <h1>{home?.title||'The clearer way to run your business.'}</h1>

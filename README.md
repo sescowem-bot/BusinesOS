@@ -1,3 +1,5 @@
+> **Latest prepared performance hotfix:** Public route caching, targeted Supabase proxy, request-scoped workspace verification and responsive loading states. Read `MD/PERFORMANCE_REVIEW_AND_OPTIMIZATION.md` before merging or deploying. No new SQL is required for this patch.
+
 > New: **Phase 030L-B – Mobile signup/login and email delivery guidance**. See `MD/PHASE_030L_B_AUTH_EMAIL_AND_MOBILE_UX.md`. Supabase SMTP setup is a separate admin task; this code does not bypass email rate limits.
 
 > Current prepared upgrade: **Phase 030K-B — Branch Stock Locations, Transfers & Counts (SQL 039)**. Test only in staging after Migration 038. See `MD/PHASE_030K_B_BRANCH_STOCK.md`.

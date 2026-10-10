@@ -1,4 +1,3 @@
-import {getViewerAccess} from '@/lib/server/viewer-access';
 import Link from 'next/link';
 import {CheckCircle2,ArrowRight,LockKeyhole,Building2,BriefcaseBusiness,Rocket,UsersRound} from 'lucide-react';
 import PublicNav from '@/components/public-nav';
@@ -6,7 +5,7 @@ import PublicFooter from '@/components/public-footer';
 import {getPlatformBrand} from '@/lib/server/branding';
 import {getPublishedPlans,getPublishedPlanCapabilities} from '@/lib/server/public-cms';
 import {essentialCapabilities,paidCapabilities} from '@/lib/plan-catalog';
-export const dynamic='force-dynamic';
+export const revalidate=60;
 /** Guides are not subscribed plans. Live plan names and entitlements come from Supabase. */
 const planPaths=[
  {label:'Starting out',name:'Starter',text:'Build a reliable routine for customers, orders, products and payments.',icon:Rocket},
@@ -15,9 +14,9 @@ const planPaths=[
  {label:'Complex workflows',name:'Enterprise',text:'For multi-team operations with tailored responsibilities and requirements.',icon:Building2}
 ];
 export default async function Pricing(){
- const [brand,plans,access,catalog]=await Promise.all([getPlatformBrand(),getPublishedPlans(),getViewerAccess(),getPublishedPlanCapabilities()]);
+ const [brand,plans,catalog]=await Promise.all([getPlatformBrand(),getPublishedPlans(),getPublishedPlanCapabilities()]);
  const groups=[...new Set(paidCapabilities.map(f=>f.group))];
- return <main id="site-main" className="marketing-site site-refresh"><PublicNav name={brand.name} logo={brand.logo_url} access={access}/>
+ return <main id="site-main" className="marketing-site site-refresh"><PublicNav name={brand.name} logo={brand.logo_url} access={'guest'}/>
   <section className="marketing-section marketing-section-muted"><div className="marketing-container marketing-section-heading"><span className="marketing-kicker">PLANS & ACCESS</span><h1 className="public-page-title">The right tools for every stage of business.</h1><p>Choose from our available plans. Every plan includes the essential workspace, while additional modules depend on the subscription and your authorised business role.</p></div></section>
   <section className="marketing-section plan-paths-section"><div className="marketing-container"><div className="site-section-top"><div><span className="marketing-kicker">FIND YOUR FIT</span><h2>Four ways to think about your next stage.</h2></div><p>These are suggested categories, not automatically activated subscriptions. Published plan names, features and permissions are managed by the System Owner.</p></div><div className="plan-paths-grid">{planPaths.map((item,index)=>{const Icon=item.icon;return <a href="#current-plans" className="plan-path-card" key={item.name}><span className="plan-path-index">{String(index+1).padStart(2,'0')} / {item.label}</span><span className="plan-path-icon"><Icon size={22}/></span><h3>{item.name}</h3><p>{item.text}</p><span className="plan-path-cta">Explore current plans <ArrowRight size={16}/></span></a>})}</div></div></section>
   <section className="marketing-section plan-active-section" id="current-plans"><div className="marketing-container"><div className="site-section-top"><div><span className="marketing-kicker">CURRENTLY PUBLISHED</span><h2>Available business plans.</h2></div><p>Compare exactly what each published plan enables. Fees are supplied by the platform team until an approved public price is configured.</p></div><div className="public-pricing-grid plan-pricing-grid">{plans.length===0?<div className="marketing-feature"><h2>Subscription categories are available to explore.</h2><p>The System Owner has not published an active plan yet. Review the category guide above, then ask about current activation options.</p><Link href="/contact">Enquire about access →</Link></div>:plans.map(plan=>{

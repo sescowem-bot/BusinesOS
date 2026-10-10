@@ -1,5 +1,5 @@
 'use server';
-import {revalidatePath} from 'next/cache';
+import {revalidatePath,updateTag} from 'next/cache';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 import {paidCapabilities,planRoles,isPaidFeature,isPlanRole} from '@/lib/plan-catalog';
 export type PermissionState={ok:boolean;message:string};
@@ -20,6 +20,6 @@ export async function savePlanPermissions(_previous:PermissionState,form:FormDat
  }
  const {error}=await session.client.rpc('admin_save_plan_permissions',{p_plan_id:planId,p_features:featureMap,p_role_features:roleMap});
  if(error)return {ok:false,message:`Could not save permissions: ${error.message}`};
- revalidatePath('/admin/plan-access');revalidatePath('/admin/plans');revalidatePath('/pricing');revalidatePath('/upgrade');
+ updateTag('businessos-public-plans');revalidatePath('/admin/plan-access');revalidatePath('/admin/plans');revalidatePath('/pricing');revalidatePath('/upgrade');
  return {ok:true,message:'Module and role permissions saved. Changes also affect businesses currently assigned to this plan.'};
 }

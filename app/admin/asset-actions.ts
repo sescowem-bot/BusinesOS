@@ -1,7 +1,7 @@
 'use server';
 
 import {randomUUID} from 'node:crypto';
-import {revalidatePath} from 'next/cache';
+import {revalidatePath,updateTag} from 'next/cache';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 
 export type AssetUploadState={ok:boolean;message:string};
@@ -45,6 +45,7 @@ export async function uploadBrandAsset(_:AssetUploadState,data:FormData):Promise
   await session.client.storage.from(BUCKET).remove([path]);
   return {ok:false,message:'Asset uploaded but branding could not be updated: '+saveError.message};
  }
+ updateTag('businessos-public-brand');
  revalidatePath('/','layout');
  revalidatePath('/admin/website');
  revalidatePath('/admin/email');

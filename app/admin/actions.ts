@@ -1,5 +1,5 @@
 'use server';
-import {revalidatePath} from 'next/cache';
+import {revalidatePath,updateTag} from 'next/cache';
 import {z} from 'zod';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 
@@ -18,6 +18,7 @@ export async function savePlatformBrand(_previous:SaveState,data:FormData):Promi
  if(!parsed.success)return {ok:false,message:parsed.error.issues[0]?.message||'Invalid settings'};
  const {error}=await session.client.from('platform_branding').update(parsed.data).eq('id',true);
  if(error)return {ok:false,message:'Could not save settings: '+error.message};
+ updateTag('businessos-public-brand');
  revalidatePath('/', 'layout');
  return {ok:true,message:'Platform identity saved and published.'};
 }

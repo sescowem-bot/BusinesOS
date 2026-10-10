@@ -1,5 +1,5 @@
 'use server';
-import {revalidatePath} from 'next/cache';
+import {revalidatePath,updateTag} from 'next/cache';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 export type ParentState={ok:boolean;message:string};
 export async function updatePlanParent(_:ParentState,form:FormData):Promise<ParentState>{
@@ -11,6 +11,6 @@ export async function updatePlanParent(_:ParentState,form:FormData):Promise<Pare
  if(!valid(plan)||(parent!==''&&!valid(parent))||parent===plan)return {ok:false,message:'Choose a different, valid lower-level plan.'};
  const {error}=await session.client.rpc('admin_set_plan_parent',{p_plan_id:plan,p_parent_plan_id:parent||null});
  if(error)return {ok:false,message:error.message};
- revalidatePath('/admin/plans');revalidatePath('/admin/plan-access');revalidatePath('/pricing');revalidatePath('/upgrade');
+ updateTag('businessos-public-plans');revalidatePath('/admin/plans');revalidatePath('/admin/plan-access');revalidatePath('/pricing');revalidatePath('/upgrade');
  return {ok:true,message:'Plan inheritance saved. Higher plans now include eligible modules from their linked lower plans.'};
 }

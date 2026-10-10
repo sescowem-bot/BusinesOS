@@ -30,5 +30,16 @@ export async function proxy(request:NextRequest){
 }
 
 export const config={
- matcher:['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2)$).*)']
+ matcher:[
+  // Avoid auth refresh on anonymous public and authentication pages.
+  '/admin/:path*','/onboarding/:path*','/dashboard/:path*',
+  '/orders/:path*','/customers/:path*','/products/:path*','/inventory/:path*',
+  '/purchasing/:path*','/pos/:path*','/returns/:path*','/payments/:path*',
+  '/invoices/:path*','/settings/:path*','/tax-profile/:path*','/tax-centre/:path*',
+  '/tax-compliance/:path*','/reports/:path*','/insights/:path*',
+  '/team/:path*','/tasks/:path*','/accounting/:path*','/expenses/:path*',
+  '/growth/:path*','/communications/:path*','/campaigns/:path*',
+  '/automations/:path*','/marketplace/:path*','/partners/:path*',
+  '/quotes/:path*','/notifications/:path*','/upgrade/:path*'
+ ]
 };
