@@ -8,7 +8,7 @@ function Result({value}:{value:ActionState}){return <div aria-live="polite">{val
 const fieldStyle={width:'100%',padding:'10px 12px',border:'1px solid #d0d5dd',borderRadius:8,background:'#fff'};
 const wrapStyle={display:'grid',gap:12,maxWidth:620};
 export function CustomerForm(){const [state,action,pending]=useActionState(createCustomer,initial);return <form action={action} style={wrapStyle}><label>Customer name<input style={fieldStyle} name="name" required minLength={2} maxLength={150}/></label><label>Phone<input style={fieldStyle} name="phone" maxLength={40}/></label><label>Email<input style={fieldStyle} type="email" name="email" maxLength={254}/></label><button className="btn primary" disabled={pending}>{pending?'Saving…':'Save customer'}</button><Result value={state}/></form>}
-export function OrderForm({customers,requestKey,canRecordCost=false}:{customers:{id:string;name:string}[];requestKey:string;canRecordCost?:boolean}){
+export function OrderForm({customers,requestKey,canRecordCost=false,initialCustomerId=''}:{customers:{id:string;name:string}[];requestKey:string;canRecordCost?:boolean;initialCustomerId?:string}){
  const[state,action,pending]=useActionState(createOrder,initial);
  const [quantity,setQuantity]=useState('1'),[unitPrice,setUnitPrice]=useState(''),[discount,setDiscount]=useState('0'),[delivery,setDelivery]=useState('0');
  const q=Number(quantity),price=Number(unitPrice),off=Number(discount),fee=Number(delivery);
@@ -16,7 +16,7 @@ export function OrderForm({customers,requestKey,canRecordCost=false}:{customers:
  const total=canEstimate?Math.round((Math.round(q*price*100)/100-off+fee)*100)/100:null;
  return <form action={action} style={wrapStyle}>
   <input type="hidden" name="request_key" value={requestKey}/>
-  <label>Customer<select required name="customer" style={fieldStyle} defaultValue=""><option value="">Select customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+  <label>Customer<select required name="customer" style={fieldStyle} defaultValue={initialCustomerId}><option value="">Select customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
   <label>Product or service description<input name="description" style={fieldStyle} minLength={2} maxLength={200} required/></label>
   <div className="form-grid"><label>Quantity<input type="number" name="quantity" value={quantity} onChange={e=>setQuantity(e.target.value)} min="0.001" step="0.001" style={fieldStyle} required/></label><label>Unit price (₦)<input type="number" name="unit_price" value={unitPrice} onChange={e=>setUnitPrice(e.target.value)} min="0" step="0.01" style={fieldStyle} required/></label></div>
   <div className="form-grid"><label>Discount (₦)<input type="number" name="discount" value={discount} onChange={e=>setDiscount(e.target.value)} min="0" step="0.01" style={fieldStyle}/></label><label>Delivery fee (₦)<input type="number" name="delivery" value={delivery} onChange={e=>setDelivery(e.target.value)} min="0" step="0.01" style={fieldStyle}/></label></div>

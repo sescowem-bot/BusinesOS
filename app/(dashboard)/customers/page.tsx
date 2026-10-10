@@ -6,7 +6,8 @@ export const dynamic='force-dynamic';
 
 type CustomerLink={customer_id:string;customers:{name?:string;phone?:string|null;email?:string|null}|{name?:string;phone?:string|null;email?:string|null}[]|null};
 export default async function Customers(){
- const {client,businessId}=await getWorkspace();
+ const {client,businessId,role}=await getWorkspace();
+ const canRecordOrders=['owner','manager','finance','sales'].includes(role);
  const [linksResult,ordersResult,paymentsResult]=await Promise.all([
   client.from('business_customers').select('customer_id,customers(name,phone,email)').eq('business_id',businessId).order('created_at',{ascending:false}).limit(250),
   client.from('orders').select('customer_id,total,status').eq('business_id',businessId).limit(1000),
@@ -29,7 +30,8 @@ export default async function Customers(){
   return {id:link.customer_id,filter,search:[name,c?.phone,c?.email,filter].filter(Boolean).join(' '),cells:[
    {text:name,kind:'strong'},{text:c?.phone||'—'},{text:c?.email||'—'},{text:String(sale.count)},
    {text:money(sale.total),kind:'amount'},{text:money(paid),kind:'amount'},
-   {text:money(balance),kind:'amount',tone:balance>0?'warning':'neutral'}
+   {text:money(balance),kind:'amount',tone:balance>0?'warning':'neutral'},
+   canRecordOrders?{text:'Create order',href:`/orders/new?customer=${encodeURIComponent(link.customer_id)}`,kind:'strong'}:{text:'View customer',kind:'muted'}
   ]};
  });
  const limited=links.length===250||orders.length===1000||payments.length===1000;
@@ -39,8 +41,8 @@ export default async function Customers(){
   <BusinessPageHeading eyebrow="SALES / CUSTOMERS" title="Customers" description="Customer contacts and related order balances for your current business workspace." action={{href:'/customers/new',label:'Add customer'}}/>
   <BusinessSummary items={[{label:'Customers in loaded list',value:links.length,detail:'Most recent 250 maximum'},{label:'With recorded orders',value:withOrders,detail:'Based on loaded transactions'},{label:'With outstanding balances',value:withBalances,detail:'Review individual orders for accuracy'}]}/>
   {limited&&<BusinessAlert>Some records have reached the loading limit. The displayed balances and counts may be incomplete. Use the financial reports for reconciled totals.</BusinessAlert>}
-  <BusinessSection title="Customer directory" description="Search by name, phone or email. Select a row's customer details in an order when creating a sale.">
-   <BusinessRecordsTable columns={['Customer','Phone','Email','Orders','Order value','Received','Balance']} rows={rows} searchLabel="Search customers by name, phone or email" emptyTitle="No customers added yet" emptyDescription="Add your first customer to begin recording orders and payments." emptyHref="/customers/new" emptyAction="Add customer" limitNote="Balances reflect loaded, non-cancelled orders and completed payments. A customer can have credits or historical transactions outside this loaded set."/>
+  <BusinessSection title="Customer directory" description="Find customers by name, phone or email. Authorised sales staff can start a new order with the customer already selected.">
+   <BusinessRecordsTable columns={['Customer','Phone','Email','Orders','Order value','Received','Balance','Next step']} rows={rows} searchLabel="Search customers by name, phone or email" emptyTitle="No customers added yet" emptyDescription="Add your first customer to begin recording orders and payments." emptyHref="/customers/new" emptyAction="Add customer" limitNote="Balances reflect loaded, non-cancelled orders and completed payments. A customer can have credits or historical transactions outside this loaded set."/>
   </BusinessSection>
  </div>;
 }

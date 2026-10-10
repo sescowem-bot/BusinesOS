@@ -52,6 +52,7 @@ jobs:
           npm run check:performance
           npm run check:phase30m
           npm run check:dashboard-support
+          npm run check:phase30n-ux
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

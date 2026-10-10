@@ -30,7 +30,7 @@ assert.match(read('supabase/migrations/042_dashboard_support_roles.sql'),/v_orde
 assert.match(payment,/Not paid/);assert.match(payment,/Part payment/);assert.match(payment,/Paid in full/);
 assert.match(payment,/name="payment_method"/);assert.match(payment,/name="payment_amount"/);
 assert.match(detail,/paymentLabel/);assert.match(detail,/Order saved successfully/);
-assert.match(newPage,/randomUUID\(\)/);assert.match(newPage,/requestKey=\{reviewedRequestKey\}/);
+assert.match(newPage,/randomUUID\(\)/);assert.match(newPage,/requestKey=\{(?:reviewedRequestKey|randomUUID\(\))\}/);
 assert.match(read('app/(dashboard)/sales/forms.tsx'),/InitialPaymentFields/);
 assert.match(read('app/(dashboard)/orders/new/reviewed-tax-form.tsx'),/InitialPaymentFields/);
 const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js');

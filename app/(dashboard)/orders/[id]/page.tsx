@@ -48,10 +48,10 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
     !canManage?<p className="muted">Your role is not authorised to issue invoices.</p>:
     cancelled?<p className="muted">Cancelled orders cannot be invoiced.</p>:<IssueInvoiceForm orderId={order.id}/>}</div>
   </BusinessSection>
-  <BusinessSection title="Payment history" description="Only completed payment entries reduce the outstanding balance.">
+  <div id="payment-history" className="bo-order-payment-anchor"><BusinessSection title="Payment history" description="Only completed payment entries reduce the outstanding balance.">
    <div className="bo-detail-section-body">{pays.length?pays.map(p=><div key={p.id} className="bo-detail-row"><span>{new Date(p.paid_at).toLocaleDateString('en-NG')} · {p.method} · {p.status}</span><strong>{money(Number(p.amount))}</strong>{p.status==='completed'&&<Link href={`/payments/${p.id}`}>Print acknowledgement</Link>}</div>):<p className="muted">No payments recorded.</p>}
    {balance>0&&!cancelled&&canManage?<div className="bo-order-payment-form"><h3>Record a payment</h3><p className="muted small">Record only payments you have verified. This does not initiate a bank transfer.</p><PaymentForm order={order.id} balance={balance}/></div>:
     balance>0&&!cancelled&&!canManage?<p className="muted small">Only authorised sales or finance roles can record payments.</p>:null}</div>
-  </BusinessSection>
+  </BusinessSection></div>
  </div>;
 }

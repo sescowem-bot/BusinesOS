@@ -4,7 +4,7 @@ import {createReviewedTaxOrder,type ReviewedTaxState} from './reviewed-tax-actio
 import {InitialPaymentFields} from '@/components/order-initial-payment';
 import {useState} from 'react';
 const initial:ReviewedTaxState={error:'',success:''};
-export function ReviewedTaxForm({customers,supplies,requestKey,canRecordCost=false}:{customers:Array<{id:string;name:string}>;supplies:Array<{id:string;name:string;treatment:string;rateBasisPoints:number}>;requestKey:string;canRecordCost?:boolean}){
+export function ReviewedTaxForm({customers,supplies,requestKey,canRecordCost=false,initialCustomerId=''}:{customers:Array<{id:string;name:string}>;supplies:Array<{id:string;name:string;treatment:string;rateBasisPoints:number}>;requestKey:string;canRecordCost?:boolean;initialCustomerId?:string}){
  const [state,action,pending]=useActionState(createReviewedTaxOrder,initial);
  const [quantity,setQuantity]=useState('1'),[unitPrice,setUnitPrice]=useState(''),[discount,setDiscount]=useState('0'),[supplyId,setSupplyId]=useState('');
  const s=supplies.find(x=>x.id===supplyId);
@@ -14,7 +14,7 @@ export function ReviewedTaxForm({customers,supplies,requestKey,canRecordCost=fal
  return <form action={action} style={{display:'grid',gap:15}}>
   <input type="hidden" name="request_key" value={requestKey}/>
   <div className="form-grid">
-   <label className="field">Customer<select name="customer" required defaultValue=""><option value="">Select customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+   <label className="field">Customer<select name="customer" required defaultValue={initialCustomerId}><option value="">Select customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
    <label className="field">Reviewed product / service<select name="tax_supply_id" required value={supplyId} onChange={e=>setSupplyId(e.target.value)}><option value="">Select approved supply</option>{supplies.map(s=><option key={s.id} value={s.id}>{s.name} · {s.treatment.replaceAll('_',' ')}</option>)}</select></label>
    <label className="field">Quantity<input type="number" name="quantity" value={quantity} onChange={e=>setQuantity(e.target.value)} step="0.001" min="0.001" required/></label>
    <label className="field">Unit price before VAT (₦)<input type="number" name="unit_price" value={unitPrice} onChange={e=>setUnitPrice(e.target.value)} min="0" step="0.01" required/></label>

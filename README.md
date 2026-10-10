@@ -1,3 +1,5 @@
+> **Current prepared usability release:** Phase 030N-A — Mobile-first customer and business workflows. See `MD/PHASE_030N_A_USER_EXPERIENCE.md`. No additional SQL or environment variables; it requires the previous application database migrations to be installed.
+
 > **Latest prepared upgrade:** Phase 030M-C, **Professional Business Dashboard, Estimated Profit Evidence and Support/Role Controls** (SQL 042). See `MD/PHASE_030M_C_DASHBOARD_ADMIN_SUPPORT.md`. Run only after SQL 041 is installed, and test in staging before production.
 
 > Current prepared development: **Phase 030M-A — Wholesale Reference Tiers & Fast Retail Performance (SQL 041)**. See `MD/PHASE_030M_WHOLESALE_FAST_REPORTING.md`. Apply SQL 041 after SQL 040 in staging.

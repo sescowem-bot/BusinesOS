@@ -43,7 +43,8 @@
     "check:auth-ux": "node scripts/verify-auth-ux.cjs",
     "check:performance": "node scripts/verify-performance-hardening.cjs",
     "check:phase30m": "node scripts/verify-phase30m.cjs",
-    "check:dashboard-support": "node scripts/verify-dashboard-support.cjs"
+    "check:dashboard-support": "node scripts/verify-dashboard-support.cjs",
+    "check:phase30n-ux": "node scripts/verify-phase30n-ux.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
