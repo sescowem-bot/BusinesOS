@@ -9,7 +9,9 @@
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "check:routes": "node scripts/check-routes.cjs",
-    "check:phase21": "node scripts/verify-phase21.cjs"
+    "check:phase21": "node scripts/verify-phase21.cjs",
+    "check:phase22": "node scripts/verify-phase22.cjs",
+    "check:phase23": "node scripts/verify-phase23.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

@@ -16,3 +16,7 @@ Existing projects previously applied migrations 001–020. **Phase 021 has no ne
 ## Deployment status
 
 See `docs/PHASE_021_RELEASE_NOTES.md` and `docs/PHASE_021_DEPLOY_AND_ACCEPTANCE_TESTS.md`. A successful code audit is not a production deployment. Email delivery activation, complete RBAC/RLS verification and operational accounting integration remain separate tasks.
+
+## Phase 022 extension
+
+The latest source includes secure Super Admin business-review details and a no-code CMS section editor. Apply `supabase/migrations/021_admin_business_review.sql` after migration 020, and consult `docs/PHASE_022_RELEASE_NOTES.md` for limitations, staging checks and rollout steps.
