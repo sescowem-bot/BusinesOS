@@ -3,21 +3,25 @@ import {redirect} from 'next/navigation';
 import {getServerSupabase} from '@/lib/server/supabase';
 import {cookies} from 'next/headers';
 import {ACTIVE_BUSINESS_COOKIE} from '@/lib/server/workspace-selection';
-export type LoginState={error:string};
+import {explainAuthError} from '@/lib/auth-feedback';
+export type LoginState={error:string;retryAfterSeconds:number;reason:string};
+const fail=(error:string):LoginState=>({error,retryAfterSeconds:0,reason:'general'});
 export async function signIn(_previous:LoginState,form:FormData):Promise<LoginState>{
- const email=String(form.get('email')||'').trim();const password=String(form.get('password')||'');
- if(!email||!password)return {error:'Enter your email and password.'};
+ const email=String(form.get('email')||'').trim().toLowerCase(),password=String(form.get('password')||'');
+ if(!email||!password)return fail('Enter your email and password.');
  const supabase=await getServerSupabase();
- if(!supabase)return {error:'Authentication is not configured. Set Supabase environment variables.'};
- const {error}=await supabase.auth.signInWithPassword({email,password});
- if(error)return {error:'Unable to sign in. Check your credentials and account status.'};
+ if(!supabase)return fail('Sign in is temporarily unavailable. Please contact BusinessOS support.');
+ let result;
+ try{result=await supabase.auth.signInWithPassword({email,password})}
+ catch{return fail('Could not reach the sign-in service. Check your connection and try again.');}
+ if(result.error){const feedback=explainAuthError(result.error,'login');return {error:feedback.message,retryAfterSeconds:feedback.retryAfterSeconds,reason:feedback.reason};}
  const {data:{user}}=await supabase.auth.getUser();
- if(!user)return {error:'Session could not be verified. Please sign in again.'};
+ if(!user)return fail('Your sign-in session could not be verified. Please try again.');
  const {data:admin,error:adminError}=await supabase.from('platform_admins').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();
- if(adminError)return {error:'Unable to verify account permissions. Please try again shortly.'};
+ if(adminError)return fail('Signed in, but account permissions are temporarily unavailable. Please refresh the page.');
  if(admin)redirect('/admin');
  const {data:member,error:memberError}=await supabase.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
- if(memberError)return {error:'Your workspace access cannot be verified right now. Contact platform support if this continues.'};
+ if(memberError)return fail('Signed in, but your business workspace is temporarily unavailable. Please refresh the page.');
  if(member?.length)redirect('/dashboard');
  redirect('/onboarding');
 }

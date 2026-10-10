@@ -1,4 +1,5 @@
 import {customerNameFromRelation} from '@/lib/customer-relations';
+import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
@@ -42,6 +43,7 @@ export default async function Invoices(){
   ]};
  });
  return <div className="bo-page">
+  <p className="small" style={{textAlign:"right"}}><Link href="/settings/invoice">Edit invoice identity and payment details →</Link></p>
   <BusinessPageHeading eyebrow="SALES / DOCUMENTS" title="Invoices & statements" description="Issue numbered commercial invoices from existing orders and print payment statements. These documents are not certified statutory tax invoices." action={{href:'/orders/new',label:'New order'}}/>
   <BusinessSummary items={[{label:'Issued invoices in loaded list',value:available?issued.length:'Unavailable',detail:'Latest 100 maximum'},{label:'Orders awaiting issuance',value:available?pending:'Unavailable',detail:'Within listed orders'},{label:'Orders in loaded list',value:orders.length,detail:'Latest 100 maximum'}]}/>
   {!available&&<BusinessAlert>Commercial invoice records are unavailable. Check Migration 022 and database permissions. Order statements can still be opened from the orders listed below.</BusinessAlert>}

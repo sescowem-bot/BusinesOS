@@ -6,8 +6,9 @@ import {IssueInvoiceForm} from '../../invoices/issue-form';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
 export const dynamic='force-dynamic';
-export default async function OrderDetail({params}:{params:Promise<{id:string}>}){
+export default async function OrderDetail({params,searchParams}:{params:Promise<{id:string}>;searchParams:Promise<{created?:string}>}){
  const {id}=await params;
+ const {created}=await searchParams;
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))notFound();
  const {client,businessId,role}=await getWorkspace();
  const [orderResult,invoiceResult]=await Promise.all([
@@ -20,9 +21,12 @@ export default async function OrderDetail({params}:{params:Promise<{id:string}>}
  const total=Number(order.total)||0,balance=Math.max(0,total-paid);
  const canManage=['owner','manager','finance','sales'].includes(role);
  const cancelled=order.status==='cancelled';
+ const paymentLabel=total<=0?'No payment due':paid<=0?'Unpaid':balance<=0?'Paid in full':'Part payment';
  return <div className="bo-page">
   <BusinessPageHeading eyebrow="SALES / ORDER DETAILS" title={order.order_number||'Order details'} description={`Status: ${order.status||'Unknown'}  ·  Due date: ${order.due_date||'Not specified'}`}/>
-  <p className="bo-back-link"><Link href="/orders">← All orders</Link> · <Link href={`/invoices/${id}`}>Printable order statement ↗</Link></p>
+  {created==='1'&&<div className="bo-order-created" role="status"><strong>Order saved successfully.</strong> Initial payment and outstanding balance are shown below. You can print a statement or record another payment here.</div>}
+  <div className="bo-payment-status" aria-label={`Payment status: ${paymentLabel}`}><span className={balance===0?'settled':paid>0?'part-paid':'unpaid'}>{paymentLabel}</span><span>{paid>0?`${money(paid)} received`: 'No payment recorded'}</span></div>
+  <p className="bo-back-link"><Link href="/orders">← All orders</Link> · <Link href={`/invoices/${id}`}>Printable order statement ↗</Link> · <Link href="/returns">POS returns / credit notes ↗</Link></p>
   <BusinessSummary items={[{label:'Order total',value:money(total)},{label:'Completed payments',value:money(paid)},{label:'Balance due',value:money(balance),warning:!cancelled&&balance>0}]}/>
   {cancelled&&<BusinessAlert>This order is cancelled. Review any recorded payments separately; cancellation and refund processing are not automated.</BusinessAlert>}
   <BusinessSection title="Order items" description="Amounts from the saved order. Verify invoice details before issuing a commercial document.">

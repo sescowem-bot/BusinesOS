@@ -38,6 +38,17 @@ jobs:
           npm run check:phase30b
           npm run check:phase30c
           npm run check:phase30d
+          npm run check:phase30e
+          npm run check:phase30f
+          npm run check:phase30g
+          npm run check:phase30h
+          npm run check:phase30i
+          npm run check:order-payment
+          npm run check:phase30j
+          npm run check:phase30k
+          npm run check:branch-stock
+          npm run check:phase30l
+          npm run check:auth-ux
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

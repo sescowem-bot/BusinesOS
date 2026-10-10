@@ -274,3 +274,129 @@
 @media(prefers-reduced-motion:reduce){.interior-visual,.plan-path-card{animation:none!important;transition:none!important}}
 @media(min-width:901px) and (max-width:1190px){.site-refresh .public-nav{gap:12px}.site-refresh .public-nav-links{gap:11px}.site-refresh .public-nav-actions{gap:8px}.site-refresh .public-nav-actions .public-signin{display:none}.site-refresh .public-logo strong{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .site-refresh .public-more-trigger{list-style:none;cursor:pointer}.site-refresh .public-more-trigger::-webkit-details-marker{display:none}.site-refresh .public-more[open] .public-more-menu{display:grid;gap:2px}.site-refresh .public-more[open] .public-more-trigger{color:#155b78}
+
+
+/* Phase 030E — responsive checkout and purchasing forms */
+.bo-pos-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:18px;align-items:start;margin:20px 0}
+.bo-pos-layout .card,.bo-pos-layout form,.bo-pos-layout input,.bo-pos-layout select{min-width:0}
+.bo-pos-layout .comms-form{display:grid;gap:14px}
+.bo-pos-add{display:grid;grid-template-columns:minmax(0,2fr) minmax(85px,.7fr) minmax(90px,.9fr) auto;gap:10px;align-items:end;margin:14px 0}
+.bo-pos-add label{min-width:0;display:grid;gap:5px}
+.bo-pos-add select,.bo-pos-add input{width:100%;min-width:0}
+.bo-pos-add .btn{min-height:42px}
+.bo-pos-total{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:16px;border:1px solid #dce7ec;border-radius:12px;background:#f3f8fa}
+.bo-pos-total strong{font-size:clamp(1.2rem,3vw,2rem);color:#123b63}
+@media(max-width:950px){.bo-pos-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.bo-pos-add{grid-template-columns:minmax(0,1fr) minmax(90px,.6fr)}.bo-pos-add .btn{grid-column:1/-1}.bo-pos-layout .card{padding:16px}.bo-pos-total{flex-wrap:wrap}}
+
+/* Phase 030F: invoice is a purpose-built document, not a dashboard card. */
+.invoice-view{max-width:950px;margin:0 auto 40px;min-width:0}
+.invoice-view-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 17px}
+.invoice-sheet{position:relative;background:#fff;border:1px solid #dce7ee;border-radius:15px;overflow:hidden;box-shadow:0 16px 42px rgba(13,42,67,.08);font-variant-numeric:tabular-nums;color:#14283b}
+.invoice-accent{height:9px;background:linear-gradient(90deg,#123b63 0 73%,#16845b 73%)}
+.invoice-head{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;padding:40px 46px 26px}
+.invoice-seller{min-width:0;flex:1}.invoice-seller-main{display:flex;align-items:flex-start;gap:15px;min-width:0}
+.invoice-seller-main>div{min-width:0}.invoice-seller h1{margin:0 0 6px;font-size:24px;letter-spacing:-.04em;color:#123b63;overflow-wrap:anywhere}
+.invoice-logo{width:60px;height:60px;object-fit:contain;border-radius:12px;border:1px solid #e7edf2;flex-shrink:0}
+.invoice-logo-fallback{display:grid;place-items:center;width:56px;height:56px;flex-shrink:0;background:#123b63;color:#fff;font-size:26px;font-weight:800;border-radius:13px}
+.invoice-seller p,.invoice-meta-grid p{margin:3px 0;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.invoice-muted{color:#607285}.invoice-business-ids{display:flex;flex-wrap:wrap;gap:5px 20px;margin-top:15px!important;color:#43586b}
+.invoice-number-block{text-align:right;display:grid;justify-items:end;gap:7px;min-width:180px}
+.invoice-eyebrow{font-size:11px;font-weight:850;letter-spacing:.17em;color:#16845b}
+.invoice-number-block strong{font-size:23px;color:#123b63;letter-spacing:-.04em;overflow-wrap:anywhere}
+.invoice-status-chip{padding:5px 13px;color:#166f4e;background:#e8f7ef;border-radius:99px;font-size:11px;font-weight:750}
+.invoice-meta-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.75fr);gap:20px;margin:0 46px 32px;padding:24px;background:#f4f8fb;border:1px solid #eaf0f4;border-radius:13px}
+.invoice-meta-grid h2{font-size:17px;margin:8px 0;color:#152b3b;overflow-wrap:anywhere}
+.invoice-field-label{display:block;font-size:10px;color:#62778a;letter-spacing:.1em;font-weight:800;margin-bottom:8px}
+.invoice-meta-dates{display:grid;grid-template-columns:1fr 1fr;gap:14px}.invoice-meta-dates>div:last-child{grid-column:1/-1}
+.invoice-meta-dates strong{display:block;font-size:12px;overflow-wrap:anywhere}
+.invoice-items-wrap{margin:0 46px;overflow-x:auto}
+.invoice-items{width:100%;border-collapse:collapse;table-layout:fixed}.invoice-items th{background:#123b63;color:#fff;font-size:11px;letter-spacing:.025em;padding:13px 12px;text-align:left}
+.invoice-items th:first-child{width:45%}.invoice-items th:nth-child(2){width:12%}.invoice-items th:nth-child(3),.invoice-items th:nth-child(4){width:21.5%;text-align:right}
+.invoice-items td{padding:18px 12px;vertical-align:top;border-bottom:1px solid #e3e9ed;font-size:12px;overflow-wrap:anywhere}.invoice-items td:not(:first-child){text-align:right}.invoice-items td strong{font-weight:650}
+.invoice-settlement{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:30px;padding:28px 46px 36px}
+.invoice-help{padding-top:12px;color:#546a7d;font-size:12px;min-width:0}.invoice-help strong{display:block;color:#20384d}.invoice-help p{margin:6px 0;overflow-wrap:anywhere;line-height:1.55}
+.invoice-tax-note{margin-top:23px!important;font-size:11px;color:#667b8d}
+.invoice-amounts{min-width:0}.invoice-amounts>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px solid #edf0f3;font-size:12px}.invoice-amounts>div strong{text-align:right;white-space:nowrap}
+.invoice-amounts .invoice-total{border-top:2px solid #123b63;margin-top:8px;color:#123b63;font-size:15px;font-weight:750}.invoice-amounts .invoice-due{color:#16845b;font-size:15px;font-weight:750}
+.invoice-sheet-footer{border-top:1px solid #e0e9ef;text-align:center;background:#f8fafc;padding:25px 42px;font-size:12px;color:#456073}
+.invoice-sheet-footer p{margin:6px auto;line-height:1.65}.invoice-sheet-footer .invoice-legal-caption{margin-top:14px;font-size:10px;color:#64788b;max-width:700px}
+@media(max-width:700px){.invoice-view{margin:0 -6px 30px}.invoice-sheet{border-radius:11px}.invoice-head{padding:25px 18px 21px;gap:15px;flex-direction:column}.invoice-seller-main{gap:10px}.invoice-seller h1{font-size:20px}.invoice-logo,.invoice-logo-fallback{width:45px;height:45px}.invoice-number-block{display:flex;width:100%;min-width:0;justify-content:space-between;align-items:center;gap:9px;text-align:left;flex-wrap:wrap}.invoice-number-block strong{font-size:17px}.invoice-meta-grid{margin:0 16px 18px;padding:18px 14px;grid-template-columns:1fr;gap:18px}.invoice-items-wrap{margin:0 16px;overflow:visible}.invoice-items thead{display:none}.invoice-items,.invoice-items tbody,.invoice-items tr,.invoice-items td{display:block;width:100%}.invoice-items tr{border:1px solid #e2e9ee;border-radius:10px;padding:10px 12px;margin-bottom:10px}.invoice-items td{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:6px 0;border:0;font-size:12px;text-align:right!important;overflow-wrap:anywhere}.invoice-items td:before{content:attr(data-heading);font-size:11px;color:#6a7b89;font-weight:700;text-align:left}.invoice-items td:first-child{text-align:right}.invoice-items td strong{max-width:70%}.invoice-settlement{grid-template-columns:1fr;gap:14px;padding:15px 17px 26px}.invoice-help{order:2}.invoice-amounts{order:1}.invoice-sheet-footer{padding:18px 15px}}
+@media print{ @page{size:A4;margin:12mm}html,body{background:#fff!important}.invoice-view{max-width:none;margin:0!important}.invoice-view-actions{display:none!important}.invoice-sheet{box-shadow:none;border:0;border-radius:0;break-inside:auto}.invoice-head{padding:26px 27px 18px}.invoice-meta-grid{margin:0 27px 24px}.invoice-items-wrap{margin:0 27px;overflow:visible}.invoice-items thead{display:table-header-group}.invoice-items,.invoice-items tbody{display:table;width:100%}.invoice-items tr{display:table-row;border:0}.invoice-items td{display:table-cell!important;width:auto!important;padding:12px 10px!important;border-bottom:1px solid #e3e9ed!important;text-align:right!important}.invoice-items td:first-child{text-align:left!important}.invoice-items td:before{display:none}.invoice-items th{display:table-cell}.invoice-settlement{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);padding:20px 27px}.invoice-help{order:0}.invoice-amounts{order:0}.invoice-sheet-footer{padding:18px 25px}.invoice-head,.invoice-meta-grid,.invoice-items tr,.invoice-amounts{break-inside:avoid}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* Phase 030G: print-friendly itemized POS VAT breakdown. */
+.invoice-pos-tax-summary{border-top:1px solid #dfebf1;margin:28px 0 16px;padding-top:20px}.invoice-pos-tax-summary h3{font-size:14px;margin:0 0 12px;color:#123b63}.invoice-pos-tax-summary .invoice-items{font-size:12px}.invoice-pos-tax-summary td,.invoice-pos-tax-summary th{padding:10px 8px}
+@media(max-width:640px){.invoice-pos-tax-summary{overflow-x:auto}.invoice-pos-tax-summary table{min-width:420px}}
+
+/* Phase 030H POS pricing and invoice transparency */
+.invoice-pricing-note{margin:18px 0 12px;padding:12px 16px;background:#f5f8fc;border-left:3px solid #16845b;color:#244659;font-size:.82rem;line-height:1.65}
+@media print{.invoice-pricing-note{break-inside:avoid;background:#f5f8fc;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* Phase 030I — returns, refund approval, and printable credit notes */
+.bo-return-steps{padding-left:22px;line-height:1.9;color:#27425b;margin:12px 0 16px}
+.bo-return-steps li{padding-left:5px;margin-bottom:9px}
+.bo-checkbox{display:flex!important;flex-direction:row!important;gap:11px;align-items:flex-start!important;line-height:1.5;font-size:.87rem}
+.bo-checkbox input[type=checkbox]{width:18px!important;height:18px!important;flex:0 0 18px;margin-top:3px}
+.bo-credit-view .invoice-number-block strong{overflow-wrap:anywhere}
+@media(max-width:640px){.bo-credit-view .invoice-sheet{max-width:100%}.bo-credit-view .invoice-meta-grid{overflow-wrap:anywhere}.bo-credit-view .invoice-help{overflow-wrap:anywhere}}
+
+
+/* Phase 030I UX follow-up: create order and payment in one clear screen. */
+.bo-initial-payment{display:grid;gap:13px;min-width:0;border:1px solid #d6e5eb;border-radius:14px;padding:18px;background:#f8fbfc}
+.bo-initial-payment legend{font-size:15px;font-weight:800;color:#123b63;padding:0 7px}
+.bo-payment-choice{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.bo-payment-choice>label{display:flex!important;gap:9px!important;align-items:flex-start;border:1px solid #d8e4eb;padding:13px;border-radius:11px;background:#fff;cursor:pointer}
+.bo-payment-choice>label.selected{border-color:#16845b;background:#edf8f1;box-shadow:0 0 0 1px #16845b}
+.bo-payment-choice input{width:17px!important;height:17px!important;min-height:17px!important;flex-shrink:0;margin:2px 0 0!important;accent-color:#16845b}
+.bo-payment-choice span{display:grid;gap:4px}.bo-payment-choice strong{font-size:13px;color:#123b63}.bo-payment-choice small{font-weight:400;font-size:11px;color:#5f7484;line-height:1.35}
+.bo-payment-preview{display:grid;gap:8px;border-top:1px solid #dbe6eb;padding-top:13px}
+.bo-payment-preview>div{display:flex;justify-content:space-between;align-items:start;gap:16px;font-size:13px;color:#49677a}
+.bo-payment-preview>div strong{color:#163b52;text-align:right}
+.bo-payment-preview>div:last-child{padding-top:9px;border-top:1px dashed #c8d9df;font-weight:800}
+.bo-order-created{padding:15px 17px;border:1px solid #a7d9bc;border-radius:11px;background:#eff9f2;color:#145b39;font-size:13px;line-height:1.6}
+.bo-payment-status{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;color:#607788}
+.bo-payment-status>span:first-child{padding:6px 12px;border-radius:99px;font-weight:800}
+.bo-payment-status .settled{background:#e8f5ed;color:#15683e}.bo-payment-status .part-paid{background:#fff4da;color:#87570c}.bo-payment-status .unpaid{background:#fbeaea;color:#9d3131}
+@media(max-width:680px){.bo-payment-choice{grid-template-columns:1fr}.bo-initial-payment{padding:13px}.bo-payment-preview>div{gap:9px}}
+
+/* Phase 030L — Retail checkout productivity. */
+.bo-pos-scan,.bo-pos-hold-line,.bo-pos-held-row,.bo-pos-held-actions{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.bo-pos-scan label,.bo-pos-hold-line input{flex:1;min-width:0}
+.bo-pos-held-list{display:grid;gap:9px;margin-top:12px}
+.bo-pos-held-row{align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid #e2eaf0;border-radius:12px;background:#f7fafc}
+.bo-pos-held-row p{margin:3px 0 0}
+.bo-pos-hold,.bo-pos-split{border:1px solid #e2eaf0;background:#f8fbfd;border-radius:14px;padding:16px;margin-top:15px}
+.bo-pos-hold h3,.bo-pos-split h3{margin:0 0 8px;color:#123b63}
+.bo-pos-tender-row{display:grid;grid-template-columns:1fr minmax(100px,.75fr) 1fr;gap:10px;margin:10px 0}
+.bo-pos-tender-row label{min-width:0}
+.bo-pos-receipt{max-width:760px}
+@media(max-width:650px){.bo-pos-scan,.bo-pos-hold-line{align-items:stretch;flex-direction:column}.bo-pos-tender-row{grid-template-columns:1fr 1fr}.bo-pos-tender-row label:last-child{grid-column:1/-1}.bo-pos-held-row{align-items:stretch}.bo-pos-held-actions .btn{flex:1}}
+@media print{.bo-pos-receipt{max-width:100%;padding:0}.bo-pos-receipt .document-footer{margin-top:24px}}
+
+.bo-pos-quantity-control{display:inline-flex;align-items:center;gap:7px;border:1px solid #dce6ef;border-radius:9px;padding:3px}
+.bo-pos-quantity-control button{border:0;background:#e7eff6;color:#123b63;border-radius:6px;min-width:27px;min-height:29px;cursor:pointer;font-weight:800}
+.bo-pos-quantity-control span{min-width:30px;text-align:center;font-variant-numeric:tabular-nums}
+
+
+/* Phase 030L-B: mobile-first auth and POS usability improvements */
+.auth-card-accessible{width:min(470px,100%);padding:clamp(22px,5vw,36px);overflow-wrap:anywhere}
+.auth-friendly-form{display:grid;gap:16px;margin-top:22px;min-width:0}
+.auth-friendly-form .field{min-width:0}.auth-friendly-form .field input{min-width:0;height:48px;font-size:16px;background:#fff}
+.auth-friendly-form .field label{font-size:13px;font-weight:750;color:#26394b}
+.auth-password-wrap{position:relative;display:flex;align-items:center}
+.auth-password-wrap>input{padding-right:70px!important;flex:1;min-width:0}
+.auth-password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);border:0;background:transparent;padding:10px 12px;min-width:55px;min-height:40px;color:#123b63;font-size:13px;font-weight:700;cursor:pointer}
+.auth-friendly-form .auth-submit{min-height:49px;font-size:15px;box-shadow:0 8px 20px rgba(18,59,99,.16)}
+.auth-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.auth-label-row a,.auth-field-help a,.auth-feedback a{color:#145c8f;text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.auth-field-help{font-size:12px;line-height:1.55;color:#667085;margin:1px 0}
+.auth-feedback{padding:14px 15px;border-radius:10px;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.auth-feedback p{margin:5px 0 0}.auth-feedback-error{color:#8d2828;background:#fff2f2;border:1px solid #f2c5c5}.auth-feedback-success{color:#15603b;background:#eaf8ee;border:1px solid #b5dfc3}
+.auth-card-accessible .brand{max-width:100%;overflow-wrap:anywhere}.auth-card-accessible h1{font-size:clamp(25px,6vw,31px);line-height:1.16}
+.auth-card-accessible .muted{line-height:1.6}
+.auth-friendly-form input:focus-visible,.auth-password-toggle:focus-visible,.auth-submit:focus-visible{outline:3px solid #5094c6;outline-offset:2px}
+.bo-pos-mobile-next{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 8px;padding:10px 0;font-size:12px;color:#52677b}
+.bo-pos-mobile-next .btn{white-space:nowrap;min-height:44px}.bo-pos-scan input{font-size:16px;min-height:44px}
+#checkout-payment-panel{scroll-margin-top:18px;min-width:0}
+@media(max-width:650px){.auth{padding:14px;place-items:center}.auth-card-accessible{border-radius:16px}.auth-friendly-form{gap:14px}.bo-pos-scan{display:grid;grid-template-columns:1fr;gap:10px}.bo-pos-scan label{width:100%;min-width:0}.bo-pos-scan button{width:100%;min-height:44px}.bo-pos-mobile-next{position:relative}.bo-pos-mobile-next .btn{width:100%}.bo-pos-add{display:grid;grid-template-columns:1fr}.bo-pos-add>*{min-width:0}#checkout-payment-panel .btn-primary{min-height:48px;width:100%}}
+@media(prefers-reduced-motion:reduce){.auth .btn,.bo-pos-mobile-next .btn{transition:none}}

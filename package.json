@@ -29,7 +29,18 @@
     "check:mobile": "node scripts/verify-phase30-mobile.cjs",
     "check:phase30b": "node scripts/verify-phase30b.cjs",
     "check:phase30c": "node scripts/verify-phase30c.cjs",
-    "check:phase30d": "node scripts/verify-phase30d.cjs"
+    "check:phase30d": "node scripts/verify-phase30d.cjs",
+    "check:phase30e": "node scripts/verify-phase30e.cjs",
+    "check:phase30f": "node scripts/verify-phase30f.cjs",
+    "check:phase30g": "node scripts/verify-phase30g.cjs",
+    "check:phase30h": "node scripts/verify-phase30h.cjs",
+    "check:phase30i": "node scripts/verify-phase30i.cjs",
+    "check:order-payment": "node scripts/verify-phase30-order-ux.cjs",
+    "check:phase30j": "node scripts/verify-phase30j.cjs",
+    "check:phase30k": "node scripts/verify-phase30k.cjs",
+    "check:branch-stock": "node scripts/verify-phase30k-branch.cjs",
+    "check:phase30l": "node scripts/verify-phase30l.cjs",
+    "check:auth-ux": "node scripts/verify-auth-ux.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

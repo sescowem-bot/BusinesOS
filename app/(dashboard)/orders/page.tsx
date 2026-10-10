@@ -19,7 +19,7 @@ export default async function Orders(){
   const paid=(o.payments||[]).filter(p=>p.status==='completed').reduce((s,p)=>s+(Number(p.amount)||0),0);
   const due=Math.max(0,amount-paid);
   if(o.status!=='cancelled'){total+=amount;received+=paid;balance+=due;if(due>0)open++}
-  const status=o.status==='cancelled'?'Cancelled':due<=0?'Paid':paid>0?'Part paid':o.status||'Unpaid';
+  const status=o.status==='cancelled'?'Cancelled':amount<=0?'No charge':due<=0?'Paid':paid>0?'Part paid':'Unpaid';
   return {id:o.id,filter:status,search:[o.order_number,names.get(o.customer_id),status,o.created_at].filter(Boolean).join(' '),cells:[
    {text:o.order_number||'View order',href:`/orders/${o.id}`,kind:'strong'},
    {text:names.get(o.customer_id)||'Walk-in'},{text:money(amount),kind:'amount'},

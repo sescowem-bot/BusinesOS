@@ -26,6 +26,7 @@ export default async function InventoryPage(){
  const nameFor=(id:string)=>items.find(p=>p.id===id)?.name||'Archived or inactive product';
  return <div className="tax-page">
   <BusinessPageHeading eyebrow="OPERATIONS / INVENTORY" title="Inventory & stock counts" description="Review on-hand quantities, count variances and stock movements. Physical counts do not automatically post accounting journals."/>
+  <p><Link href="/inventory/locations" className="btn btn-primary">Manage branch stock, transfers & counts</Link></p>
   <div className="grid grid-3">
    <section className="tax-panel"><p className="small muted">Tracked products (up to 500)</p><h2>{items.length}</h2></section>
    <section className="tax-panel"><p className="small muted">Value of displayed stock at cost</p><h2>{money(stockValue)}</h2></section>
@@ -35,6 +36,11 @@ export default async function InventoryPage(){
   <section className="tax-panel"><h2>Stock on hand</h2><div className="table-wrap"><table className="table"><thead><tr><th>Product</th><th>SKU</th><th>On hand</th><th>Minimum</th><th>Value at cost</th><th>Condition</th></tr></thead><tbody>
    {items.map(p=><tr key={p.id}><td>{p.name}</td><td>{p.sku||'—'}</td><td>{Number(p.stock_quantity)}</td><td>{Number(p.minimum_stock)}</td><td>{money(Number(p.stock_quantity)*Number(p.cost_price))}</td><td>{Number(p.stock_quantity)<=Number(p.minimum_stock)?'Restock':'Healthy'}</td></tr>)}
    </tbody></table></div>{!items.length&&<p className="muted">No tracked items yet. <Link href="/products/new">Create a product</Link>.</p>}{items.length===500&&<p className="small muted">Showing first 500 products. Figures here are not a complete inventory valuation.</p>}</section>
+  <section className="tax-panel"><h2>Restock planning</h2><p className="small muted">Suggestions use existing minimum stock thresholds only. They do not create purchase orders or forecast future demand.</p>
+   {low.length?<div className="table-wrap"><table className="table"><thead><tr><th>Product</th><th>Current stock</th><th>Minimum</th><th>Quantity to minimum</th></tr></thead><tbody>{low.map(p=><tr key={p.id}><td>{p.name}</td><td>{Number(p.stock_quantity)}</td><td>{Number(p.minimum_stock)}</td><td>{Math.max(0,Number(p.minimum_stock)-Number(p.stock_quantity)).toFixed(3)}</td></tr>)}</tbody></table></div>:<p className="muted">No tracked products are at or below their configured minimums in the loaded list.</p>}
+   <p className="small muted"><Link href="/purchasing">Open purchasing</Link> to create a supplier draft. Actual goods receipts update company-wide stock, not individual branch quantities.</p>
+  </section>
+  <p className="small muted">This page counts the company-wide quantity. If any units are allocated to a branch, use location-specific stock counts instead; the database will reject legacy whole-company counts for distributed stock.</p>
   {canManage&&<div className="grid grid-2"><section className="tax-panel"><h2>Record physical stock count</h2><StockCountForm items={items.map(p=>({id:p.id,name:p.name,stock:Number(p.stock_quantity)}))}/></section>
    <section className="tax-panel"><h2>Manual stock adjustment</h2><p className="small muted">Use for known losses, returns or corrections. Counts should use the physical stock-count form instead.</p><AdjustmentForm items={items.map(p=>({id:p.id,name:p.name}))}/></section></div>}
   {!canManage&&<p className="small muted">You have inventory viewing access. Only an owner, manager or inventory-role member may change stock.</p>}

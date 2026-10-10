@@ -10,6 +10,8 @@ export const essentialCapabilities=[
  {key:'settings',name:'Business settings',detail:'Maintain the contact and identity details of your business'}
 ] as const;
 export const paidCapabilities=[
+ {key:'pos',name:'Software POS',group:'Sales',detail:'Record retail checkout, optional payment and stock movement on one sale'},
+ {key:'purchasing',name:'Suppliers and purchasing',group:'Operations',detail:'Manage suppliers, draft purchase orders and goods receipts'},
  {key:'inventory',name:'Stock and inventory',group:'Operations',detail:'Review quantities, low-stock records and stock movements'},
  {key:'team',name:'Team and branches',group:'Operations',detail:'Member invitations, branch records and internal approval requests'},
  {key:'accounting',name:'Accounting workspace',group:'Finance',detail:'Manual ledgers and journal records; transaction auto-posting is under development'},
@@ -31,6 +33,7 @@ export const planRoles=[
 ] as const;
 export type PlanRole=typeof planRoles[number]['key'];
 export const defaultFeatureRoleAccess:Record<PaidFeature,readonly PlanRole[]>={
+ pos:['owner','manager','sales'],purchasing:['owner','manager','inventory'],
  inventory:['owner','manager','inventory'],team:['owner'],accounting:['owner','manager','finance'],financial_reports:['owner','manager','finance'],tax:['owner','manager','finance'],communications:['owner','manager','sales'],campaigns:['owner','manager'],insights:['owner','manager','finance'],growth:['owner','manager']
 };
 export const capabilityKeys=paidCapabilities.map(x=>x.key);
