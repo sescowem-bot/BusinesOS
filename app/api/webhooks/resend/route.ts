@@ -24,5 +24,11 @@ export async function POST(req:Request){
   p_event_id:eventId,p_event_type:event.type,p_provider_message_id:providerId
  });
  if(error)return new NextResponse('Unable to record signed delivery event',{status:503});
+ // Optional Phase 030D automation delivery tracking; earlier installations remain supported.
+ const {error:automationError}=await service.rpc('automation_record_resend_event',{
+  p_provider_id:providerId,p_event_type:event.type
+ });
+ if(automationError && !['PGRST202','42883'].includes(automationError.code||''))
+  return new NextResponse('Automation delivery status unavailable',{status:503});
  return new NextResponse('OK',{status:200});
 }

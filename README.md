@@ -60,3 +60,8 @@ The public site has a server-role-aware Admin Console link, the System Owner nav
 ## Phase 030C — Add-on subscription architecture and automation enquiries
 
 Run migration `supabase/migrations/029_cumulative_plans_business_grants_automation_requests.sql` only after 028 is applied. See `MD/PHASE_030C_PLAN_GRANTS_AUTOMATION.md`. Higher plan inheritance is configured at `/admin/plans`, individual business extras at `/admin/businesses/[id]`, customer requests at `/automations/requests`, and Super Admin review at `/admin/automations`. No background jobs or automatic email sends are enabled by this migration.
+
+
+## Phase 030D: Automation reminders
+
+The latest source includes an optional, disabled-by-default reminder scheduler for Super Admin-approved task reminders. Read `MD/PHASE_030D_AUTOMATION_EXECUTION.md` before enabling it. First apply migration `030_automation_execution.sql` in staging after 029, then configure the private runner and test permissions and email opt-outs. Do not enable automatic email delivery in production without evidence of safe staging operation. No existing migrations should be rerun.

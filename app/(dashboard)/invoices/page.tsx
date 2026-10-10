@@ -1,3 +1,4 @@
+import {customerNameFromRelation} from '@/lib/customer-relations';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
@@ -13,7 +14,7 @@ export default async function Invoices(){
  ]);
  if(ordersResult.error||linksResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / DOCUMENTS" title="Invoices & statements" description="Keep issued commercial invoices and order statements organised."/><BusinessAlert>Order records could not be verified. Try again before issuing documents.</BusinessAlert></div>;
  const available=!invoicesResult.error,issued=invoicesResult.data||[],orders=ordersResult.data||[];
- const names=new Map<string,string>((linksResult.data||[]).map(v=>[v.customer_id,(Array.isArray(v.customers)?v.customers[0]?.name:v.customers?.name)||'Customer']));
+ const names=new Map<string,string>((linksResult.data||[]).map(v=>[v.customer_id,customerNameFromRelation(v.customers, 'Customer')]));
  const issuedOrderIds=new Set(issued.map(i=>i.order_id));
  const issuedRows:RecordItem[]=issued.map(i=>{
   const s=(i.snapshot||{}) as InvoiceSnapshot;

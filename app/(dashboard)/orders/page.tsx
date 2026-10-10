@@ -1,3 +1,4 @@
+import {customerNameFromRelation} from '@/lib/customer-relations';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
@@ -11,7 +12,7 @@ export default async function Orders(){
  ]);
  if(ordersResult.error||customersResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / ORDERS" title="Orders & sales" description="Review customer orders and their recorded payments."/><BusinessAlert>Order data could not be loaded or verified. Please retry; no financial totals are shown.</BusinessAlert></div>;
  const orders=ordersResult.data||[];
- const names=new Map<string,string>((customersResult.data||[]).map(v=>[v.customer_id,(Array.isArray(v.customers)?v.customers[0]?.name:v.customers?.name)||'Customer']));
+ const names=new Map<string,string>((customersResult.data||[]).map(v=>[v.customer_id,customerNameFromRelation(v.customers, 'Customer')]));
  let total=0,received=0,balance=0,open=0;
  const rows:RecordItem[]=orders.map(o=>{
   const amount=Number(o.total)||0;

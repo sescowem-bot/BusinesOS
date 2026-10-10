@@ -36,6 +36,8 @@ jobs:
           npm run check:phase29
           npm run check:phase30
           npm run check:phase30b
+          npm run check:phase30c
+          npm run check:phase30d
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

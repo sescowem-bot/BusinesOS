@@ -28,7 +28,8 @@
     "smoke:pilot": "node scripts/pilot-smoke.cjs",
     "check:mobile": "node scripts/verify-phase30-mobile.cjs",
     "check:phase30b": "node scripts/verify-phase30b.cjs",
-    "check:phase30c": "node scripts/verify-phase30c.cjs"
+    "check:phase30c": "node scripts/verify-phase30c.cjs",
+    "check:phase30d": "node scripts/verify-phase30d.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

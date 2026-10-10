@@ -1,0 +1,12 @@
+-- REFERENCE ONLY. DO NOT RUN WITHOUT PROVIDER CONFIGURATION AND SECURITY REVIEW.
+-- Supabase Cron + pg_net + Vault may require extensions/project-specific setup.
+-- 1. Use Supabase Vault UI to create two secrets:
+--    businessos_automation_url     = https://your-real-domain.example/api/internal/automation-dispatch
+--    businessos_automation_bearer  = your long random AUTOMATION_RUNNER_SECRET
+-- 2. After verifying vault.decrypted_secrets is available to your Cron runner,
+--    consult the project documentation for supported cron schedule syntax.
+-- Do NOT store the bearer token directly in a cron SQL command or check it into GitHub.
+-- Suggested cadence: hourly; manually validate first.
+-- Example schematic (not executable):
+-- cron.schedule(name: businessos-automation, interval: hourly,
+--   net.http_post(url: VAULT_URL, headers: Authorization Bearer VAULT_SECRET));
