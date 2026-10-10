@@ -1,22 +1,30 @@
 import {getViewerAccess} from '@/lib/server/viewer-access';
 import Link from 'next/link';
-import {CheckCircle2,ArrowRight,LockKeyhole} from 'lucide-react';
+import {CheckCircle2,ArrowRight,LockKeyhole,Building2,BriefcaseBusiness,Rocket,UsersRound} from 'lucide-react';
 import PublicNav from '@/components/public-nav';
 import PublicFooter from '@/components/public-footer';
 import {getPlatformBrand} from '@/lib/server/branding';
 import {getPublishedPlans,getPublishedPlanCapabilities} from '@/lib/server/public-cms';
 import {essentialCapabilities,paidCapabilities} from '@/lib/plan-catalog';
 export const dynamic='force-dynamic';
+/** Guides are not subscribed plans. Live plan names and entitlements come from Supabase. */
+const planPaths=[
+ {label:'Starting out',name:'Starter',text:'Build a reliable routine for customers, orders, products and payments.',icon:Rocket},
+ {label:'Building momentum',name:'Growth',text:'For businesses adding people, repeat sales and more operational oversight.',icon:UsersRound},
+ {label:'Structured operations',name:'Professional',text:'For established teams that need finance, inventory and reporting discipline.',icon:BriefcaseBusiness},
+ {label:'Complex workflows',name:'Enterprise',text:'For multi-team operations with tailored responsibilities and requirements.',icon:Building2}
+];
 export default async function Pricing(){
  const [brand,plans,access,catalog]=await Promise.all([getPlatformBrand(),getPublishedPlans(),getViewerAccess(),getPublishedPlanCapabilities()]);
  const groups=[...new Set(paidCapabilities.map(f=>f.group))];
  return <main id="site-main" className="marketing-site site-refresh"><PublicNav name={brand.name} logo={brand.logo_url} access={access}/>
   <section className="marketing-section marketing-section-muted"><div className="marketing-container marketing-section-heading"><span className="marketing-kicker">PLANS & ACCESS</span><h1 className="public-page-title">The right tools for every stage of business.</h1><p>Choose from our available plans. Every plan includes the essential workspace, while additional modules depend on the subscription and your authorised business role.</p></div></section>
-  <section className="marketing-section"><div className="marketing-container"><div className="public-pricing-grid plan-pricing-grid">{plans.length===0?<div className="marketing-feature"><h2>Plans are being prepared</h2><p>Our team is updating available options. Contact us to find the right fit.</p><Link href="/contact">Contact us →</Link></div>:plans.map(plan=>{
+  <section className="marketing-section plan-paths-section"><div className="marketing-container"><div className="site-section-top"><div><span className="marketing-kicker">FIND YOUR FIT</span><h2>Four ways to think about your next stage.</h2></div><p>These are suggested categories, not automatically activated subscriptions. Published plan names, features and permissions are managed by the System Owner.</p></div><div className="plan-paths-grid">{planPaths.map((item,index)=>{const Icon=item.icon;return <a href="#current-plans" className="plan-path-card" key={item.name}><span className="plan-path-index">{String(index+1).padStart(2,'0')} / {item.label}</span><span className="plan-path-icon"><Icon size={22}/></span><h3>{item.name}</h3><p>{item.text}</p><span className="plan-path-cta">Explore current plans <ArrowRight size={16}/></span></a>})}</div></div></section>
+  <section className="marketing-section plan-active-section" id="current-plans"><div className="marketing-container"><div className="site-section-top"><div><span className="marketing-kicker">CURRENTLY PUBLISHED</span><h2>Available business plans.</h2></div><p>Compare exactly what each published plan enables. Fees are supplied by the platform team until an approved public price is configured.</p></div><div className="public-pricing-grid plan-pricing-grid">{plans.length===0?<div className="marketing-feature"><h2>Subscription categories are available to explore.</h2><p>The System Owner has not published an active plan yet. Review the category guide above, then ask about current activation options.</p><Link href="/contact">Enquire about access →</Link></div>:plans.map(plan=>{
    const enabled=new Set(catalog.byPlan[plan.id]||[]);
    const active=paidCapabilities.filter(f=>enabled.has(f.key));
    return <article className="public-plan public-plan-detailed" key={plan.id}>
-    <span className="marketing-kicker">{plan.billing_label||'SUBSCRIPTION'}</span><h2>{plan.name}</h2><p>{plan.description}</p><div className="public-plan-price">{plan.price_label||'Contact sales'}</div>
+    <span className="marketing-kicker">{plan.billing_label||'SUBSCRIPTION'}</span><h2>{plan.name}</h2><p>{plan.description}</p><div className="public-plan-price">{plan.price_label&& !/^(contact (us|sales|admin)|pricing to be announced)$/i.test(plan.price_label.trim())?plan.price_label:'Pricing on request'}</div><p className="plan-price-note">Exact pricing and activation terms are confirmed before approval. No payment is collected here.</p>
     <Link className="marketing-btn-primary" href={plan.cta_url.startsWith('/')?plan.cta_url:'/contact'}>{plan.cta_label||'Contact us'} <ArrowRight size={16}/></Link>
     <div className="plan-details-divider"/><h3>Everyday business essentials</h3><ul className="plan-capability-list">{essentialCapabilities.map(feature=><li key={feature.key}><CheckCircle2 size={17} aria-hidden="true"/><span title={feature.detail}>{feature.name}</span></li>)}</ul>
     <h3>Additional modules</h3>

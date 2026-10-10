@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {requireBusinessFeature} from '@/lib/server/authorization';
 import {money} from '@/lib/format';
+import {BusinessPageHeading} from '@/components/business-page-ui';
 import {AdjustmentForm,StockCountForm} from '../catalog/forms';
 export const dynamic='force-dynamic';
 
@@ -24,8 +25,7 @@ export default async function InventoryPage(){
  const low=items.filter(p=>Number(p.stock_quantity)<=Number(p.minimum_stock));
  const nameFor=(id:string)=>items.find(p=>p.id===id)?.name||'Archived or inactive product';
  return <div className="tax-page">
-  <p className="muted small">BUSINESS / INVENTORY CONTROL</p><h1>Inventory & Stock Counts</h1>
-  <p className="muted">Current on-hand quantities, low-stock exceptions and a reviewable physical-count history. Stock counts do not create accounting journals.</p>
+  <BusinessPageHeading eyebrow="OPERATIONS / INVENTORY" title="Inventory & stock counts" description="Review on-hand quantities, count variances and stock movements. Physical counts do not automatically post accounting journals."/>
   <div className="grid grid-3">
    <section className="tax-panel"><p className="small muted">Tracked products (up to 500)</p><h2>{items.length}</h2></section>
    <section className="tax-panel"><p className="small muted">Value of displayed stock at cost</p><h2>{money(stockValue)}</h2></section>

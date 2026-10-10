@@ -36,3 +36,46 @@
 .brand-upload-panel input[type=file]{max-width:100%;font-size:13px}
 .brand-upload-panel .btn{justify-self:start}
 @media(max-width:740px){.brand-upload-grid{grid-template-columns:1fr}}
+
+/* Phase 030: System Owner pilot acceptance register */
+.pilot-header{align-items:start}.pilot-env-switch{display:flex;gap:9px;align-items:center;margin:0 0 20px;flex-wrap:wrap}.pilot-env-switch>span{font-size:12px;font-weight:750;color:#687d91;margin-right:6px}.pilot-env-switch>a{font-size:12px;font-weight:750;border:1px solid #dce6ed;padding:10px 14px;background:white;border-radius:9px;color:#37546a}.pilot-env-switch>a.is-current{background:#123b63;color:#fff;border-color:#123b63}.pilot-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.pilot-summary{display:flex;flex-direction:column;gap:6px;padding:21px;background:#fff;border:1px solid #e3eaf0;border-radius:13px}.pilot-summary small{font-size:11px;color:#687f93}.pilot-summary strong{font-size:28px;line-height:1.2;letter-spacing:-.04em;color:#173c58}.pilot-summary span{font-size:10px;color:#8497a9}.pilot-infrastructure{margin-bottom:28px}.pilot-config-list{padding:8px 20px}.pilot-config-row{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid #edf2f5}.pilot-config-row:last-child{border:0}.pilot-config-row>div{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}.pilot-config-row strong{font-size:12px}.pilot-config-row small{font-size:11px;color:#768a9a;line-height:1.5}.pilot-dot{height:10px;width:10px;flex-shrink:0;border-radius:100%}.pilot-dot.is-present{background:#16845b}.pilot-dot.is-missing{background:#c78937}.pilot-config-status{font-size:11px;color:#5a7184;white-space:nowrap}.pilot-content-heading{display:flex;justify-content:space-between;gap:20px;align-items:center;margin:22px 0 13px}.pilot-content-heading h2{font-size:19px;margin:0 0 7px}.pilot-content-heading p{font-size:12px;color:#718498;margin:0;max-width:800px}.pilot-group{margin-bottom:13px}.pilot-group>summary{padding:18px 21px;display:flex;justify-content:space-between;gap:15px;align-items:center;font-size:14px;font-weight:800;cursor:pointer;list-style-position:inside}.pilot-group>summary span{font-size:11px;color:#6b8796}.pilot-check-list{border-top:1px solid #edf1f5;padding:8px 18px 16px}.pilot-check{border-bottom:1px solid #edf1f5}.pilot-check:last-child{border-bottom:0}.pilot-check>summary{display:flex;gap:12px;align-items:center;cursor:pointer;padding:15px 4px;min-width:0}.pilot-test-id{font-size:11px;font-weight:800;color:#18745b;background:#e8f5ef;padding:6px 8px;border-radius:8px;white-space:nowrap}.pilot-check-label{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.pilot-check-label strong{font-size:12px}.pilot-check-label small{font-size:11px;color:#73889c;line-height:1.5}.pilot-status,.pilot-critical{border-radius:99px;font-size:10px;font-weight:750;padding:5px 9px;white-space:nowrap;text-transform:capitalize}.pilot-status-pass{background:#e4f5eb;color:#126c4b}.pilot-status-fail{background:#fbe7e6;color:#ad3333}.pilot-status-blocked{background:#fff2dd;color:#9a6929}.pilot-status-not_tested{background:#ecf1f5;color:#637b8c}.pilot-critical{background:#f9e8e7;color:#b34840}.pilot-check-editor{padding:10px 8px 19px 70px}.pilot-review-form{display:grid;grid-template-columns:minmax(185px,240px) minmax(0,1fr) auto;gap:13px;align-items:end}.pilot-review-form label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:750;color:#425d72}.pilot-review-form select,.pilot-review-form textarea{width:100%;border:1px solid #cfdae4;border-radius:9px;background:#fff;font:inherit;font-size:12px;padding:10px;min-height:41px}.pilot-review-form textarea{min-height:67px;resize:vertical}.pilot-review-form button{align-self:end}.pilot-form-ok,.pilot-form-error{grid-column:1/-1;margin:0;font-size:11px}.pilot-form-ok{color:#167b53}.pilot-form-error{color:#b43a3a}.pilot-release-summary{display:flex;gap:17px;align-items:flex-start;padding:23px;margin-top:24px}.pilot-release-summary>svg{flex-shrink:0;color:#a97631}.pilot-release-summary h2{margin:0 0 8px;font-size:17px}.pilot-release-summary p{margin:0 0 8px;font-size:12px;color:#5d7287}
+@media(max-width:1090px){.pilot-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pilot-review-form{grid-template-columns:1fr 1fr}.pilot-review-form button{justify-self:start}}
+@media(max-width:650px){.pilot-summary-grid{gap:9px}.pilot-summary{padding:15px}.pilot-summary strong{font-size:23px}.pilot-content-heading{flex-direction:column;align-items:start}.pilot-check>summary{flex-wrap:wrap;gap:8px}.pilot-check-label{flex-basis:calc(100% - 105px)}.pilot-check-editor{padding:12px 0 18px}.pilot-review-form{grid-template-columns:1fr}.pilot-config-row{flex-wrap:wrap}.pilot-config-status{margin-left:23px}}
+
+/* Mobile System Owner refinements — drawer usability and smaller admin cards. */
+.owner-console,.owner-shell-content,.owner-shell-body{min-width:0;max-width:100%}
+@media(max-width:800px){
+ .owner-console{overflow-x:clip}
+ .owner-sidebar{width:min(315px,88vw);max-width:100%;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom)}
+ .owner-shell-content .admin-area{min-width:0;max-width:100%}
+ .owner-sidebar-links{padding-bottom:22px}
+ .owner-sidebar-backdrop{touch-action:none}
+ .owner-menu-toggle{min-width:39px;min-height:39px}
+ .owner-topbar{min-width:0;max-width:100vw;gap:8px}
+ .owner-topbar-actions{flex-shrink:0}
+ .owner-topbar-start{min-width:0}
+}
+@media(max-width:590px){
+ .owner-topbar{padding:0 10px}
+ .owner-breadcrumb{gap:4px;min-width:0}
+ .owner-breadcrumb strong{max-width:clamp(78px,26vw,155px)}
+ .owner-shell-content .admin-area{padding:17px 12px 45px}
+ .owner-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-shell-content .table-wrap{max-width:100%;overflow-x:auto}
+ .owner-sidebar-footer{padding-bottom:max(18px,env(safe-area-inset-bottom))}
+}
+
+/* Phase 030B — search and workspace shortcuts, responsive System Owner navigation. */
+.owner-nav-search{margin:14px 12px 2px;display:flex;align-items:center;gap:9px;border:1px solid rgba(205,226,238,.28);border-radius:11px;padding:10px 12px;color:#c4d8e7;background:rgba(255,255,255,.06)}
+.owner-nav-search:focus-within{border-color:#9dd9bc;box-shadow:0 0 0 2px rgba(157,217,188,.17)}
+.owner-nav-search input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:white;font:inherit;font-size:12px}
+.owner-nav-search input::placeholder{color:#b4cada;opacity:.92}.owner-nav-search input::-webkit-search-cancel-button{filter:invert(1)}
+.owner-nav-empty{font-size:12px;color:#c7d8e6;padding:10px 16px;line-height:1.5}
+.owner-search-shortcut,.owner-workspace-switch{display:inline-flex;align-items:center;gap:8px;justify-content:center;border:1px solid #dbe6ec;border-radius:10px;background:#fff;padding:10px 12px;color:#2d4c62;font-size:12px;font-weight:800;white-space:nowrap}
+.owner-search-shortcut:hover,.owner-workspace-switch:hover{background:#eff8f5;color:#126b4b;border-color:#afd9c8}
+.owner-workspace-switch{background:#ecf7f2;color:#146647;border-color:#c6e5d7}
+.owner-menu-toggle{flex-shrink:0}
+@media(max-width:1100px){.owner-topbar{padding-left:18px;padding-right:18px}.owner-search-shortcut span{display:none}}
+@media(max-width:800px){.owner-nav-search{margin-top:10px}.owner-topbar-actions{gap:6px}.owner-search-shortcut{padding:9px}}
+@media(max-width:590px){.owner-topbar{gap:7px}.owner-topbar-actions{gap:5px}.owner-workspace-switch{padding:9px}.owner-workspace-switch span{display:none}.owner-search-shortcut{padding:9px}.owner-breadcrumb strong{max-width:100px}.owner-role-chip{display:none}}
+@media(prefers-reduced-motion:reduce){.owner-search-shortcut,.owner-workspace-switch{transition:none!important}}

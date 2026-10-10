@@ -1,20 +1,52 @@
-name: Verify Business Platform
+name: Verify BusinessOS
 on:
   pull_request:
   push:
     branches: [main]
+permissions:
+  contents: read
 jobs:
-  check:
+  nextjs:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
-      - run: npm run check:routes
-      - run: npm run check:phase21
-      - run: npm run check:phase24
-      - run: npm run check:phase27
-      - run: npm run typecheck
-      - run: npm run build
+      - name: Install website dependencies
+        run: if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+      - name: Route audit
+        run: npm run check:routes
+      - name: Regression and security checks
+        run: |
+          npm run check:phase21
+          npm run check:phase22
+          npm run check:phase23
+          npm run check:phase24
+          npm run check:website
+          npm run check:plans
+          npm run test:accounting
+          npm run check:admin-ui
+          npm run check:phase26
+          npm run check:branding-assets
+          npm run check:phase27
+          npm run check:phase28
+          npm run check:phase28b
+          npm run check:phase29
+          npm run check:phase30
+          npm run check:phase30b
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+  deno-auth-hook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Typecheck Supabase Auth Email Hook independently
+        run: deno check supabase/functions/send-email/index.ts

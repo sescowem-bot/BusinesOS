@@ -1,0 +1,28 @@
+/** Phase 030B static release invariants (not a substitute for browser or database tests). */
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
+const publicNav=read('components/public-nav.tsx');
+const admin=read('components/admin-workspace.tsx');
+const shell=read('components/shell.tsx');
+const prices=read('app/pricing/page.tsx');
+const interior=read('app/(public)/[slug]/page.tsx');
+const art=read('components/public-hero-art.tsx');
+assert(publicNav.includes("access==='admin'&&<Link href=\"/admin\""),'Admin Console must be visible only to admins on the public site');
+assert(publicNav.includes('Open Admin Console'),'Admin mobile navigation must include direct console link');
+assert(publicNav.includes('<details className="public-more">'),'Company menu should be keyboard operable');
+assert(shell.includes('Admin Console'),'Business workspace should link to console');
+assert(admin.includes('filteredNavigation')&&admin.includes('Search admin navigation'),'Admin must provide searchable tools');
+assert(admin.includes('menuOpen')&&admin.includes('owner-sidebar-backdrop'),'Admin mobile drawer missing');
+for(const p of ['/admin/plans','/admin/businesses','/admin/website','/admin/pilot'])assert(admin.includes(p),'Admin navigation missing '+p);
+for(const kind of ['features','solutions','how-it-works','about','resources'])assert(art.includes("kind==='"+kind+"'")||(kind==='features'&&art.includes('interior-features')),'Missing page-specific hero '+kind);
+assert(interior.includes('<PublicHeroArt kind='),'Interior pages must use distinct artwork');
+assert(!interior.includes('<PublicWorkspacePreview/>'),'Interior pages should not repeat the home preview');
+for(const n of ['Starter','Growth','Professional','Enterprise'])assert(prices.includes("name:'"+n+"'"),'Missing pricing category '+n);
+assert(prices.includes('getPublishedPlans()')&&prices.includes('getPublishedPlanCapabilities()'),'Actual plan catalogue must remain database driven');
+assert(prices.includes('Pricing on request'),'Published plans must not require invented price figures');
+assert(prices.includes('suggested categories, not automatically activated subscriptions'),'Suggested categories must be distinguished from approved plans');
+assert(!fs.readdirSync(root).some(f=>f.endsWith('.md')&&f!=='README.md'),'Keep documentation in MD/');
+console.log('Phase 030B checks passed: admin visibility, mobile navigation, hero variants, pricing separation and docs.');

@@ -20,7 +20,15 @@
     "check:admin-ui": "node scripts/verify-admin-redesign.cjs",
     "check:phase26": "node scripts/verify-phase26.cjs",
     "check:phase27": "node scripts/verify-phase27.cjs",
-    "check:branding-assets": "node scripts/verify-phase26-branding.cjs"
+    "check:branding-assets": "node scripts/verify-phase26-branding.cjs",
+    "check:phase28": "node scripts/verify-phase28.cjs",
+    "check:phase28b": "node scripts/verify-phase28b.cjs",
+    "check:phase29": "node scripts/verify-phase29.cjs",
+    "check:phase30": "node scripts/verify-phase30.cjs",
+    "smoke:pilot": "node scripts/pilot-smoke.cjs",
+    "check:mobile": "node scripts/verify-phase30-mobile.cjs",
+    "check:phase30b": "node scripts/verify-phase30b.cjs",
+    "check:phase30c": "node scripts/verify-phase30c.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

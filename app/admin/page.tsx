@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import {ArrowRight, BellRing, Building2, CheckCircle2, CreditCard, FileText, Globe2, Mail, MonitorCog, ShieldCheck, UsersRound, Wallet} from 'lucide-react';
+import {ClipboardCheck,ArrowRight, BellRing, Building2, CheckCircle2, CreditCard, FileText, Globe2, Mail, MonitorCog, ShieldCheck, UsersRound, Wallet} from 'lucide-react';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 import {getPlatformBrand} from '@/lib/server/branding';
 
@@ -11,6 +11,7 @@ const tools=[
  {name:'Feature permissions',detail:'Control module and team-role entitlements.',href:'/admin/plan-access',icon:ShieldCheck},
  {name:'Email templates',detail:'Review branded notifications and delivery settings.',href:'/admin/email',icon:Mail},
  {name:'System health',detail:'Check data services and administration readiness.',href:'/admin/health',icon:MonitorCog},
+ {name:'Pilot readiness',detail:'Record launch tests, blockers and evidence with an audit trail.',href:'/admin/pilot',icon:ClipboardCheck},
 ];
 export default async function AdminPage(){
  const session=await requirePlatformAdmin();
