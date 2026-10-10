@@ -1,6 +1,8 @@
 'use server';
 import {redirect} from 'next/navigation';
 import {getServerSupabase} from '@/lib/server/supabase';
+import {cookies} from 'next/headers';
+import {ACTIVE_BUSINESS_COOKIE} from '@/lib/server/workspace-selection';
 export type LoginState={error:string};
 export async function signIn(_previous:LoginState,form:FormData):Promise<LoginState>{
  const email=String(form.get('email')||'').trim();const password=String(form.get('password')||'');
@@ -19,4 +21,4 @@ export async function signIn(_previous:LoginState,form:FormData):Promise<LoginSt
  if(member?.length)redirect('/dashboard');
  redirect('/onboarding');
 }
-export async function signOut(){const supabase=await getServerSupabase();if(supabase)await supabase.auth.signOut();redirect('/login');}
+export async function signOut(){const supabase=await getServerSupabase();if(supabase)await supabase.auth.signOut();(await cookies()).delete(ACTIVE_BUSINESS_COOKIE);redirect('/login');}

@@ -96,3 +96,25 @@
 @media(prefers-reduced-motion:reduce){.site-refresh,.site-refresh *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .site-skip{position:fixed;left:16px;top:-100px;z-index:200;background:#fff;color:#163b51;border:2px solid var(--green);padding:12px 18px;border-radius:9px;font-size:13px;font-weight:800}.site-skip:focus{top:12px}.site-refresh .public-nav-links a[aria-current="page"]{color:var(--brand);font-weight:850}.site-refresh .public-mobile-menu a[aria-current="page"]{color:var(--green)}
+
+/* Admin personal workspace — clear separation between tenant data and platform management. */
+.owner-workspace-intro{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+.owner-workspace-intro .card h2{margin:11px 0 6px}
+.owner-workspace-intro .card p{line-height:1.65}
+.owner-section-header{display:flex;justify-content:space-between;align-items:start;gap:16px}
+.owner-section-header h2{margin:0 0 6px}
+.owner-business-list{display:grid;gap:10px;margin-top:18px}
+.owner-business-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border:1px solid #dfe7ee;border-radius:12px;background:#fafcfe}
+.owner-business-row p{margin:6px 0 0}
+.owner-create-workspace{margin-top:18px}
+.owner-create-workspace h2{margin-top:0}
+.owner-business-form{display:grid;grid-template-columns:minmax(200px,1fr) minmax(200px,1fr) auto;gap:13px;align-items:end;margin-top:18px}
+.owner-business-form .field{margin:0}
+.owner-business-form button{min-height:42px}
+.owner-business-form [role=alert]{grid-column:1/-1}
+@media(max-width:900px){.owner-business-form{grid-template-columns:1fr 1fr}.owner-business-form button{grid-column:1/-1}}
+@media(max-width:690px){.owner-workspace-intro,.owner-business-form{grid-template-columns:1fr}.owner-business-row{align-items:stretch;flex-direction:column}.owner-business-row form,.owner-business-row button{width:100%}.owner-business-form button{grid-column:auto}}
+@media(min-width:1081px){.admin-feature-choices{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* The dedicated mobile Sign out navigation remains visible on narrow screens. */
+@media (max-width:720px){.logout-desktop-link{display:none!important}}

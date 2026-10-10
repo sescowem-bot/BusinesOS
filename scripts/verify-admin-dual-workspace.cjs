@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const read=p=>fs.readFileSync(p,'utf8');
+const page=read('app/admin/my-business/page.tsx');
+const actions=read('app/admin/my-business/actions.ts');
+const workspace=read('lib/server/workspace.ts');
+const shell=read('components/shell.tsx');
+const publicNav=read('components/public-nav.tsx');
+const adminHome=read('app/admin/page.tsx');
+assert.match(page,/requirePlatformAdmin\(/,'My Business must have a Super Admin gate');
+assert.match(page,/\.eq\('user_id',session\.user\.id\)/,'List only own business memberships');
+assert.match(actions,/\.eq\('business_id',id\)\.eq\('user_id',session\.user\.id\)/,'Switch requires a membership check');
+assert.match(actions,/create_my_business_workspace/,'Use the existing secure business creation RPC');
+assert.match(actions,/businessCookieOptions/,'Workspace choice must be stored securely');
+assert.match(workspace,/\.eq\('user_id',user\.id\)\.eq\('business_id',requestedBusinessId\)/,'Untrusted cookie must be rechecked on every request');
+assert.match(workspace,/\.eq\('user_id',user\.id\)\.order\('created_at'/,'Fallback must only use own memberships');
+for(const content of [shell,publicNav,adminHome]) assert.match(content,/\/admin\/my-business/,'The My Business link must be discoverable');
+assert.match(read('app/(auth)/login/actions.ts'),/\.delete\(ACTIVE_BUSINESS_COOKIE\)/,'Signout clears workspace choice');
+console.log('Admin dual-workspace invariants verified (static checks; real Supabase tests still needed).');
