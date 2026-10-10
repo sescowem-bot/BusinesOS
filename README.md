@@ -1,3 +1,5 @@
+> Current prepared development: **Phase 030M-A — Wholesale Reference Tiers & Fast Retail Performance (SQL 041)**. See `MD/PHASE_030M_WHOLESALE_FAST_REPORTING.md`. Apply SQL 041 after SQL 040 in staging.
+
 > **Latest prepared performance hotfix:** Public route caching, targeted Supabase proxy, request-scoped workspace verification and responsive loading states. Read `MD/PERFORMANCE_REVIEW_AND_OPTIMIZATION.md` before merging or deploying. No new SQL is required for this patch.
 
 > New: **Phase 030L-B – Mobile signup/login and email delivery guidance**. See `MD/PHASE_030L_B_AUTH_EMAIL_AND_MOBILE_UX.md`. Supabase SMTP setup is a separate admin task; this code does not bypass email rate limits.
@@ -125,3 +127,9 @@ See `MD/PHASE_030K_PARTIAL_RECEIPTS_SUPPLIER_BILLS.md`. SQL 038 must be applied 
 - Docs: `MD/PHASE_030L_PREMIUM_POS.md`, `MD/PHASE_030L_ACCEPTANCE.md`, `MD/VERIFY_SQL_040_READ_ONLY.sql`.
 
 **Deployment status:** Source package prepared only. SQL 040, TypeScript build, actual database concurrency tests and Vercel Preview acceptance have not been executed against a live installation.
+
+## 030M fast retail reporting
+
+Routes `/retail-reports` and `/wholesale` add bounded, indexed POS operational reporting and a reference bulk pricing catalogue. They do **not** automatically change VAT-reviewed POS prices or existing financial ledger statements. No new paid API is required. See the Phase 030M installation and staging checklist in `MD/`.
+
+**Release gate:** the inherited source does not include `package-lock.json`. Generate and review one before requiring `npm ci`; run `npm run typecheck` and `npm run build` on a clean install before production.

@@ -50,6 +50,7 @@ jobs:
           npm run check:phase30l
           npm run check:auth-ux
           npm run check:performance
+          npm run check:phase30m
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

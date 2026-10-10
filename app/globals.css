@@ -422,3 +422,13 @@
 .bo-performance-loading-bars{display:grid;gap:11px;margin:22px 0}
 .bo-performance-loading-bars i{display:block;height:14px;background:var(--brand-soft);border-radius:7px}
 .bo-performance-loading-bars i:nth-child(2){width:75%}.bo-performance-loading-bars i:nth-child(3){width:87%}.bo-performance-loading-bars i:nth-child(4){width:55%}
+
+/* Phase 030M: lightweight, mobile-first server-rendered management reports. */
+.bo-retail-filter{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:16px 0 20px;padding:15px;border:1px solid var(--border,#dce6ed);border-radius:14px;background:var(--surface,#fff)}
+.bo-retail-filter label{display:grid;gap:6px;font-size:.82rem;font-weight:600;min-width:145px;flex:1 1 160px}
+.bo-retail-filter input{width:100%;min-width:0;padding:10px 12px;border-radius:9px;border:1px solid #cbd6e1;font:inherit}
+.bo-wholesale-form-wrap{padding:18px;max-width:680px}
+.bo-wholesale-delete{display:grid;gap:6px;min-width:130px}
+.bo-wholesale-delete label{display:flex;align-items:center;gap:6px;font-size:.75rem}
+.bo-wholesale-delete input{width:16px;height:16px}
+@media(max-width:600px){.bo-retail-filter{align-items:stretch}.bo-retail-filter label,.bo-retail-filter button{flex-basis:100%}.bo-wholesale-form-wrap{padding:10px}}
