@@ -12,14 +12,12 @@ export function BrandingForm({brand}:{brand:PlatformBrand}){
    <Field name="tagline" label="Tagline" value={brand.tagline}/>
    <Field name="support_email" label="Support email" value={brand.support_email} type="email"/>
    <Field name="support_phone" label="Support phone" value={brand.support_phone}/>
-   <Field name="logo_url" label="Logo HTTPS URL" value={brand.logo_url} type="url"/>
-   <Field name="favicon_url" label="Favicon HTTPS URL" value={brand.favicon_url} type="url"/>
    <Field name="primary_color" label="Primary brand colour" value={brand.primary_color} pattern="#[0-9a-fA-F]{6}"/>
    <Field name="accent_color" label="Accent colour" value={brand.accent_color} pattern="#[0-9a-fA-F]{6}"/>
    <div className="field full"><label htmlFor="description">Platform description</label><textarea id="description" name="description" defaultValue={brand.description} rows={4} maxLength={400}/></div>
   </div>
   <div className="admin-actions"><button className="btn btn-primary" type="submit" disabled={pending}>{pending?'Saving…':'Save & publish'}</button><span className={state.ok?'positive':'negative'} role="status">{state.message}</span></div>
-  <p className="small muted">Logo and favicon currently accept hosted HTTPS links. Media library uploads are planned for the next branding increment.</p>
+  <p className="small muted">Upload or replace your logo and favicon in the image manager below. Saving these text settings will not overwrite your uploaded assets.</p>
  </form>
 }
 function Field({name,label,value,type='text',required=false,pattern}:{name:string;label:string;value:string;type?:string;required?:boolean;pattern?:string}){

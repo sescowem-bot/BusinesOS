@@ -3,13 +3,12 @@ import {revalidatePath} from 'next/cache';
 import {z} from 'zod';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 
-const url=z.union([z.literal(''),z.string().url().max(1000).refine(x=>x.startsWith('https://'),'Use HTTPS only')]);
 const hex=z.string().regex(/^#[0-9a-fA-F]{6}$/,'Enter a six-digit colour such as #123B63');
 const schema=z.object({
  name:z.string().trim().min(2).max(90),short_name:z.string().trim().min(2).max(28),
  tagline:z.string().trim().max(150),description:z.string().trim().max(400),
  support_email:z.union([z.literal(''),z.email().max(200)]),support_phone:z.string().trim().max(35),
- logo_url:url,favicon_url:url,primary_color:hex,accent_color:hex
+ primary_color:hex,accent_color:hex
 });
 export type SaveState={ok:boolean;message:string};
 export async function savePlatformBrand(_previous:SaveState,data:FormData):Promise<SaveState>{

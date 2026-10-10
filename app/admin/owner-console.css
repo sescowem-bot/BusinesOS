@@ -24,3 +24,15 @@
 @media(prefers-reduced-motion:reduce){.owner-console *{transition:none!important;animation:none!important}}
 @media print{.owner-sidebar,.owner-topbar,.owner-footer{display:none!important}.owner-console{display:block;background:white}.owner-shell-content .admin-area{max-width:none;padding:0}.owner-shell-body{display:block}}
 .owner-website-stats{margin-bottom:22px}.owner-identity-value{font-size:20px!important;letter-spacing:-.03em!important;padding-top:6px}.owner-brand-swatches{display:flex;gap:9px;margin:12px 0}.owner-brand-swatches span{display:block;width:32px;height:32px;border:3px solid white;border-radius:10px;box-shadow:0 0 0 1px #dce6eb}.owner-website-hub .owner-management-heading{margin-bottom:20px}.owner-website-hub .brand-preview{background:linear-gradient(150deg,#f6fafb,#eaf2f6);margin:18px 0 10px}.owner-website-hub .admin-layout{align-items:start}.owner-website-hub .owner-management-card{min-height:164px}.owner-shell-content .owner-business-directory .grid-3{margin-bottom:22px}.owner-business-directory .admin-header .owner-search{align-items:flex-end}.owner-business-directory .card .admin-header{margin:0 0 18px}.owner-business-directory .owner-business-table strong{font-weight:800}.owner-business-directory .owner-business-table a:hover{text-decoration:underline}.owner-console .admin-area p{line-height:1.62}
+
+/* Phase 026: accessible brand asset controls */
+.brand-assets-card{border-top:1px solid #e2e8f0;margin-top:24px;padding-top:24px}
+.brand-assets-card h2{margin:0 0 5px;font-size:19px}
+.brand-assets-card>p{margin-top:14px}
+.brand-upload-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:18px}
+.brand-upload-panel{min-width:0;border:1px solid #dce5ed;border-radius:14px;padding:18px;background:#fafcff;display:grid;gap:11px;align-content:start}
+.brand-upload-title{display:grid;gap:4px}
+.brand-upload-preview{min-height:87px;border:1px dashed #d1dce8;border-radius:10px;display:flex;align-items:center;justify-content:center;background:white;padding:10px}
+.brand-upload-panel input[type=file]{max-width:100%;font-size:13px}
+.brand-upload-panel .btn{justify-self:start}
+@media(max-width:740px){.brand-upload-grid{grid-template-columns:1fr}}
