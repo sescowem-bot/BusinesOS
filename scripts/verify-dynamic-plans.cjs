@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+const fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const sql=read('supabase/migrations/023_dynamic_plans_role_permissions.sql');
+const auth=read('lib/server/authorization.ts');
+const plans=read('app/admin/plans/page.tsx');
+const access=read('app/admin/plan-access/page.tsx');
+const pricing=read('app/pricing/page.tsx');
+const publicCms=read('lib/server/public-cms.ts');
+for(const needle of ['platform_plan_role_features','admin_save_plan_permissions','public.business_has_feature','published_plan_features','ENABLE ROW LEVEL SECURITY','auth.uid()'])assert.ok(sql.includes(needle),`Missing SQL invariant: ${needle}`);
+assert.ok(sql.includes('business_members bm') && sql.includes('bm.user_id=auth.uid()'),'Feature checks must use current authenticated business membership');
+assert.ok(sql.includes('JOIN public.public_site_plans p ON p.id=f.plan_id')&&sql.includes('p.published=true'),'Public RPC must hide draft plans');
+assert.ok(sql.includes('IF v_role=\'owner\' THEN RETURN true'),'Business owner retains access to purchased modules');
+assert.ok(auth.includes("rpc('business_has_feature'"),'Server feature checks must call the role-aware DB entitlement');
+assert.ok(!auth.includes('featureRoles[feature]'),'Frontend role allowlist must not override configured database roles');
+assert.ok(plans.includes('PlanEditor')&&plans.includes('New business plan'),'Admin can create custom plans');
+assert.ok(access.includes('PlanPermissionEditor'),'Role editor must be available');
+assert.ok(pricing.includes('essentialCapabilities')&&pricing.includes('paidCapabilities')&&pricing.includes('plan-comparison'),'Public plan comparison should enumerate actual features');
+assert.ok(publicCms.includes("if(!client)return []")&&!publicCms.includes('return error?demoPlans'),'Public pricing must not invent fallback plans');
+console.log('Dynamic plans source / permission invariants passed. Live RLS and migrations require Supabase tests.');

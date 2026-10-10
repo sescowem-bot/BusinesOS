@@ -6,7 +6,7 @@ import {BrandingForm} from '../branding-form';
 export const dynamic='force-dynamic';
 const sections=[
  {title:'Public Pages',detail:'Edit section titles, copy and publication status.',href:'/admin/content'},
- {title:'Pricing & Plans',detail:'Manage pricing cards and public plan information.',href:'/admin/content'},
+ {title:'Pricing & Plans',detail:'Manage pricing cards and public plan information.',href:'/admin/plans'},
  {title:'Email Templates',detail:'Edit message templates and branded email content.',href:'/admin/email'},
  {title:'Platform Diagnostics',detail:'Check CMS and configuration availability.',href:'/admin/health'}
 ];

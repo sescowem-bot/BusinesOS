@@ -72,6 +72,27 @@ export async function getPublicPage(slug:string):Promise<(PublicPage & {reviewRe
   return {...data,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown)=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
  }catch{return draft||(fallback?.published?fallback:null)}
 }
-export async function getPublishedPlans():Promise<PublicPlan[]>{const client=publicClient();if(!client)return demoPlans;try{const {data,error}=await client.from('public_site_plans').select('id,name,price_label,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');return error?demoPlans:(data||[]) as PublicPlan[]}catch{return demoPlans}}
+export async function getPublishedPlans():Promise<PublicPlan[]>{
+ const client=publicClient();if(!client)return [];
+ try{
+  const {data,error}=await client.from('public_site_plans').select('id,name,price_label,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');
+  if(error)return [];
+  return (data||[]).map(p=>({...p,features:Array.isArray(p.features)?p.features.filter((f:unknown):f is string=>typeof f==='string'):[]})) as PublicPlan[];
+ }catch{return []}
+}
+/** Published feature lookup is intentionally limited to published plans and enabled modules. */
+export async function getPublishedPlanCapabilities():Promise<{byPlan:Record<string,string[]>;available:boolean}>{
+ const client=publicClient();
+ if(!client)return {byPlan:{},available:false};
+ try{
+  const {data,error}=await client.rpc('published_plan_features');
+  if(error)return {byPlan:{},available:false};
+  const byPlan:Record<string,string[]>={};
+  for(const row of data||[]){if(typeof row.plan_id==='string'&&typeof row.feature_key==='string'){
+   (byPlan[row.plan_id]??=[]).push(row.feature_key);
+  }}
+  return {byPlan,available:true};
+ }catch{return {byPlan:{},available:false}}
+}
 export const defaultPages=Object.values(defaults);
 export const defaultPlans=demoPlans;

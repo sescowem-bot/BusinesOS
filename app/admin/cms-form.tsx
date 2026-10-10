@@ -35,7 +35,8 @@ export function PlanEditor({plan}:{plan:PublicPlan}){
   <label>Displayed price<input name="price_label" defaultValue={plan.price_label} maxLength={70}/></label>
   <label>Billing note<input name="billing_label" defaultValue={plan.billing_label} maxLength={2000}/></label>
   <label>Description<textarea name="description" defaultValue={plan.description} maxLength={2000}/></label>
-  <label>Features (one per line)<textarea name="features" rows={5} maxLength={5000} defaultValue={Array.isArray(plan.features)?plan.features.join('\n'):''}/></label>
+  <label>Additional marketing notes (one per line)<textarea name="features" rows={6} maxLength={5000} defaultValue={Array.isArray(plan.features)?plan.features.join('\n'):''}/></label>
+  <p className="small muted">Real module access and role permissions are managed separately under <a href="/admin/plan-access">Plan Access & Roles</a>. These notes never grant a feature automatically.</p>
   <label>CTA label<input name="cta_label" maxLength={90} defaultValue={plan.cta_label}/></label>
   <label>CTA path<input name="cta_url" defaultValue={plan.cta_url} pattern="/[a-z0-9/-]*"/></label>
   <label>Display order<input type="number" name="sort_order" min={0} max={1000} defaultValue={plan.sort_order}/></label>

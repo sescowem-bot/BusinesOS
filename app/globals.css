@@ -118,3 +118,43 @@
 
 /* The dedicated mobile Sign out navigation remains visible on narrow screens. */
 @media (max-width:720px){.logout-desktop-link{display:none!important}}
+
+/* Subscription plan administration and expanded public comparison */
+.plan-heading-actions,.plan-card-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.plan-card-directory{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;margin:18px 0}
+.plan-management-card summary,.plan-access-panel summary{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;cursor:pointer;list-style:revert}
+.plan-management-card[open]{grid-column:1/-1}
+.plan-card-links{margin:16px 0}
+.plan-access-panel{margin:0 0 18px}
+.plan-access-intro{margin:16px 0}
+.plan-role-key{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0}
+.plan-role-key span{padding:4px 10px;border-radius:100px;background:#eff5fa;font-size:.85rem}
+.plan-permissions-list{border:1px solid #dce6ed;border-radius:14px;overflow:hidden}
+.plan-feature-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.7fr);gap:20px;padding:18px;border-bottom:1px solid #dce6ed}
+.plan-feature-row:last-child{border:0}
+.plan-feature-row:nth-child(odd){background:rgba(244,248,250,.6)}
+.plan-feature-description h3{margin:5px 0;font-size:1rem}.plan-feature-description p{margin:0}
+.plan-feature-switch{display:flex;gap:10px;align-items:center;font-size:.9rem}
+.plan-role-checks{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0 0}
+.plan-role-checks label{display:flex;align-items:center;gap:6px;font-size:.84rem;cursor:pointer}
+.plan-role-checks label:has(input:disabled){opacity:.55;cursor:not-allowed}
+.plan-permission-footer{padding:18px 0;display:flex;gap:18px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.plan-permission-footer p{max-width:650px}
+.plan-pricing-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,275px),1fr));align-items:start}
+.public-plan-detailed h3{font-size:1rem;margin:20px 0 10px}
+.public-plan-detailed .marketing-btn-primary{display:inline-flex;margin:12px 0}
+.plan-details-divider{border-top:1px solid #dce6ed;margin-top:22px}
+.plan-capability-list{padding:0!important;list-style:none!important;margin:10px 0!important}
+.plan-capability-list li{display:flex;align-items:flex-start;gap:10px;margin:8px 0;color:inherit}
+.plan-capability-list li svg{color:#16845b;flex-shrink:0;margin-top:2px}
+.plan-feature-group>strong{font-size:.84rem;color:#123b63}
+.plan-marketing-notes{padding:12px 0;border-top:1px solid #e4eaf0;margin-top:12px}
+.plan-comparison{margin:72px auto 30px}
+.plan-comparison-scroll{overflow-x:auto;border:1px solid #dae5ed;border-radius:16px}
+.plan-comparison table{width:100%;min-width:670px;border-collapse:collapse}
+.plan-comparison th,.plan-comparison td{text-align:center;padding:13px 15px;border-bottom:1px solid #e6edf2}
+.plan-comparison th:first-child{text-align:left;min-width:240px}
+.plan-comparison thead th{background:#eff6fa;color:#123b63}
+.plan-comparison tbody tr:has(th[colspan]) th{background:#f5f9fb;text-align:left;font-size:.84rem;color:#123b63}
+.plan-included{color:#16845b;font-weight:600;font-size:.85rem}
+@media (max-width:700px){.plan-feature-row{grid-template-columns:1fr;gap:9px}.plan-heading-actions{width:100%}.plan-management-card summary,.plan-access-panel summary{align-items:flex-start;flex-direction:column}}
