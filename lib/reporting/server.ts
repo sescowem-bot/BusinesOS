@@ -1,9 +1,9 @@
 import 'server-only';
-import {getWorkspace} from '@/lib/server/workspace';
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import type {TrialRow} from './financial';
 export async function financialContext(){
- const ctx=await getWorkspace();
- if(!['owner','manager','finance'].includes(ctx.role))throw new Error('Finance reporting permission required');
+ const ctx=await requireBusinessFeature('financial_reports');
+ if(!ctx.allowed)throw new Error(ctx.reason);
  return ctx;
 }
 export async function loadTrial(){

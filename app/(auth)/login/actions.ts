@@ -11,9 +11,11 @@ export async function signIn(_previous:LoginState,form:FormData):Promise<LoginSt
  if(error)return {error:'Unable to sign in. Check your credentials and account status.'};
  const {data:{user}}=await supabase.auth.getUser();
  if(!user)return {error:'Session could not be verified. Please sign in again.'};
- const {data:admin}=await supabase.from('platform_admins').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();
+ const {data:admin,error:adminError}=await supabase.from('platform_admins').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();
+ if(adminError)return {error:'Unable to verify account permissions. Please try again shortly.'};
  if(admin)redirect('/admin');
- const {data:member}=await supabase.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
+ const {data:member,error:memberError}=await supabase.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
+ if(memberError)return {error:'Your workspace access cannot be verified right now. Contact platform support if this continues.'};
  if(member?.length)redirect('/dashboard');
  redirect('/onboarding');
 }

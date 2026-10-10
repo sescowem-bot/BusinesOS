@@ -1,22 +1,28 @@
-import {getServerSupabase} from '@/lib/server/supabase';
-import {requestUpgrade} from './actions';
-import {redirect} from 'next/navigation';
+import {getWorkspace} from '@/lib/server/workspace';
+import {UpgradeRequestForm} from './request-form';
 export const dynamic='force-dynamic';
+type Plan={id:string;name:string;description:string|null;price_label:string|null;billing_label:string|null;features:unknown};
+type Request={id:string;plan_id:string;status:string;requested_at:string;review_note:string|null};
 export default async function UpgradePage(){
- const client=await getServerSupabase();if(!client)redirect('/login');
- const {data:{user}}=await client.auth.getUser();if(!user)redirect('/login');
- const {data:members}=await client.from('business_members').select('business_id,role,businesses(name)').eq('user_id',user.id).limit(1);
- const member=members?.[0];if(!member)redirect('/onboarding');
+ const {client,businessId,role}=await getWorkspace();
  const [plans,requests,assignments]=await Promise.all([
- client.from('public_site_plans').select('id,name,description,price_label,billing_label,features').eq('published',true).order('sort_order'),
- client.from('business_upgrade_requests').select('id,plan_id,status,requested_at,review_note').eq('business_id',member.business_id).order('requested_at',{ascending:false}).limit(10),
- client.from('business_plan_assignments').select('plan_id,approved_at').eq('business_id',member.business_id).maybeSingle()
+  client.from('public_site_plans').select('id,name,description,price_label,billing_label,features').eq('published',true).order('sort_order'),
+  client.from('business_upgrade_requests').select('id,plan_id,status,requested_at,review_note').eq('business_id',businessId).order('requested_at',{ascending:false}).limit(15),
+  client.from('business_plan_assignments').select('plan_id,approved_at').eq('business_id',businessId).maybeSingle()
  ]);
- const planRows=Array.isArray(plans.data)?plans.data:[];
- const requestRows=Array.isArray(requests.data)?requests.data:[];
- const safeFeatures=(value:unknown):string[]=>Array.isArray(value)?value.filter((x):x is string=>typeof x==='string'):[];
- const planName=(id:string)=>planRows.find(p=>p.id===id)?.name||id;
- return <div className="tax-page"><p className="small muted">BUSINESS / SUBSCRIPTION</p><h1>Plans & upgrades</h1><p className="muted">Choose a plan and request access. Only the platform administration team can approve changes. No online charge is made here.</p>
- {(plans.error||requests.error||assignments.error)&&<div className="tax-panel" role="alert"><strong>Some plan information is temporarily unavailable.</strong><p className="small muted">Please contact support if the problem continues. No plan has been changed.</p></div>}<div className="tax-panel"><h2>Current plan</h2><p>{assignments.data?.plan_id?planName(assignments.data.plan_id):'No approved plan assigned yet'}</p>{requests.error&&<p role="alert">Unable to read request history. Check database migration 017.</p>}<h3>Request history</h3>{requestRows.length?requestRows.map(r=><p key={r.id}><strong>{planName(r.plan_id)}</strong> — {r.status} <span className="muted small">{new Date(r.requested_at).toLocaleDateString('en-NG')}</span>{r.review_note&&<span> — {r.review_note}</span>}</p>):<p className="muted">No previous requests.</p>}</div>
- <div className="grid grid-3">{planRows.map(plan=><section className="tax-panel" key={plan.id}><h2>{plan.name}</h2><p>{plan.price_label} {plan.billing_label}</p><p>{plan.description}</p><ul>{safeFeatures(plan.features).map((item:string,i:number)=><li key={i}>{item}</li>)}</ul>{member.role==='owner'?<form action={requestUpgrade}><input type="hidden" name="business_id" value={member.business_id}/><input type="hidden" name="plan_id" value={plan.id}/><label className="field">Reason for upgrade (optional)<textarea name="reason" rows={2} maxLength={1200}/></label><button className="btn btn-primary" disabled={!!requestRows.some(r=>r.status==='pending')||assignments.data?.plan_id===plan.id}>Request upgrade</button></form>:<p className="muted small">Only the business owner can request a change.</p>}</section>)}{!planRows.length&&<p>No published plans. Contact platform support.</p>}</div></div>;
+ const planRows=(Array.isArray(plans.data)?plans.data:[]) as Plan[];
+ const requestRows=(Array.isArray(requests.data)?requests.data:[]) as Request[];
+ const pending=requestRows.some(r=>r.status==='pending');
+ const errors=[plans.error&&'pricing plans',requests.error&&'request history',assignments.error&&'current plan'].filter(Boolean);
+ const nameFor=(id:string)=>planRows.find(p=>p.id===id)?.name||id;
+ const featuresOf=(input:unknown)=>Array.isArray(input)?input.filter((v):v is string=>typeof v==='string'):[];
+ const current=assignments.data?.plan_id;
+ return <div className="tax-page"><p className="small muted">BUSINESS / SUBSCRIPTION</p><h1>Plans & upgrades</h1><p className="muted">Plan changes are subject to platform administrator approval. No online payment is processed on this page.</p>
+ {errors.length>0&&<section className="tax-panel" role="alert"><strong>Some subscription information could not be loaded.</strong><p className="small muted">Unavailable: {errors.join(', ')}. No plan has been changed. Contact platform support if the issue continues.</p></section>}
+ <section className="tax-panel"><h2>Current plan</h2><p>{assignments.error?'Cannot verify current plan':current?nameFor(current):'No approved plan assigned yet'}</p><h3>Request history</h3>
+ {requests.error?<p role="alert">History is unavailable; you cannot safely submit another request yet.</p>:requestRows.length?requestRows.map(r=><p key={r.id}><strong>{nameFor(r.plan_id)}</strong> — {r.status}<span className="small muted"> · {Number.isNaN(new Date(r.requested_at).getTime())?'Date unavailable':new Date(r.requested_at).toLocaleDateString('en-NG')}</span>{r.review_note&&<span> · {r.review_note}</span>}</p>):<p className="muted">No previous requests.</p>}</section>
+ <div className="grid grid-3">{planRows.map(plan=><section className="tax-panel" key={plan.id}><h2>{plan.name}</h2><p>{plan.price_label||'Contact sales'} {plan.billing_label||''}</p><p>{plan.description||''}</p><ul>{featuresOf(plan.features).map((item,i)=><li key={i}>{item}</li>)}</ul>
+ {role==='owner'?<UpgradeRequestForm planId={plan.id} disabled={pending||current===plan.id||Boolean(errors.length)}/>:<p className="muted small">Only the business owner can request a plan change.</p>}
+ {current===plan.id&&<p className="small muted">Your current approved plan</p>}
+ </section>)}{!planRows.length&&!plans.error&&<p>No published plans are currently available. Contact platform support.</p>}</div></div>;
 }

@@ -13,5 +13,6 @@ jobs:
           node-version: '22'
       - run: if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
       - run: npm run check:routes
+      - run: npm run check:phase21
       - run: npm run typecheck
       - run: npm run build

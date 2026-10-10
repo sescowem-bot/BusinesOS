@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "check:routes": "node scripts/check-routes.cjs"
+    "check:routes": "node scripts/check-routes.cjs",
+    "check:phase21": "node scripts/verify-phase21.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
