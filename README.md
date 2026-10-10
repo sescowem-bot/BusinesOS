@@ -24,3 +24,7 @@ The automatic accounting bridge is **disabled by default** and requires chart ma
 ## Phase 026: Email, notifications and brand media
 
 Read [`MD/PHASE_026_COMPLETE_GUIDE.md`](MD/PHASE_026_COMPLETE_GUIDE.md) before installation. It includes SQL 025 (email delivery records) and SQL 026 (public brand asset storage). The System Owner can upload logo and favicon files from `/admin/website`, while email previews and provider test sending are managed from `/admin/email`. Existing Supabase authentication email sending is retained until the optional signed Auth Hook has been tested in staging. No secrets belong in `NEXT_PUBLIC_*` variables.
+
+## Phase 027 operational integrity
+
+Inventory physical counts, source-accounting reconciliation, and tax-review safeguards are included. Read `MD/PHASE_027_RELEASE_NOTES.md` for the SQL prerequisite and rollout tests. The new migration is `supabase/migrations/027_inventory_counts_security.sql`. Do not enable new functionality in production until staging has passed.

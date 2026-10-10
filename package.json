@@ -19,6 +19,7 @@
     "organize:docs": "node scripts/organize-docs.cjs",
     "check:admin-ui": "node scripts/verify-admin-redesign.cjs",
     "check:phase26": "node scripts/verify-phase26.cjs",
+    "check:phase27": "node scripts/verify-phase27.cjs",
     "check:branding-assets": "node scripts/verify-phase26-branding.cjs"
   },
   "dependencies": {
