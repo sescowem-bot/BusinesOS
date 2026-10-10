@@ -1,17 +1,15 @@
-import {requireBusinessFeature} from '@/lib/server/authorization';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {ExpenseForm} from './expense-form';
 export const dynamic='force-dynamic';
 export default async function Expenses(){
  const {client,businessId,role}=await getWorkspace();
- const [expenses,access]=await Promise.all([
-  client.from('expenses').select('id,description,amount,paid_at,expense_categories(name)').eq('business_id',businessId).order('paid_at',{ascending:false}).limit(200),
-  requireBusinessFeature('expenses')
- ]);
+ // Expenses are a core feature: the workspace verifies membership and RLS
+ // restricts the query to the current business. Creation is finance-role only.
+ const expenses=await client.from('expenses').select('id,description,amount,paid_at,expense_categories(name)').eq('business_id',businessId).order('paid_at',{ascending:false}).limit(200);
  if(expenses.error)return <section className="tax-page"><h1>Expenses</h1><p role="alert">Expense records could not be loaded. Verify your workspace access.</p></section>;
  const rows=expenses.data||[],total=rows.reduce((v,e)=>v+Number(e.amount),0);
- const mayCreate=access.allowed&&['owner','manager','finance'].includes(role);
+ const mayCreate=['owner','manager','finance'].includes(role);
  return <div className="tax-page"><p className="small muted">BUSINESS / FINANCE</p><h1>Expenses</h1><p className="muted">Actual paid expenses recorded for your business. Accounting postings are tracked separately.</p>
  {mayCreate&&<ExpenseForm/>}
  <section className="tax-panel"><p className="small muted">Total of displayed {rows.length} records</p><h2>{money(total)}</h2></section>

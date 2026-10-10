@@ -24,8 +24,15 @@ const remaining=fs.readdirSync(root).filter(f=>f.endsWith('.md')&&f!=='README.md
 assert.equal(remaining.length,0,`Markdown still in project root: ${remaining.join(', ')}`);
 assert(fs.existsSync(path.join(root,'MD','PHASE_025_ACCOUNTING_INTEGRATION.md')));
 assert(read('app/(dashboard)/accounting/integration-actions.ts').includes("requireBusinessFeature('accounting')"));
-assert(read('app/(dashboard)/expenses/actions.ts').includes("requireBusinessFeature('expenses')"));
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
+const expenseAction=read('app/(dashboard)/expenses/actions.ts');
+const expensePage=read('app/(dashboard)/expenses/page.tsx');
+assert(expenseAction.includes('getWorkspace()'),'Expense writes must validate workspace membership');
+assert(expenseAction.includes("['owner','manager','finance'].includes(a.role)"),'Expense writes must require finance roles');
+assert(expenseAction.includes("client.rpc('gl_record_paid_expense'"),'Expense writes must use guarded database RPC');
+assert(expensePage.includes('getWorkspace()'),'Expense page must validate workspace membership');
+assert(!expenseAction.includes("requireBusinessFeature('expenses')"),'Core expenses cannot pass as paid-only feature');
+assert(!expensePage.includes("requireBusinessFeature('expenses')"),'Core expenses cannot pass as paid-only feature');
+const ts=require('typescript');
 let count=0;
 function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){
   if(item.name==='node_modules'||item.name==='.next')continue;

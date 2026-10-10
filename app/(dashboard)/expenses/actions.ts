@@ -1,11 +1,12 @@
 'use server';
 import {revalidatePath} from 'next/cache';
-import {requireBusinessFeature} from '@/lib/server/authorization';
+import {getWorkspace} from '@/lib/server/workspace';
 export type ExpenseResult={error:string;success:string};
 export async function createPaidExpense(_:ExpenseResult,fd:FormData):Promise<ExpenseResult>{
  try{
-  const a=await requireBusinessFeature('expenses');
-  if(!a.allowed)return {error:a.reason,success:''};
+  // Expenses are a core capability. A verified membership and the finance role
+  // are required here; gl_record_paid_expense enforces both again in PostgreSQL.
+  const a=await getWorkspace();
   if(!['owner','manager','finance'].includes(a.role))return {error:'Finance permission required.',success:''};
   const description=String(fd.get('description')||'').trim();
   const raw=String(fd.get('amount')||'');
