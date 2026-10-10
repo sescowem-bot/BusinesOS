@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import {requirePlatformAdmin} from '@/lib/server/supabase';
+import {getPlatformBrand} from '@/lib/server/branding';
+import {savePlatformEmailTemplate} from './actions';
+export const dynamic='force-dynamic';
+type Template={template_key:string;subject:string;heading:string;body_text:string;button_label:string;enabled:boolean};
+export default async function EmailAdmin(){
+ const session=await requirePlatformAdmin();if(!session)return <main className="admin-access"><h1>Administrator access required</h1><Link href="/login">Sign in</Link></main>;
+ const [brand,result]=await Promise.all([getPlatformBrand(),session.client.from('platform_email_templates').select('template_key,subject,heading,body_text,button_label,enabled').order('template_key')]);
+ return <main className="admin-area"><header className="admin-header"><div><span className="badge badge-brand">PLATFORM OWNER</span><h1>Email templates & notifications</h1><p>Manage platform notification copy. The branding shown below follows your Super Admin identity settings.</p></div><Link className="btn" href="/admin">Back to dashboard</Link></header>
+ <section className="card card-pad" style={{marginBottom:20}}><h2>Current email branding</h2><p><strong>{brand.name}</strong> · {brand.support_email||'Set your support email in platform settings'}</p><p className="small muted">Logo: {brand.logo_url?'Configured':'Not configured'} · Primary colour: {brand.primary_color}</p><p className="small muted">Templates are stored here for future email delivery. Supabase Auth continues using its existing email provider until the Auth Hook is safely deployed and enabled. No messages are sent from this screen.</p></section>
+ {result.error?<section className="card card-pad" role="alert">Unable to load templates. Apply migration 020 and verify administrator access.</section>:<div className="grid grid-2">{((result.data||[]) as Template[]).map(t=><section className="card card-pad" key={t.template_key}><h2>{t.template_key.replaceAll('_',' ')}</h2><form action={savePlatformEmailTemplate}><input type="hidden" name="template_key" value={t.template_key}/><label className="field">Email subject<input name="subject" required maxLength={200} defaultValue={t.subject}/></label><label className="field">Heading<input name="heading" maxLength={200} defaultValue={t.heading}/></label><label className="field">Email content<textarea name="body_text" rows={5} maxLength={10000} defaultValue={t.body_text}/></label><label className="field">Button label<input name="button_label" maxLength={100} defaultValue={t.button_label}/></label><label className="field"><input name="enabled" type="checkbox" defaultChecked={t.enabled}/> Enabled</label><button className="btn btn-primary" type="submit">Save template</button></form></section>)}</div>}
+ </main>;
+}

@@ -1,7 +1,8 @@
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
 import {VatEstimator} from './vat-estimator';
-export default async function TaxCentre(){
+async function InternalProtectedPage(){
  const {client,businessId}=await getWorkspace();
  const [{data:supplies,error:suppliesError},{data:assignments,error:assignmentsError}]=await Promise.all([
  client.from('business_supply_categories').select('id,name,supply_kind').eq('business_id',businessId).order('name'),
@@ -19,4 +20,10 @@ export default async function TaxCentre(){
  <section className="tax-panel"><h2>Mixed-invoice VAT estimator</h2><VatEstimator items={mapped}/></section>
  <section className="tax-panel"><h2>Legal foundation</h2><p className="muted">Rules are versioned, with legal citations and effective dates. Standard, zero-rated, exempt and outside-scope are distinct classifications. Pending classifications are not assumed standard-rated.</p><p><a href="https://nass.gov.ng/documents/download/11249" target="_blank" rel="noopener noreferrer">Nigeria Tax Act 2025 (National Assembly)</a></p><p><a href="https://fmino.gov.ng/federal-government-issues-transition-guidelines-for-tax-acts-2025/" target="_blank" rel="noopener noreferrer">2026 transition guidance</a></p></section>
  </div>;
+}
+
+export default async function GuardedPage(){
+ const check=await requireBusinessFeature('tax');
+ if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
+ return <InternalProtectedPage/>;
 }

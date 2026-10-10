@@ -1,7 +1,8 @@
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {AccountingSetup,JournalForm} from './forms';
-export default async function AccountingPage(){
+async function InternalProtectedPage(){
  const {client,businessId,role}=await getWorkspace();
  const allowed=['owner','manager','finance'].includes(role);
  if(!allowed)return <div className="tax-page"><h1>Accounting</h1><p>Only the business owner or authorised finance staff can view the ledger.</p></div>;
@@ -19,4 +20,10 @@ export default async function AccountingPage(){
  <section className="tax-panel"><h2>Record a journal</h2><JournalForm accounts={accounts||[]}/></section>
  <section className="tax-panel"><h2>Recently posted journals</h2><div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Description</th><th>Reference</th><th>Status</th></tr></thead><tbody>{(journals||[]).map(j=><tr key={j.id}><td>{j.journal_date}</td><td>{j.description}</td><td>{j.reference||'—'}</td><td>{j.status}</td></tr>)}</tbody></table></div></section>
  </div>;
+}
+
+export default async function GuardedPage(){
+ const check=await requireBusinessFeature('accounting');
+ if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
+ return <InternalProtectedPage/>;
 }

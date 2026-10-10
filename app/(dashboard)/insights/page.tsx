@@ -1,8 +1,9 @@
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import Link from 'next/link';
 import {loadBusinessInsights} from '@/lib/insights/server';
 import {money} from '@/lib/format';
 const asMoney=(kobo:number)=>money(kobo/100);
-export default async function InsightsPage(){
+async function InternalProtectedPage(){
  let report:Awaited<ReturnType<typeof loadBusinessInsights>>;
  try{report=await loadBusinessInsights()}catch(e){return <div className="tax-page"><h1>Business Intelligence</h1><p role="alert">Insights unavailable. Check your workspace access, database migrations and reporting data.</p><Link href="/dashboard">Return to dashboard</Link></div>}
  const {current:c,previous:p,insights}=report;
@@ -14,4 +15,10 @@ export default async function InsightsPage(){
  <section className="tax-panel"><h2>Month comparison</h2><div className="table-wrap"><table className="table"><thead><tr><th>Metric</th><th>Previous month</th><th>Current month</th></tr></thead><tbody><tr><td>Sales by order date</td><td>{asMoney(p.sales)}</td><td>{asMoney(c.sales)}</td></tr><tr><td>Received payments</td><td>{asMoney(p.received)}</td><td>{asMoney(c.received)}</td></tr><tr><td>Recorded expenses</td><td>{asMoney(p.expenses)}</td><td>{asMoney(c.expenses)}</td></tr><tr><td>Number of orders</td><td>{p.orders}</td><td>{c.orders}</td></tr></tbody></table></div></section>
  <section className="tax-panel"><h2>Inventory attention</h2><p className="muted">Stock valuation uses recorded unit costs; it is not a substitute for reconciled inventory accounts.</p><p>Stock value at recorded cost: <strong>{asMoney(c.inventoryValue)}</strong></p><div className="table-wrap"><table className="table"><thead><tr><th>Product</th><th>Available</th><th>Minimum</th></tr></thead><tbody>{c.lowStock.map(x=><tr key={x.id}><td>{x.name}</td><td>{x.stock_quantity}</td><td>{x.minimum_stock}</td></tr>)}</tbody></table></div>{!c.lowStock.length&&<p>No low-stock warnings.</p>}</section>
  <p className="muted small">Important: cancellations are excluded from sales; only completed payments count as received. Outstanding balances use existing orders and payments. Refunds, reversals, taxes and manual journals may need further reconciliation. Use <Link href="/reports">Financial Reports</Link> for ledger-based financial statements.</p></div>
+}
+
+export default async function GuardedPage(){
+ const check=await requireBusinessFeature('insights');
+ if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
+ return <InternalProtectedPage/>;
 }

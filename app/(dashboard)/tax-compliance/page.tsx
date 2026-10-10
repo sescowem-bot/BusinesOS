@@ -1,6 +1,7 @@
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import Link from 'next/link';
 import {financialContext} from '@/lib/reporting/server';
-export default async function TaxCompliancePage(){
+async function InternalProtectedPage(){
  let context;try{context=await financialContext()}catch{return <div className="tax-page"><h1>Tax compliance</h1><p>Finance permission required.</p></div>}
  const {client,businessId}=context;
  const [{data:profile,error:profileError},{data:snapshots,error:snapshotError},{data:deadlines,error:deadlineError}]=await Promise.all([
@@ -15,4 +16,10 @@ export default async function TaxCompliancePage(){
  <section className="tax-panel"><h2>Recorded calculation reviews</h2>{snapshotError?<p role="alert">Tax snapshots unavailable; check migration 009.</p>:<div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Transaction</th><th>Review status</th></tr></thead><tbody>{(snapshots||[]).map(s=><tr key={s.id}><td>{s.tax_date}</td><td>{s.transaction_reference||s.id}</td><td>{s.status}</td></tr>)}</tbody></table></div>}{!snapshotError&&!snapshots?.length&&<p className="muted">No tax calculation snapshots available.</p>}</section>
  <section className="tax-panel"><h2>Export compliance evidence</h2><p className="muted">Use <Link href="/api/reports/export?kind=tax-review">the CSV review schedule</Link> to inspect recorded cases in Excel. An approved VAT return needs additional transaction-level data and reconciliation.</p></section>
  </div>;
+}
+
+export default async function GuardedPage(){
+ const check=await requireBusinessFeature('tax');
+ if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
+ return <InternalProtectedPage/>;
 }

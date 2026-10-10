@@ -1,8 +1,9 @@
+import {requireBusinessFeature} from '@/lib/server/authorization';
 import Link from 'next/link';
 import {money} from '@/lib/format';
 import {financialContext,loadTrial} from '@/lib/reporting/server';
 import {balanceSheet,profitAndLoss,trialBalance} from '@/lib/reporting/financial';
-export default async function ReportsPage(){
+async function InternalProtectedPage(){
  let rows;try{await financialContext();rows=await loadTrial()}catch(e){return <section className="tax-page"><h1>Financial Reports</h1><p role="alert">Reports unavailable. You need finance permission and migration 008.</p></section>}
  const tb=trialBalance(rows),pl=profitAndLoss(rows),bs=balanceSheet(rows);
  return <div className="tax-page"><p className="muted small">FINANCE / REPORTING</p><h1>Financial Reports</h1><p className="muted">Generated from posted general-ledger entries only. Existing operational sales and expenses are not yet journalized automatically; these figures can be incomplete.</p>
@@ -13,4 +14,10 @@ export default async function ReportsPage(){
  <section className="tax-panel"><h2>Accountant-ready CSV exports</h2><p className="muted">Exports are generated server-side and scoped to your business membership.</p><div className="grid grid-2"><Link className="btn" href="/api/reports/export?kind=trial">Download trial balance CSV</Link><Link className="btn" href="/api/reports/export?kind=ledger">Download general ledger CSV</Link><Link className="btn" href="/api/reports/export?kind=tax-review">Download VAT review schedule CSV</Link></div><p className="muted small">CSV opens in Excel. Tax review schedules are not VAT returns and contain no automatic tax filing.</p></section>
  <p><Link href="/tax-compliance">Open Tax Compliance Centre →</Link></p>
  </div>;
+}
+
+export default async function GuardedPage(){
+ const check=await requireBusinessFeature('financial_reports');
+ if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
+ return <InternalProtectedPage/>;
 }
