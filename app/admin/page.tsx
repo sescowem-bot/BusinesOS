@@ -11,6 +11,7 @@ const tools=[
  {name:'Feature permissions',detail:'Control module and team-role entitlements.',href:'/admin/plan-access',icon:ShieldCheck},
  {name:'Email templates',detail:'Review branded notifications and delivery settings.',href:'/admin/email',icon:Mail},
  {name:'System health',detail:'Check data services and administration readiness.',href:'/admin/health',icon:MonitorCog},
+ {name:'Customer assistance',detail:'Review support requests and owner-authorised staff role changes.',href:'/admin/support',icon:UsersRound},
  {name:'Pilot readiness',detail:'Record launch tests, blockers and evidence with an audit trail.',href:'/admin/pilot',icon:ClipboardCheck},
 ];
 export default async function AdminPage(){

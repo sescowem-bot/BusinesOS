@@ -22,6 +22,6 @@ check(!workspace.includes('unstable_cache'),'private identity must never be cach
 check(read('app/admin/actions.ts').includes("updateTag('businessos-public-brand')"),'admin brand cache invalidation absent');
 check(read('app/admin/cms-actions.ts').includes("updateTag('businessos-public-pages')"),'CMS cache invalidation absent');
 check(read('app/admin/cms-actions.ts').includes("updateTag('businessos-public-plans')"),'public plans cache invalidation absent');
-check(read('app/(dashboard)/dashboard/page.tsx').includes('<Suspense fallback='),'private dashboard streaming skeleton absent');
+check(read('app/(dashboard)/dashboard/page.tsx').includes('business_dashboard_command')&&read('app/(dashboard)/dashboard/loading.tsx').includes('aria-busy'),'bounded dashboard RPC + loading route absent');
 check(read('components/public-nav.tsx').includes('prefetch={false}'),'public nav prefetch must be bounded');
 console.log(`BusinessOS performance integrity passed (${checked} checks); live timings require Vercel Preview and Web Vitals.`);

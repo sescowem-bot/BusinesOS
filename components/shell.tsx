@@ -14,12 +14,12 @@ const groups:NavigationGroup[]=[
  {title:'Operations',items:[{label:'Expenses',href:'/expenses',icon:Wallet},{label:'Inventory',href:'/inventory',icon:Warehouse},{label:'Branch stock & transfers',href:'/inventory/locations',icon:Warehouse},{label:'Suppliers & purchasing',href:'/purchasing',icon:Package},{label:'Tasks',href:'/tasks',icon:Target},{label:'Automation requests',href:'/automations/requests',icon:Target},{label:'Team & branches',href:'/team',icon:Users}]},
  {title:'Finance & compliance',items:[{label:'Accounting',href:'/accounting',icon:Calculator},{label:'Financial reports',href:'/reports',icon:BarChart3},{label:'Retail performance',href:'/retail-reports',icon:BarChart3},{label:'Tax Centre',href:'/tax-centre',icon:Calculator},{label:'Tax Compliance',href:'/tax-compliance',icon:ShieldCheck},{label:'Tax Discovery',href:'/tax-profile',icon:FileText}]},
  {title:'Engagement & growth',items:[{label:'Communications',href:'/communications',icon:Users},{label:'Campaigns',href:'/campaigns',icon:Target},{label:'Insights',href:'/insights',icon:Activity},{label:'Growth Centre',href:'/growth',icon:BriefcaseBusiness},{label:'Marketplace',href:'/marketplace',icon:Store},{label:'Partners',href:'/partners',icon:Handshake}]},
- {title:'Workspace',items:[{label:'Plans & upgrades',href:'/upgrade',icon:CreditCard},{label:'Settings',href:'/settings',icon:Settings}]}
+ {title:'Workspace',items:[{label:'Plans & upgrades',href:'/upgrade',icon:CreditCard},{label:'Help & support',href:'/support',icon:ShieldCheck},{label:'Settings',href:'/settings',icon:Settings}]}
 ];
 const ownerLinks:NavigationItem[]=[
  {label:'Admin Console',href:'/admin',icon:ShieldCheck},
  {label:'Manage website',href:'/admin/website',icon:Home},
- {label:'Manage businesses',href:'/admin/businesses',icon:Building2},
+ {label:'Manage businesses',href:'/admin/businesses',icon:Building2},{label:'Support & roles',href:'/admin/support',icon:ShieldCheck},
  {label:'Manage plans and pricing',href:'/admin/plans',icon:CreditCard},{label:'Automation service requests',href:'/admin/automations',icon:Target},
  {label:'Pilot readiness',href:'/admin/pilot',icon:ShieldCheck},
  {label:'Switch my business',href:'/admin/my-business',icon:BriefcaseBusiness}

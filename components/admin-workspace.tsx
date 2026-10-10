@@ -12,7 +12,7 @@ type NavigationItem = {href:string;label:string;icon:IconComponent;exact?:boolea
 const navigation: {heading:string;items:NavigationItem[]}[] = [
  {heading:'CONTROL CENTRE',items:[{href:'/admin',label:'Overview',icon:LayoutDashboard,exact:true},{href:'/admin/notifications',label:'Notifications',icon:Bell},{href:'/admin/health',label:'System health',icon:Activity},{href:'/admin/pilot',label:'Pilot readiness',icon:ClipboardCheck}]},
  {heading:'WEBSITE MANAGEMENT',items:[{href:'/admin/website',label:'Website overview',icon:Globe2},{href:'/admin/content',label:'Pages & content',icon:PanelTop},{href:'/admin/plans',label:'Pricing plans',icon:CreditCard},{href:'/admin/email',label:'Email templates',icon:Mail}]},
- {heading:'BUSINESS MANAGEMENT',items:[{href:'/admin/businesses',label:'Registered businesses',icon:Building2},{href:'/admin/upgrades',label:'Upgrade approvals',icon:ShieldCheck},{href:'/admin/automations',label:'Automation requests',icon:ClipboardCheck},{href:'/admin/plan-access',label:'Features & roles',icon:SlidersHorizontal}]},
+ {heading:'BUSINESS MANAGEMENT',items:[{href:'/admin/businesses',label:'Registered businesses',icon:Building2},{href:'/admin/upgrades',label:'Upgrade approvals',icon:ShieldCheck},{href:'/admin/support',label:'Support & role assistance',icon:ShieldCheck},{href:'/admin/automations',label:'Automation requests',icon:ClipboardCheck},{href:'/admin/plan-access',label:'Features & roles',icon:SlidersHorizontal}]},
  {heading:'MY WORKSPACE',items:[{href:'/admin/my-business',label:'My business',icon:Wallet},{href:'/',label:'Public website',icon:ExternalLink,exact:true}]},
 ];
 function isSelected(path:string,item:NavigationItem){

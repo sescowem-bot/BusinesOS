@@ -26,6 +26,9 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
   const paymentAmount=Number(form.get('payment_amount')||0);
   const paymentMethod=paymentState==='unpaid'?null:String(form.get('payment_method')||'');
   const paymentReference=String(form.get('payment_reference')||'').trim();
+  const costRaw=String(form.get('unit_cost')||'').trim();
+  const unitCost=costRaw===''?null:Number(costRaw);
+  if(unitCost!==null&&(!Number.isFinite(unitCost)||unitCost<0||unitCost>9999999999.99||Math.abs(unitCost-Math.round(unitCost*100)/100)>0.00000001))return {error:'Enter a valid unit cost with two decimals, or leave it blank if unknown.',success:''};
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if(!uuid.test(customer)||!uuid.test(requestKey)||desc.length<2||desc.length>200||
     ![quantity,unitPrice,discount,delivery,paymentAmount].every(Number.isFinite)||
@@ -37,15 +40,15 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
     (paymentState!=='unpaid'&&!['transfer','cash','pos','card','other'].includes(paymentMethod||''))||
     paymentReference.length>150||Boolean(date&&!/^\d{4}-\d{2}-\d{2}$/.test(date)))
    return {error:'Check your order details and the payment amount before saving.',success:''};
-  const {data,error}=await client.rpc('crm_create_order_with_initial_payment',{
+  const {data,error}=await client.rpc('crm_create_order_with_cost',{
    p_business:businessId,p_customer:customer,p_request_key:requestKey,p_mode:'manual',
    p_description:desc,p_supply:null,p_quantity:quantity,p_unit_price:unitPrice,
    p_discount:discount,p_delivery:delivery,p_due_date:date||null,
    p_payment_state:paymentState,p_payment_amount:paymentAmount,
-   p_payment_method:paymentMethod,p_payment_reference:paymentReference||null
+   p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
   if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
-   'Order payments on creation require SQL migration 036. Ask the System Owner to install it.':
+   'Order payments on creation require SQL migration 042. Ask the System Owner to install it.':
    'Order was not created. Check payment amount, customer, business access or reviewed VAT requirements.',success:''};
   if(!data)return {error:'The saved order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);

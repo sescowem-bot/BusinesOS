@@ -7,3 +7,11 @@ export async function addBranch(form:FormData){const w=await owner();const name=
 export async function requestApproval(form:FormData){const w=await requireBusinessFeature('team');if(!w.allowed)throw new Error(w.reason);const title=String(form.get('title')||'').trim(),details=String(form.get('details')||'').trim(),type=String(form.get('request_type')||'other');if(title.length<3||title.length>160||details.length>2000||!['expense','purchase','adjustment','other'].includes(type))throw new Error('Invalid request');const {data:{user}}=await w.client.auth.getUser();if(!user)throw new Error('Not authenticated');const {error}=await w.client.from('business_approval_requests').insert({business_id:w.businessId,title,details,request_type:type,requested_by:user.id});if(error)throw new Error(error.message);revalidatePath('/team');}
 export async function reviewApproval(form:FormData){const w=await owner();const id=String(form.get('id')||''),approve=String(form.get('decision'))==='approved';if(!/^[0-9a-f-]{36}$/i.test(id))throw new Error('Invalid request');const {error}=await w.client.rpc('review_business_approval',{p_request_id:id,p_approve:approve,p_note:String(form.get('note')||'').slice(0,500)});if(error)throw new Error(error.message);revalidatePath('/team');}
 export async function acceptInvitation(form:FormData){const w=await requireBusinessFeature('team');if(!w.allowed)throw new Error(w.reason);const id=String(form.get('id')||'');if(!/^[0-9a-f-]{36}$/i.test(id))throw new Error('Invalid invitation');const {error}=await w.client.rpc('accept_team_invitation',{p_invitation_id:id});if(error)throw new Error(error.message);revalidatePath('/team');}
+/** Adjust an existing staff role with owner consent; business owners cannot transfer ownership here. */
+export async function changeTeamRole(form:FormData){
+ const w=await owner();const member=String(form.get('member')||''),role=String(form.get('role')||'');
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(member)||
+ !['manager','sales','inventory','finance','staff'].includes(role))throw new Error('Choose an existing member and permitted role');
+ const {error}=await w.client.rpc('business_update_team_role',{p_business:w.businessId,p_member:member,p_role:role});
+ if(error)throw new Error(error.message);revalidatePath('/team');
+}

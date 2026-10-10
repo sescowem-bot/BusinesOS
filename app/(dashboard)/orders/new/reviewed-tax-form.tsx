@@ -4,7 +4,7 @@ import {createReviewedTaxOrder,type ReviewedTaxState} from './reviewed-tax-actio
 import {InitialPaymentFields} from '@/components/order-initial-payment';
 import {useState} from 'react';
 const initial:ReviewedTaxState={error:'',success:''};
-export function ReviewedTaxForm({customers,supplies,requestKey}:{customers:Array<{id:string;name:string}>;supplies:Array<{id:string;name:string;treatment:string;rateBasisPoints:number}>;requestKey:string}){
+export function ReviewedTaxForm({customers,supplies,requestKey,canRecordCost=false}:{customers:Array<{id:string;name:string}>;supplies:Array<{id:string;name:string;treatment:string;rateBasisPoints:number}>;requestKey:string;canRecordCost?:boolean}){
  const [state,action,pending]=useActionState(createReviewedTaxOrder,initial);
  const [quantity,setQuantity]=useState('1'),[unitPrice,setUnitPrice]=useState(''),[discount,setDiscount]=useState('0'),[supplyId,setSupplyId]=useState('');
  const s=supplies.find(x=>x.id===supplyId);
@@ -19,6 +19,7 @@ export function ReviewedTaxForm({customers,supplies,requestKey}:{customers:Array
    <label className="field">Quantity<input type="number" name="quantity" value={quantity} onChange={e=>setQuantity(e.target.value)} step="0.001" min="0.001" required/></label>
    <label className="field">Unit price before VAT (₦)<input type="number" name="unit_price" value={unitPrice} onChange={e=>setUnitPrice(e.target.value)} min="0" step="0.01" required/></label>
    <label className="field">Discount before VAT (₦)<input type="number" name="discount" value={discount} onChange={e=>setDiscount(e.target.value)} min="0" step="0.01" required/></label>
+   {canRecordCost&&<label className="field">Estimated cost per unit (₦) — optional<input type="number" name="unit_cost" min="0" step="0.01" placeholder="Leave blank if unknown"/><small className="muted">Only owner, manager or finance may record cost evidence. An unknown cost is not zero.</small></label>}
    <label className="field">Payment due date<input type="date" name="due_date"/></label>
   </div>
   <p className="muted small">The tax rate is selected by the database from ONE approved supply rule effective on the transaction date. Delivery charges are not supported in this reviewed flow until their VAT classification is configured. This does not create a certified NRS e-invoice.</p>

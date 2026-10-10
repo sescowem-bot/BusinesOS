@@ -1,3 +1,5 @@
+> **Latest prepared upgrade:** Phase 030M-C, **Professional Business Dashboard, Estimated Profit Evidence and Support/Role Controls** (SQL 042). See `MD/PHASE_030M_C_DASHBOARD_ADMIN_SUPPORT.md`. Run only after SQL 041 is installed, and test in staging before production.
+
 > Current prepared development: **Phase 030M-A — Wholesale Reference Tiers & Fast Retail Performance (SQL 041)**. See `MD/PHASE_030M_WHOLESALE_FAST_REPORTING.md`. Apply SQL 041 after SQL 040 in staging.
 
 > **Latest prepared performance hotfix:** Public route caching, targeted Supabase proxy, request-scoped workspace verification and responsive loading states. Read `MD/PERFORMANCE_REVIEW_AND_OPTIMIZATION.md` before merging or deploying. No new SQL is required for this patch.
@@ -133,3 +135,7 @@ See `MD/PHASE_030K_PARTIAL_RECEIPTS_SUPPLIER_BILLS.md`. SQL 038 must be applied 
 Routes `/retail-reports` and `/wholesale` add bounded, indexed POS operational reporting and a reference bulk pricing catalogue. They do **not** automatically change VAT-reviewed POS prices or existing financial ledger statements. No new paid API is required. See the Phase 030M installation and staging checklist in `MD/`.
 
 **Release gate:** the inherited source does not include `package-lock.json`. Generate and review one before requiring `npm ci`; run `npm run typecheck` and `npm run build` on a clean install before production.
+
+## Phase 030M-C
+
+Dashboard uses a compact SQL RPC, shows customer payment statuses and carefully qualified profit estimates. Owners/managers/finance can supply cost evidence; owners can manage existing team roles; Platform Admin can assist through an explicit customer-support workflow. SQL 042 is required. The app has **not** been deployed, migration 042 has **not** been executed, and a full Next.js production build has **not** been verified in this source session.

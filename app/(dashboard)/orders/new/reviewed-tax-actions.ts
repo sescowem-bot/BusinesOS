@@ -14,6 +14,9 @@ export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):P
   const paymentAmount=Number(form.get('payment_amount')||0);
   const paymentMethod=paymentState==='unpaid'?null:String(form.get('payment_method')||'');
   const paymentReference=String(form.get('payment_reference')||'').trim();
+  const costRaw=String(form.get('unit_cost')||'').trim();
+  const unitCost=costRaw===''?null:Number(costRaw);
+  if(unitCost!==null&&(!Number.isFinite(unitCost)||unitCost<0||unitCost>9999999999.99||Math.abs(unitCost-Math.round(unitCost*100)/100)>0.00000001))return {error:'Enter a valid unit cost with two decimals, or leave it blank if unknown.',success:''};
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if(!uuid.test(customer)||!uuid.test(supply)||!uuid.test(requestKey)||
    ![quantity,price,discount,paymentAmount].every(Number.isFinite)||
@@ -27,15 +30,15 @@ export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):P
    return {error:'Select an approved supply and check the order and initial payment details.',success:''};
   const {client,businessId,role}=await getWorkspace();
   if(!['owner','manager','finance','sales'].includes(role))return {error:'Not authorised to create orders.',success:''};
-  const {data,error}=await client.rpc('crm_create_order_with_initial_payment',{
+  const {data,error}=await client.rpc('crm_create_order_with_cost',{
    p_business:businessId,p_customer:customer,p_request_key:requestKey,p_mode:'reviewed',
    p_description:null,p_supply:supply,p_quantity:quantity,p_unit_price:price,
    p_discount:discount,p_delivery:0,p_due_date:dueDate||null,
    p_payment_state:paymentState,p_payment_amount:paymentAmount,
-   p_payment_method:paymentMethod,p_payment_reference:paymentReference||null
+   p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
   if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
-   'Apply SQL 036 to enable creating a reviewed order with its payment.':
+   'Apply SQL 042 after 041 to enable order cost evidence and payment.':
    'Order not saved. Verify the VAT profile, approved classification, payment details and total.',success:''};
   if(!data)return {error:'Order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);

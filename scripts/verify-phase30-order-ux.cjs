@@ -21,11 +21,12 @@ assert.match(sql,/REVOKE ALL ON public\.business_order_create_requests FROM PUBL
 assert.match(sql,/GRANT EXECUTE .*authenticated/);
 assert.doesNotMatch(sql,/UPDATE public\.business_invoices|DELETE FROM public\.orders/);
 for(const src of [classic,reviewed]){
- assert.match(src,/crm_create_order_with_initial_payment/);
+ assert.match(src,/crm_create_order_with_initial_payment|crm_create_order_with_cost/);
  assert.match(src,/p_payment_state:paymentState/);
  assert.match(src,/p_request_key:requestKey/);
  assert.match(src,/redirect\(`\/orders\/\$\{savedOrderId\}\?created=1`\)/);
 }
+assert.match(read('supabase/migrations/042_dashboard_support_roles.sql'),/v_order:=public.crm_create_order_with_initial_payment/);
 assert.match(payment,/Not paid/);assert.match(payment,/Part payment/);assert.match(payment,/Paid in full/);
 assert.match(payment,/name="payment_method"/);assert.match(payment,/name="payment_amount"/);
 assert.match(detail,/paymentLabel/);assert.match(detail,/Order saved successfully/);

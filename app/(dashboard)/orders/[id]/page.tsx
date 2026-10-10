@@ -2,6 +2,7 @@ import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 import {PaymentForm} from '../../sales/forms';
+import {OrderCostForm} from './cost-form';
 import {IssueInvoiceForm} from '../../invoices/issue-form';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
@@ -11,9 +12,11 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
  const {created}=await searchParams;
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))notFound();
  const {client,businessId,role}=await getWorkspace();
- const [orderResult,invoiceResult]=await Promise.all([
+ const [orderResult,invoiceResult,costResult,posResult]=await Promise.all([
   client.from('orders').select('id,order_number,status,subtotal,discount,tax,delivery_fee,total,due_date,order_items(name_snapshot,quantity,unit_price,line_total),payments(id,amount,method,status,paid_at)').eq('id',id).eq('business_id',businessId).maybeSingle(),
-  client.from('business_invoices').select('id,invoice_number').eq('business_id',businessId).eq('order_id',id).maybeSingle()
+  client.from('business_invoices').select('id,invoice_number').eq('business_id',businessId).eq('order_id',id).maybeSingle(),
+  ['owner','manager','finance'].includes(role)?client.from('business_order_cost_evidence').select('unit_cost,recorded_at').eq('business_id',businessId).eq('order_id',id).maybeSingle():Promise.resolve({data:null,error:null}),
+  ['owner','manager','finance'].includes(role)?client.from('business_pos_sales').select('id').eq('business_id',businessId).eq('order_id',id).maybeSingle():Promise.resolve({data:null,error:null})
  ]);
  if(orderResult.error||!orderResult.data)notFound();
  const order=orderResult.data,pays=Array.isArray(order.payments)?order.payments:[];
@@ -38,6 +41,7 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
    <div className="bo-detail-row bo-detail-total"><span>Total</span><strong>{money(total)}</strong></div>
    </div>
   </BusinessSection>
+  {['owner','manager','finance'].includes(role)&&<BusinessSection title="Estimated profit cost evidence" description="Internal item costs are not invoice prices. Missing cost evidence is never treated as zero."><div className="bo-detail-section-body">{costResult.error||posResult.error?<p role="alert">Cost records are unavailable. Confirm SQL 042 before relying on profit calculations.</p>:posResult.data?<p className="small muted">POS item costs were recorded with the original checkout; see <Link href="/retail-reports">Retail performance</Link>.</p>:costResult.data?<p>Recorded unit cost: <strong>{money(Number(costResult.data.unit_cost))}</strong>. Saved {new Date(costResult.data.recorded_at).toLocaleDateString('en-NG')}. This is an estimated cost input and not an audited expense.</p>:cancelled?<p>Cancelled orders are excluded from new cost recording.</p>:<><p className="small muted">This manual order has no cost evidence yet, so it is excluded from the estimated gross profit calculation. Use a supplier invoice or cost record to supply the true unit cost.</p><OrderCostForm order={id}/></>}</div></BusinessSection>}
   <BusinessSection title="Commercial invoice" description="A numbered invoice can be issued once and preserves the details recorded at issuance.">
    <div className="bo-detail-section-body">{invoiceResult.error?<p role="alert">Invoice information is unavailable. Check migration 022 and your database permissions.</p>:
     invoiceResult.data?<p>Invoice <Link href={`/invoices/issued/${invoiceResult.data.id}`}>{invoiceResult.data.invoice_number} — View or print</Link></p>:
