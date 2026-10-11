@@ -683,3 +683,19 @@
 .mp-site .mp-feature-tag,.mp-site .mp-card-link,.mp-site .mp-text-link,.mp-site .mp-mini-points svg,.mp-site .mp-home-solution>svg,.mp-site .mp-home-solution>span,.mp-site .mp-home-pricing a,.mp-site .mp-contact-questions svg,.mp-site .mp-pricing-hero h1 span,.mp-site .mp-comparison-yes,.mp-site .mp-feature-index{color:var(--green,#16845b)}
 .mp-site .mp-feature-icon,.mp-site .mp-timeline-icon{color:var(--green,#16845b)}
 .mp-site .mp-pricing-hero .site-breadcrumb a:hover{color:var(--brand,#123B63)}
+/* Subscription matrix, receivables and renewal workspaces — Phase 030N-M */
+.bo-tier-align-form {display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; margin-top:18px; padding-top:16px; border-top:1px solid #e5ebf1}
+.bo-tier-align-form label {flex:1 1 320px; color:#465a72; font-size:.9rem}
+.bo-tier-align-form label strong {color:#123b63;display:block;margin:5px 0}
+.bo-tier-align-form input {flex:1 1 230px; max-width:350px; min-width:200px; border:1px solid #cad6e4; border-radius:10px; padding:12px 14px; background:#fff}
+.bo-tier-align-form button {min-height:44px}
+.bo-tier-align-form [role=status] {flex-basis:100%;margin:0}
+.bo-installment-details {margin:8px 0; border-radius:10px; border:1px solid #d7e2ed; padding:9px 12px; min-width:165px}
+.bo-installment-details summary {cursor:pointer; font-weight:700; color:#123b63}
+.bo-installment-form {display:grid; gap:10px; margin-top:12px; min-width:min(260px,80vw)}
+.bo-installment-form label {display:grid; gap:4px; font-size:.85rem; color:#405671; font-weight:600}
+.bo-installment-form input,.bo-installment-form select,.bo-installment-form textarea {width:100%; border:1px solid #cbd7e5; background:#fff; border-radius:8px; padding:9px 10px; color:#12334f}
+.bo-balance-reminder {display:grid; gap:6px; margin-top:8px}
+.bo-balance-reminder .btn {white-space:normal; text-align:center; min-height:40px}
+.bo-balance-reminder p {max-width:270px; margin:2px 0}
+@media(max-width:720px){.bo-tier-align-form {display:grid}.bo-tier-align-form input{width:100%;max-width:none}.bo-installment-details{min-width:0}.bo-installment-form{min-width:0}}

@@ -52,7 +52,8 @@
     "check:dashboard-runtime-date": "node scripts/verify-dashboard-runtime-date.cjs",
     "check:ios-safe-errors": "node scripts/verify-ios-safe-customer-ux.cjs",
     "check:customer-ux": "node scripts/verify-customer-facing-ux.cjs",
-    "check:public-product": "node scripts/verify-phase30n-l-public-product.cjs"
+    "check:public-product": "node scripts/verify-phase30n-l-public-product.cjs",
+    "check:tier-billing": "node scripts/verify-phase30n-m-billing.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

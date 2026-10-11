@@ -11,7 +11,7 @@ type NavigationItem={label:string;href:string;icon:typeof LayoutDashboard;featur
 type NavigationGroup={title:string;items:NavigationItem[]};
 const groups:NavigationGroup[]=[
  {title:'Overview',items:[{label:'Dashboard',href:'/dashboard',icon:LayoutDashboard},{label:'Getting started',href:'/getting-started',icon:ClipboardList},{label:'Notifications',href:'/notifications',icon:Bell}]},
- {title:'Sales & customers',items:[{label:'Customers',href:'/customers',icon:Users},{label:'Orders & sales',href:'/orders',icon:ClipboardList},{label:'Retail POS',href:'/pos',icon:Store},{label:'Wholesale pricing',href:'/wholesale',icon:Package},{label:'Cashier shifts',href:'/pos/shifts',icon:Wallet},{label:'Returns & credit notes',href:'/returns',icon:Receipt},{label:'Products & services',href:'/products',icon:Package},{label:'Invoices',href:'/invoices',icon:Receipt},{label:'Payments',href:'/payments',icon:CreditCard}]},
+ {title:'Sales & customers',items:[{label:'Customers',href:'/customers',icon:Users},{label:'Orders & sales',href:'/orders',icon:ClipboardList},{label:'Retail POS',href:'/pos',icon:Store},{label:'Wholesale pricing',href:'/wholesale',icon:Package},{label:'Cashier shifts',href:'/pos/shifts',icon:Wallet},{label:'Returns & credit notes',href:'/returns',icon:Receipt},{label:'Products & services',href:'/products',icon:Package},{label:'Invoices',href:'/invoices',icon:Receipt},{label:'Payments',href:'/payments',icon:CreditCard},{label:'Outstanding & instalments',href:'/receivables',icon:Wallet}]},
  {title:'Operations',items:[{label:'Expenses',href:'/expenses',icon:Wallet},{label:'Inventory',href:'/inventory',icon:Warehouse},{label:'Branch stock & transfers',href:'/inventory/locations',icon:Warehouse},{label:'Suppliers & purchasing',href:'/purchasing',icon:Package},{label:'Tasks',href:'/tasks',icon:Target},{label:'My team',href:'/team',icon:Users},{label:'Team updates',href:'/team/updates',icon:Users}]},
  {title:'Finance & compliance',items:[{label:'Accounting',href:'/accounting',icon:Calculator},{label:'Financial reports',href:'/reports',icon:BarChart3},{label:'Retail performance',href:'/retail-reports',icon:BarChart3},{label:'Tax Centre',href:'/tax-centre',icon:Calculator},]},
  {title:'Engagement & growth',items:[{label:'Customer notes',href:'/communications',icon:Users},{label:'Insights',href:'/insights',icon:Activity},{label:'Growth Centre',href:'/growth',icon:BriefcaseBusiness},{label:'Business directory',href:'/directory',icon:Store},]},
@@ -35,10 +35,10 @@ const restrictedModules:Record<string,string>={
 const allItems=groups.flatMap(g=>g.items);
 const selected=(path:string,href:string)=>path===href||(href!=='/admin'&&href!=='/dashboard'&&path.startsWith(href+'/'));
 
-function NavigationItems({path,isPlatformAdmin,unreadCount,onNavigate,filter,enabledFeatures}:{path:string;isPlatformAdmin:boolean;unreadCount:number;onNavigate:()=>void;filter:string;enabledFeatures:string[]}){
+function NavigationItems({path,isPlatformAdmin,unreadCount,onNavigate,filter,enabledFeatures,businessRole}:{path:string;isPlatformAdmin:boolean;unreadCount:number;onNavigate:()=>void;filter:string;enabledFeatures:string[];businessRole?:string}){
  const term=filter.trim().toLocaleLowerCase();
  const visibleGroups=[...(isPlatformAdmin?[{title:'Platform administration',items:ownerLinks}]:[]),...groups]
-  .map(group=>({...group,items:group.items.filter(item=>(!restrictedModules[item.href]||enabledFeatures.includes(restrictedModules[item.href]))&&(!term||`${item.label} ${group.title}`.toLocaleLowerCase().includes(term)))}))
+  .map(group=>({...group,items:group.items.filter(item=>(!restrictedModules[item.href]||enabledFeatures.includes(restrictedModules[item.href]))&&(item.href!=='/receivables'||['owner','manager','finance','sales'].includes(businessRole||''))&&(!term||`${item.label} ${group.title}`.toLocaleLowerCase().includes(term)))}))
   .filter(group=>group.items.length>0);
  return <>
  {visibleGroups.map(group=><section className="work-nav-group" key={group.title} aria-label={group.title}>
@@ -96,7 +96,7 @@ export function Shell({children,brand,businessRole,businessName,businessLogo,unr
     <div className="work-sidebar-mobile-head"><strong>All business tools</strong><button type="button" ref={closeButton} className="work-sidebar-close" onClick={closeDrawer} aria-label="Close workspace navigation">Close <span aria-hidden="true">×</span></button></div>
     <div className="work-sidebar-intro"><span className="work-sidebar-eyebrow">ACTIVE BUSINESS</span><strong>{businessName||'My business'}</strong><span>{role}</span>{isPlatformAdmin&&<Link href="/admin/my-business" onClick={closeDrawer}>Switch business <ChevronRight size={14}/></Link>}</div>
     <label className="work-nav-search"><Search size={17} aria-hidden="true"/><span className="work-nav-search-label">Find a page</span><input type="search" value={navSearch} onChange={e=>setNavSearch(e.target.value)} placeholder="Search all modules" autoComplete="off"/></label>
-    <nav aria-label="Business workspace modules"><NavigationItems path={path} unreadCount={unreadCount} isPlatformAdmin={isPlatformAdmin} onNavigate={closeDrawer} filter={navSearch} enabledFeatures={enabledFeatures}/></nav>
+    <nav aria-label="Business workspace modules"><NavigationItems path={path} unreadCount={unreadCount} isPlatformAdmin={isPlatformAdmin} onNavigate={closeDrawer} filter={navSearch} enabledFeatures={enabledFeatures} businessRole={businessRole}/></nav>
     <div className="work-sidebar-end"><Link href="/logout" prefetch={false} onClick={closeDrawer} className="work-nav-link"><LogOut size={18}/>Sign out</Link></div>
    </aside>
    {drawerOpen&&<button type="button" className="work-drawer-backdrop" onClick={closeDrawer} aria-label="Close workspace navigation"/>}
