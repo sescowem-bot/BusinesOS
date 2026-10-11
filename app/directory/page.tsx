@@ -16,6 +16,15 @@ type DirectoryBusiness = {
   state: string | null;
 };
 
+function isDirectoryBusiness(value: unknown): value is DirectoryBusiness {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  if (typeof record.id !== 'string' || typeof record.slug !== 'string' || typeof record.name !== 'string') return false;
+  return (['category', 'description', 'logo_url', 'city', 'state'] as const).every(
+    (key) => record[key] === null || typeof record[key] === 'string'
+  );
+}
+
 export const dynamic = 'force-dynamic';
 
 export default async function BusinessDirectory() {
@@ -24,10 +33,11 @@ export default async function BusinessDirectory() {
     ? await client.rpc('public_directory_list')
     : {data: null, error: true};
 
-  // The Supabase client does not have generated RPC return types here.
-  // Keep an explicit view type so callbacks are never implicitly any.
-  const businesses: DirectoryBusiness[] = Array.isArray(data)
-    ? (data as DirectoryBusiness[])
+  // Public directory rows are not generated as typed Supabase RPC results.
+  // Accept only validated, opt-in business profiles; never expose user records.
+  const rawBusinesses: unknown = data;
+  const businesses: DirectoryBusiness[] = Array.isArray(rawBusinesses)
+    ? rawBusinesses.filter(isDirectoryBusiness)
     : [];
 
   return <main className="marketing-site">

@@ -14,6 +14,12 @@ const configs={
  invoices:{table:'business_invoices',fields:'invoice_number,order_id,issued_at,snapshot,id',order:'id',head:['Invoice number','Order ID','Issued at','Customer','Amount at issue NGN']}
 } as const;
 type Kind=keyof typeof configs;
+// Supabase cannot statically infer rows from a configuration-driven selection.
+// Validate the returned values instead of casting its query-parser types to records.
+function isExportRecord(value:unknown):value is Record<string,unknown>{
+ return value!==null&&typeof value==='object'&&!Array.isArray(value);
+}
+
 function flatRows(kind:Kind,raw:Record<string,unknown>[]):unknown[][]{
  return raw.map(row=>{
   switch(kind){
@@ -39,11 +45,15 @@ export async function GET(request:NextRequest){
    const query=client.from(config.table).select(config.fields,{count:start===0?'exact':undefined})
     .eq('business_id',businessId).order(config.order,{ascending:true}).range(start,start+BATCH-1);
    const {data,error,count}=await query;
-   if(error||!data)return NextResponse.json({message:'This export is unavailable. Please try again.'},{status:503,headers:HEADERS});
+   // The selected columns vary by export type, so the generated result cannot
+   // be safely asserted as a single TypeScript record array.
+   const rows:unknown=data;
+   if(error||!Array.isArray(rows)||!rows.every(isExportRecord))
+    return NextResponse.json({message:'This export is unavailable. Please try again.'},{status:503,headers:HEADERS});
    if(start===0&&count!==null&&count>MAX_RECORDS)return NextResponse.json({message:'This record set needs a larger export. Please contact support for an archive.'},{status:409,headers:HEADERS});
-   records.push(...data as Record<string,unknown>[]);
+   records.push(...rows);
    if(records.length>MAX_RECORDS)return NextResponse.json({message:'This export is too large for a single download. Please contact support for an archive.'},{status:409,headers:HEADERS});
-   if(data.length<BATCH)break;
+   if(rows.length<BATCH)break;
   }
   const output=csv([Array.from(config.head),...flatRows(kind as Kind,records)]);
   return new NextResponse(output,{headers:{...HEADERS,'Content-Type':'text/csv; charset=utf-8',

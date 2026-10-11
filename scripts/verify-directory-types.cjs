@@ -6,5 +6,6 @@ assert.match(src, /type\s+DirectoryBusiness\s*=/);
 assert.match(src, /const\s+businesses\s*:\s*DirectoryBusiness\[\]/);
 assert.match(src, /businesses\.map\s*\(\s*\(business\)/);
 assert.match(src, /client\.rpc\('public_directory_list'\)/);
-assert.match(src, /Array\.isArray\(data\)/);
+assert.match(src, /Array\.isArray\(rawBusinesses\)/);
+assert.match(src, /rawBusinesses\.filter\(isDirectoryBusiness\)/);
 console.log('Directory RPC result typing regression passed.');
