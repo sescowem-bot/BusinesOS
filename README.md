@@ -1,3 +1,7 @@
+## Latest public website release — Phase 030N-L
+
+The public Home, Features, Solutions, How It Works, Pricing, About, Resources and Contact pages now use detailed product-focused layouts. Prices and published entitlements remain dynamic. See `MD/PHASE_030N_L_PUBLIC_WEBSITE_OVERHAUL.md` for scope and test instructions. Run `npm run check:public-product` to verify key marketing-site invariants.
+
 > Dashboard runtime fix: SQL 045 bounds POS reporting to today instead of requesting future dates; dashboard errors are now explained accurately. See `MD/DASHBOARD_ERROR_042_AND_DATE_FIX.md`. **Do not apply SQL 045 before SQL 041–044 are installed.**
 
 > Latest prepared upgrade: **Phase 030N-D Structured Plans, Business Feature Access, Pricing and Company Roles (SQL 044)**. Read `MD/PHASE_030N_D_PLAN_ROLE_REDESIGN.md` before deployment.

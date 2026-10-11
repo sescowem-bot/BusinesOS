@@ -4,8 +4,8 @@ import {unstable_cache} from 'next/cache';
 export type PublicPage={slug:string;title:string;eyebrow:string;description:string;sections:{heading:string;body:string}[];published:boolean};
 export type PublicPlan={id:string;name:string;price_monthly_ngn?:number|null;price_yearly_ngn?:number|null;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
- home:{slug:'home',title:'The clearer way to run your business.',eyebrow:'YOUR BUSINESS, BETTER CONNECTED',description:'Bring customers, orders, payments and business records into one organised workspace. Less chasing information. More room to focus on what matters.',sections:[],published:true},
- features:{slug:'features',title:'Everyday operations, finally connected.',eyebrow:'WHAT YOU CAN DO',description:'From your first customer record to the end-of-day numbers, the platform brings your essential work together without unnecessary complexity.',sections:[
+ home:{slug:'home',title:'Run sales, track payments and keep your business moving.',eyebrow:'YOUR BUSINESS, ONE ORGANISED WORKSPACE',description:'Keep customers, orders, part payments, invoices, products and expenses connected. Start with Free and add more business tools when you need them.',sections:[],published:true},
+ features:{slug:'features',title:'One place for sales, customers, invoices and everything in between.',eyebrow:'EXPLORE THE PLATFORM',description:'See what you can actually do in BusinessOS: manage everyday business records, follow customer payments, issue documents and expand into POS, stock and finance when your plan includes them.',sections:[
  {heading:'Customers and relationships',body:'Keep customer details, order histories and amounts owed close at hand. Give your team one reliable place to find the next action.'},
  {heading:'Orders and collections',body:'Record what was sold, capture full or partial payments, and keep track of outstanding balances without piecing together separate spreadsheets.'},
  {heading:'Products and stock',body:'Maintain your product catalogue, monitor available stock and review movements as your operations grow.'},
@@ -16,12 +16,12 @@ const defaults:Record<string,PublicPage>={
  {heading:'Tasks and team updates',body:'Where available, assign tasks and share private notes with the people working in your business.'},
  {heading:'Exports for your records',body:'Business owners can download available transaction records in Excel-compatible format and print business documents.'},
  {heading:'Tax and compliance records',body:'Keep tax-relevant information organised for professional review. This software does not submit tax returns or replace qualified tax advice.'}],published:true},
- solutions:{slug:'solutions',title:'Built around your day, not another complicated process.',eyebrow:'SOLUTIONS FOR HOW YOU WORK',description:'Every business has its own rhythm. This software gives retailers, service teams and growing companies a simpler way to stay on top of the work that keeps them moving.',sections:[
+ solutions:{slug:'solutions',title:'Practical software for the way your business works.',eyebrow:'SOLUTIONS BY BUSINESS TYPE',description:'Retailers, wholesalers, service providers and growing teams need different workflows. See how BusinessOS helps you keep customers, sales, stock and payments connected.',sections:[
  {heading:'Retail and trading',body:'Bring products, stock, sales and customer balances into one daily workflow. See what has been sold and what still needs to be collected.'},
  {heading:'Service businesses',body:'Keep client details, service orders, issued invoices and payment records connected from request to completion.'},
  {heading:'Creative and independent brands',body:'Keep made-to-order requests, deposits and customer follow-up notes organised so important details do not get lost.'},
  {heading:'Growing teams',body:'Give authorised team members access to the business records they need, while business owners maintain oversight of operations.'}],published:true},
- 'how-it-works':{slug:'how-it-works',title:'Set up once. Stay organised every day.',eyebrow:'A SIMPLER WORKFLOW',description:'Start with the essentials, build a consistent daily routine and add more capabilities as your business grows.',sections:[
+ 'how-it-works':{slug:'how-it-works',title:'From your first sale to a more organised business.',eyebrow:'SEE HOW BUSINESSOS WORKS',description:'Create your workspace, add customers and products, record orders and payments, then review and export the information you need to run your business.',sections:[
  {heading:'01 · Create your workspace',body:'Register your account and add your business information to create a dedicated place for your records.'},
  {heading:'02 · Bring in the essentials',body:'Add customers, products or services, and begin recording the work your business actually does.'},
  {heading:'03 · Record each transaction',body:'Keep orders, payments and expenses organised as they happen, including partial payments and outstanding balances.'},
@@ -62,9 +62,11 @@ export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPag
  const client=publicClient();
  if(!client)return draft||(fallback?.published?fallback:null);
  try{
-  const {data,error}=await client.from('public_site_pages').select('slug,title,eyebrow,description,sections,published').eq('slug',slug).eq('published',true).maybeSingle();
+  const {data,error}=await client.from('public_site_pages').select('slug,title,eyebrow,description,sections,published').eq('slug',slug).maybeSingle();
   if(error)return draft||(fallback?.published?fallback:null);
   if(!data)return draft||(fallback?.published?fallback:null);
+  // An explicitly unpublished page must never reappear through a stock fallback.
+  if(!data.published)return legal?draft:null;
   // A legacy legal placeholder is never treated as an approved published policy.
   if(legal&&Array.isArray(data.sections)&&data.sections.some((section:{body?:string})=>section?.body===legacyBoilerplate))return draft;
   // Display improved editorial defaults only for the exact migration-016 boilerplate. Keep custom CMS edits.
@@ -74,7 +76,19 @@ export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPag
   if(slug==='home'&&fallback&&data.title==='Run your business with clarity. Grow with confidence.'&&Array.isArray(data.sections)&&data.sections.length===1&&data.sections[0]?.heading==='Everything you need to keep business moving.'&&data.sections[0]?.body==='No more switching between notebooks, scattered messages and separate spreadsheets.'&&data.description==='From customers and orders to accounting, stock and financial insights, bring the important parts of your business together in one thoughtful workspace.'&&data.eyebrow==='One workspace for your entire business'){
    return {...fallback};
   }
-  return {...data,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown)=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
+  // Migrate the previous stock marketing introductions in memory while preserving every CMS-edited section.
+  // Do not override bespoke titles or descriptions supplied by the System Owner.
+  const stockTitles:Record<string,string>={home:'The clearer way to run your business.',features:'Everyday operations, finally connected.',solutions:'Built around your day, not another complicated process.','how-it-works':'Set up once. Stay organised every day.'};
+  const stockDescriptions:Record<string,string>={
+   home:'Bring customers, orders, payments and business records into one organised workspace. Less chasing information. More room to focus on what matters.',
+   features:'From your first customer record to the end-of-day numbers, the platform brings your essential work together without unnecessary complexity.',
+   solutions:'Every business has its own rhythm. This software gives retailers, service teams and growing companies a simpler way to stay on top of the work that keeps them moving.',
+   'how-it-works':'Start with the essentials, build a consistent daily routine and add more capabilities as your business grows.'
+  };
+  const updatedTitle=fallback&&data.title===stockTitles[slug]?fallback.title:data.title;
+  const updatedDescription=fallback&&data.description===stockDescriptions[slug]?fallback.description:data.description;
+  const updatedEyebrow=fallback&&data.title===stockTitles[slug]?fallback.eyebrow:data.eyebrow;
+  return {...data,title:updatedTitle,description:updatedDescription,eyebrow:updatedEyebrow,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown)=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
  }catch{return draft||(fallback?.published?fallback:null)}
 },['businessos-public-pages-v1'],{revalidate:60,tags:['businessos-public-pages']});
 export const getPublishedPlans=unstable_cache(async ():Promise<PublicPlan[]>=>{

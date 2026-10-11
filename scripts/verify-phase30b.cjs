@@ -22,7 +22,7 @@ assert(interior.includes('<PublicHeroArt kind='),'Interior pages must use distin
 assert(!interior.includes('<PublicWorkspacePreview/>'),'Interior pages should not repeat the home preview');
 assert(!prices.includes('planPaths'),'Public pricing should present actual published plans, not static suggested tiers');
 assert(prices.includes('getPublishedPlans()')&&prices.includes('getPublishedPlanCapabilities()'),'Actual plan catalogue must remain database driven');
-assert(prices.includes('Pricing on request'),'Published plans must not require invented price figures');
+assert(prices.includes('Custom quote')&&prices.includes('price_monthly_ngn')&&prices.includes('price_yearly_ngn'),'Published plans must use configured amounts or ask for a quote, never invented prices');
 assert(prices.includes('getPublishedPlanCapabilities()'),'Published plans must determine actual displayed module access');
 assert(!fs.readdirSync(root).some(f=>f.endsWith('.md')&&f!=='README.md'),'Keep documentation in MD/');
 console.log('Phase 030B checks passed: admin visibility, mobile navigation, hero variants, pricing separation and docs.');
