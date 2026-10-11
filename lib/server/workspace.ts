@@ -6,6 +6,7 @@ import {getServerSupabase} from './supabase';
 import {ACTIVE_BUSINESS_COOKIE} from './workspace-selection';
 
 export const getWorkspace=cache(async ()=>{
+ const perfStart=process.env.BUSINESSOS_PERF_DIAGNOSTICS==='true'?Date.now():null;
  const client=await getServerSupabase();
  if(!client)redirect('/login');
  const {data:{user},error:authError}=await client.auth.getUser();
@@ -31,5 +32,6 @@ export const getWorkspace=cache(async ()=>{
   if(admin)redirect('/admin/my-business');
   redirect('/onboarding');
  }
+ if(perfStart!==null)console.info('[businessos-perf] workspace auth and membership ms:',Date.now()-perfStart);
  return {client,businessId:member.business_id,role:member.role,userId:user.id};
 });

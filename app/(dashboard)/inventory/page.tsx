@@ -18,7 +18,7 @@ export default async function InventoryPage(){
   client.from('inventory_stock_counts').select('id,product_id,expected_quantity,counted_quantity,variance,reason,counted_at').eq('business_id',businessId).order('counted_at',{ascending:false}).limit(30)
  ]);
  const missing=stockResult.error||movementResult.error;
- if(missing)return <section className="tax-page"><h1>Inventory</h1><p role="alert">Inventory records could not be loaded. Check your permissions and migration 007.</p></section>;
+ if(missing)return <section className="tax-page"><h1>Inventory</h1><p role="alert">Inventory could not be loaded. Please try again or contact support.</p></section>;
  const items=(stockResult.data||[]) as Product[],movements=(movementResult.data||[]) as Movement[],counts=(countResult.data||[]) as Count[];
  const canManage=['owner','manager','inventory'].includes(role);
  const stockValue=items.reduce((total,p)=>total+Number(p.stock_quantity)*Number(p.cost_price),0);
@@ -40,15 +40,15 @@ export default async function InventoryPage(){
    {low.length?<div className="table-wrap"><table className="table"><thead><tr><th>Product</th><th>Current stock</th><th>Minimum</th><th>Quantity to minimum</th></tr></thead><tbody>{low.map(p=><tr key={p.id}><td>{p.name}</td><td>{Number(p.stock_quantity)}</td><td>{Number(p.minimum_stock)}</td><td>{Math.max(0,Number(p.minimum_stock)-Number(p.stock_quantity)).toFixed(3)}</td></tr>)}</tbody></table></div>:<p className="muted">No tracked products are at or below their configured minimums in the loaded list.</p>}
    <p className="small muted"><Link href="/purchasing">Open purchasing</Link> to create a supplier draft. Actual goods receipts update company-wide stock, not individual branch quantities.</p>
   </section>
-  <p className="small muted">This page counts the company-wide quantity. If any units are allocated to a branch, use location-specific stock counts instead; the database will reject legacy whole-company counts for distributed stock.</p>
+  <p className="small muted">This page shows your company-wide stock. If you keep items in different branches, count them by location instead of updating the overall total.</p>
   {canManage&&<div className="grid grid-2"><section className="tax-panel"><h2>Record physical stock count</h2><StockCountForm items={items.map(p=>({id:p.id,name:p.name,stock:Number(p.stock_quantity)}))}/></section>
    <section className="tax-panel"><h2>Manual stock adjustment</h2><p className="small muted">Use for known losses, returns or corrections. Counts should use the physical stock-count form instead.</p><AdjustmentForm items={items.map(p=>({id:p.id,name:p.name}))}/></section></div>}
   {!canManage&&<p className="small muted">You have inventory viewing access. Only an owner, manager or inventory-role member may change stock.</p>}
   <section className="tax-panel"><h2>Stock-count audit</h2>
-   {countResult.error?<p role="alert">Count history is unavailable. Apply migration 027 before using physical counts.</p>:<div className="table-wrap"><table className="table"><thead><tr><th>Counted</th><th>Product</th><th>Recorded</th><th>Physical</th><th>Variance</th><th>Reason</th></tr></thead><tbody>{counts.map(c=><tr key={c.id}><td>{new Date(c.counted_at).toLocaleDateString('en-NG')}</td><td>{nameFor(c.product_id)}</td><td>{Number(c.expected_quantity)}</td><td>{Number(c.counted_quantity)}</td><td>{Number(c.variance)}</td><td>{c.reason}</td></tr>)}</tbody></table></div>}
+   {countResult.error?<p role="alert">Stock count history is temporarily unavailable. Please try again later.</p>:<div className="table-wrap"><table className="table"><thead><tr><th>Counted</th><th>Product</th><th>Recorded</th><th>Physical</th><th>Variance</th><th>Reason</th></tr></thead><tbody>{counts.map(c=><tr key={c.id}><td>{new Date(c.counted_at).toLocaleDateString('en-NG')}</td><td>{nameFor(c.product_id)}</td><td>{Number(c.expected_quantity)}</td><td>{Number(c.counted_quantity)}</td><td>{Number(c.variance)}</td><td>{c.reason}</td></tr>)}</tbody></table></div>}
    {!countResult.error&&!counts.length&&<p className="muted">No physical counts recorded yet.</p>}
   </section>
   <section className="tax-panel"><h2>Latest stock movements</h2><div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Product</th><th>Movement</th><th>Quantity change</th><th>Reason</th></tr></thead><tbody>{movements.map(m=><tr key={m.id}><td>{new Date(m.created_at).toLocaleDateString('en-NG')}</td><td>{nameFor(m.product_id)}</td><td>{m.movement_type}</td><td>{Number(m.quantity)}</td><td>{m.notes||'—'}</td></tr>)}</tbody></table></div>{!movements.length&&<p className="muted">No stock movements recorded.</p>}</section>
-  <p className="small muted">Review unit costs and physical valuation with your finance team before using inventory figures for financial statements. Order-related stock deductions are not yet automated.</p>
+  <p className="small muted">Review recorded costs with your finance team before using stock values in financial statements. Sales orders do not automatically reduce stock yet.</p>
  </div>;
 }

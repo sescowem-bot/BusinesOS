@@ -1,0 +1,15 @@
+const fs=require('node:fs');const assert=require('node:assert/strict');
+const s=fs.readFileSync('supabase/migrations/045_dashboard_current_month_reporting_window.sql','utf8');
+const page=fs.readFileSync('app/(dashboard)/dashboard/page.tsx','utf8');
+const previous=fs.readFileSync('supabase/migrations/042_dashboard_support_roles.sql','utf8');
+const report=fs.readFileSync('supabase/migrations/041_wholesale_pricing_pos_reporting.sql','utf8');
+assert.ok(previous.includes("((v_to AT TIME ZONE 'Africa/Lagos')::date-1)"));
+assert.ok(report.includes('p_end>current_date+1'));
+assert.ok(s.includes("least(((v_to AT TIME ZONE 'Africa/Lagos')::date-1),(now() AT TIME ZONE 'Africa/Lagos')::date)"));
+assert.ok(s.includes('CREATE OR REPLACE FUNCTION public.business_dashboard_command('));
+assert.ok(s.includes('to_regprocedure(\'public.business_pos_management_report(uuid,date,date)\')'));
+assert.ok(s.includes('GRANT EXECUTE ON FUNCTION public.business_dashboard_command(uuid) TO authenticated'));
+assert.ok(page.includes("['PGRST202','42883']")&&page.includes("['42501','PGRST301']"));
+assert.ok(page.includes('Retry dashboard')&&page.includes('Get help'));
+assert.ok(!page.includes('Apply SQL migration 042 after 041'));
+console.log('BusinessOS dashboard date-window and misleading error copy checks passed.');

@@ -30,7 +30,7 @@ ok(inventory.includes('Restock planning'),'restock recommendation panel missing'
 ok(read('package.json').includes('check:phase30k'),'package test missing');
 ok(read('.github/workflows/verify.yml').includes('check:phase30k'),'CI test missing');
 ok(read('MD/PHASE_030K_PARTIAL_RECEIPTS_SUPPLIER_BILLS.md').includes('branch'),'limitations documentation missing');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const f of ['app/(dashboard)/purchasing/actions.ts','app/(dashboard)/purchasing/page.tsx','app/(dashboard)/purchasing/purchase-form.tsx','app/(dashboard)/inventory/page.tsx']){
  const parsed=ts.createSourceFile(f,read(f),ts.ScriptTarget.Latest,true,f.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  assert.equal(parsed.parseDiagnostics.length,0,`${f}: ${parsed.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText,' ')).join('; ')}`);checks++;

@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
 export type CheckoutState={ok:boolean;message:string;orderId?:string};
@@ -56,7 +57,7 @@ export async function submitCheckout(_:CheckoutState,fd:FormData):Promise<Checko
    p_tenders:tenders,p_price_mode:priceMode,p_discount:vatRegistered?discount:0,p_location:location
   }:options;
   const {data,error}=await access.client.rpc(operation,rpcOptions);
-  if(error)return failed(error.code==='42501'?'POS access is not enabled for this business and role.':error.code==='42883'||error.code==='PGRST202'?'POS checkout function is unavailable. Apply SQL 039 and SQL 040 in order before proceeding.':`Sale was not completed: ${error.message}`);
+  if(error)return failed(error.code==='42501'?'POS access is not enabled for this business and role.':error.code==='42883'||error.code==='PGRST202'?'Checkout is temporarily unavailable. Please contact support before retrying.':friendlyServiceError('complete checkout', error));
   revalidatePath('/pos');revalidatePath('/orders');revalidatePath('/payments');revalidatePath('/products');revalidatePath('/inventory');
   return {ok:true,message:split?'Sale and split recorded tenders saved in one transaction. No bank or card was charged.':paid?'Sale and recorded payment saved. This does not charge a bank card.':'Sale saved as unpaid. Stock has been deducted for tracked items.',orderId:String(data)};
  }catch{return failed('Checkout could not be saved. Check your basket or reload before trying again.');}

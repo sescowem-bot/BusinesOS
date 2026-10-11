@@ -14,7 +14,7 @@ export default async function CashierShifts(){
   client.rpc('business_pos_cash_exceptions',{p_business:businessId}),
   ['owner','manager'].includes(role)?client.rpc('business_pos_daily_cash_report',{p_business:businessId,p_date:today}):Promise.resolve({data:null,error:null})
  ]);
- if(shiftResult.error||exceptionsResult.error||(dailyResult.error&&['owner','manager'].includes(role)))return <div className="bo-page"><BusinessPageHeading eyebrow="POS / CASH MANAGEMENT" title="Cashier shifts" description="Shift records are currently unavailable."/><BusinessAlert>Shift tables could not be verified. Confirm SQL 037 is installed and that POS permissions are active. Avoid recording cash outside an approved shift.</BusinessAlert></div>;
+ if(shiftResult.error||exceptionsResult.error||(dailyResult.error&&['owner','manager'].includes(role)))return <div className="bo-page"><BusinessPageHeading eyebrow="POS / CASH MANAGEMENT" title="Cashier shifts" description="Shift records are currently unavailable."/><BusinessAlert>Shift records cannot be verified right now. Please try again before recording cash.</BusinessAlert></div>;
  const ex=exceptionsResult.data as {pos_sales_without_shift:number;cash_payments_without_shift_receipt:number;changed_cash_payment_records:number;cash_refunds_without_matching_cash_out:number};
  const daily=dailyResult.data as {shifts:number;open_shifts:number;awaiting_review:number;reviewed:number;flagged:number;closed_shift_captured_cash:number;net_variance:number}|null;
  const shifts=shiftResult.data||[];

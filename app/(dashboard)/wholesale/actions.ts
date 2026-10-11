@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
 export type WholesaleState={ok:boolean;message:string};
@@ -15,7 +16,7 @@ export async function saveWholesaleTier(_:WholesaleState,fd:FormData):Promise<Wh
  !/^[0-9]{1,10}(?:\.[0-9]{1,2})?$/.test(priceText)||price<=0||!Number.isFinite(qty)||!Number.isFinite(price)||note.length>250)
  return invalid('Enter a minimum quantity of at least 2 and a valid discounted unit price.');
  const {error}=await a.client.rpc('business_set_wholesale_price_tier',{p_business:a.businessId,p_product:product,p_min_qty:qty,p_price:price,p_note:note});
- if(error)return invalid(`Could not save tier: ${error.message}`);
+ if(error)return invalid(friendlyServiceError('save this pricing tier', error));
  refreshed();return {ok:true,message:'Wholesale reference tier saved. POS catalogue prices and VAT calculations have not changed.'};
  }catch{return invalid('Unable to save wholesale pricing right now.');}
 }
@@ -24,7 +25,7 @@ export async function removeWholesaleTier(_:WholesaleState,fd:FormData):Promise<
  if(!['owner','manager'].includes(a.role))return invalid('Owner/manager permission required.');
  const tier=String(fd.get('tier')||'');if(!uuid.test(tier)||fd.get('confirm')!=='yes')return invalid('Choose and confirm a valid tier.');
  const {error}=await a.client.rpc('business_delete_wholesale_price_tier',{p_business:a.businessId,p_tier:tier});
- if(error)return invalid(`Tier could not be removed: ${error.message}`);
+ if(error)return invalid(friendlyServiceError('remove this pricing tier', error));
  refreshed();return {ok:true,message:'Reference price tier removed.'};
  }catch{return invalid('Unable to remove wholesale price tier.');}
 }

@@ -33,6 +33,8 @@ export function PlanEditor({plan}:{plan:PublicPlan}){
   <label>Plan identifier<input name="id" defaultValue={isNew?'':plan.id} placeholder="e.g. professional" readOnly={!isNew} required/><span className="muted small">Existing identifiers cannot be renamed here because assigned business plans reference them.</span></label>
   <label>Plan name<input name="name" defaultValue={plan.name} maxLength={80} required/></label>
   <label>Displayed price<input name="price_label" defaultValue={plan.price_label} maxLength={70}/></label>
+  <div className="grid grid-2"><label>Monthly price (₦)<input name="price_monthly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_monthly_ngn?:number|null}).price_monthly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label><label>Annual price (₦)<input name="price_yearly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_yearly_ngn?:number|null}).price_yearly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label></div>
+  <p className="small muted">Amounts shown in NGN. These are published pricing terms, not automatic invoices or online payment settings. Free is always ₦0.</p>
   <label>Billing note<input name="billing_label" defaultValue={plan.billing_label} maxLength={2000}/></label>
   <label>Description<textarea name="description" defaultValue={plan.description} maxLength={2000}/></label>
   <label>Additional marketing notes (one per line)<textarea name="features" rows={6} maxLength={5000} defaultValue={Array.isArray(plan.features)?plan.features.join('\n'):''}/></label>

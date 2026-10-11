@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 import {isPaidFeature,isPlanRole} from '@/lib/plan-catalog';
@@ -15,7 +16,7 @@ export async function saveBusinessGrant(_:GrantState,fd:FormData):Promise<GrantS
  const {error}=await session.client.rpc('admin_set_business_feature_grant',{
   p_business:businessId,p_feature:feature,p_enabled:enabled,p_roles:roles,p_expires_at:expiry,p_note:note
  });
- if(error)return {ok:false,message:error.message};
+ if(error)return {ok:false,message:friendlyServiceError('complete this request', error)};
  revalidatePath(`/admin/businesses/${businessId}`);revalidatePath('/admin/businesses');
  return {ok:true,message:'Business-specific access saved with an audit record.'};
 }

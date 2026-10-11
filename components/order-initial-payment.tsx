@@ -38,6 +38,6 @@ export function InitialPaymentFields({estimatedTotal}:{estimatedTotal:number|nul
    <div><span>Initial payment</span><strong>{status==='paid'&&safeTotal===null?'Full calculated amount':display(paidPreview)}</strong></div>
    <div><span>Estimated outstanding</span><strong>{balance===null?'Shown after saving':display(balance)}</strong></div>
   </div>
-  <p className="muted small">All figures are confirmed from the saved order by the database, including reviewed VAT. This records a payment received; it does not move money.</p>
+  <p className="muted small">The final amount and any VAT are confirmed when you save. Only record a payment you have actually received. This does not charge your customer.</p>
  </fieldset>;
 }

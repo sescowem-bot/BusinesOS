@@ -16,7 +16,7 @@ export default async function BranchInventoryPage(){
   client.from('business_location_stock_counts').select('id,location_id,product_id,variance,reason,counted_at').eq('business_id',businessId).order('counted_at',{ascending:false}).limit(25)
  ]);
  const problem=locationsResult.error||productsResult.error||branchesResult.error||balancesResult.error;
- if(problem)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / INVENTORY" title="Branch stock & transfers" description="Physical stock by location"/><BusinessAlert>Cannot verify branch stock balances. Apply SQL 039 after SQL 038 in staging, then review your inventory permissions.</BusinessAlert></div>;
+ if(problem)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / INVENTORY" title="Branch stock & transfers" description="Physical stock by location"/><BusinessAlert>Branch stock balances are temporarily unavailable. Please try again or contact support before making changes.</BusinessAlert></div>;
  const capped=locationsResult.data?.length===50||productsResult.data?.length===300||branchesResult.data?.length===100||balancesResult.data?.length===7000;
  const locations=locationsResult.data||[],products=productsResult.data||[],branches=branchesResult.data||[];
  const balances:Record<string,Record<string,number>>={};
@@ -29,21 +29,21 @@ export default async function BranchInventoryPage(){
   <BusinessPageHeading eyebrow="OPERATIONS / INVENTORY" title="Branch stock & transfers" description="Control physical stock at individual locations while keeping the company-wide total reconciled." action={{href:'/inventory',label:'Company inventory'}}/>
   <BusinessSummary items={summary}/>
   <BusinessAlert>Existing stock is initially marked <strong>Unallocated / receiving</strong>. It is not assigned to a branch automatically. Goods receipts and external refunds enter Unallocated unless later transferred. POS checkout can use explicitly selected locations. Do not treat this page as a complete financial valuation.</BusinessAlert>
-  {capped&&<BusinessAlert>Data limits reached (50 locations / 300 products / 7,000 balances). Location totals may be incomplete; management operations are disabled until data loading is expanded.</BusinessAlert>}
-  {!!mismatches.length&&<BusinessAlert>Stock ledger mismatch detected for {mismatches.length} displayed products. Do not transfer or count stock until database reconciliation is reviewed.</BusinessAlert>}
+  {capped&&<BusinessAlert>This business has more stock records than can be shown safely on this page. Stock changes are paused to avoid inaccurate totals. Contact support for help.</BusinessAlert>}
+  {!!mismatches.length&&<BusinessAlert>Stock totals do not agree for {mismatches.length} products. Pause stock transfers and counts, and ask the business owner to review the balances.</BusinessAlert>}
   {canManage&&!capped&&!mismatches.length&&<div className="grid grid-2">
    <section className="card card-pad"><h2>Enable an existing branch location</h2><p className="small muted">First create the branch in Team & Branches. Activation does not move any stock.</p><EnableBranchForm branches={branches.filter(b=>!branchIds.has(b.id))}/></section>
    <section className="card card-pad"><h2>Transfer stock between locations</h2><p className="small muted">Transfers move available quantities only. The company-wide total does not change.</p><BranchTransferForm locations={locations} products={products}/></section>
   </div>}
-  {!capped&&!mismatches.length&&['owner','manager','inventory'].includes(role)&&<BusinessSection title="Physical count at a location" description="Optimistic concurrency prevents saving a stale count. Differences update both the chosen location and the total stock atomically."><BranchStockCountForm locations={locations} products={products} balances={balances}/></BusinessSection>}
-  <BusinessSection title="Current on-hand by location" description="Each location balance reconciles to the product's company-wide quantity.">
+  {!capped&&!mismatches.length&&['owner','manager','inventory'].includes(role)&&<BusinessSection title="Physical count at a location" description="Counts are checked again when you save, so recent stock changes are not overwritten. Any difference updates the location and overall stock together."><BranchStockCountForm locations={locations} products={products} balances={balances}/></BusinessSection>}
+  <BusinessSection title="Current on-hand by location" description="See how stock is distributed across your locations.">
    <div className="table-wrap"><table className="table"><thead><tr><th>Product</th><th>SKU</th><th>Company total</th>{locations.map(l=><th key={l.id}>{l.name}</th>)}</tr></thead><tbody>{products.map(p=><tr key={p.id}><td>{p.name}</td><td>{p.sku||'—'}</td><td>{Number(p.stock_quantity)}</td>{locations.map(l=><td key={l.id}>{balances[l.id]?.[p.id]||0}</td>)}</tr>)}</tbody></table></div>
    {!products.length&&<p className="muted">No tracked products are currently registered.</p>}
   </BusinessSection>
   <BusinessSection title="Recent transfers" description="Only recorded transfers are shown; transfers do not create extra stock.">
    {transfersResult.error?<BusinessAlert>Transfer history is unavailable.</BusinessAlert>:<div className="table-wrap"><table className="table"><thead><tr><th>When</th><th>Product</th><th>From</th><th>To</th><th>Quantity</th><th>Reason</th></tr></thead><tbody>{(transfersResult.data||[]).map(t=><tr key={t.id}><td>{new Date(t.transferred_at).toLocaleString('en-NG')}</td><td>{productName.get(t.product_id)||'Product'}</td><td>{locationName.get(t.from_location_id)||'Location'}</td><td>{locationName.get(t.to_location_id)||'Location'}</td><td>{Number(t.quantity)}</td><td>{t.reason}</td></tr>)}</tbody></table></div>}
   </BusinessSection>
-  <BusinessSection title="Location count audit" description="Count adjustments are traceable and never overwrite the original count evidence.">
+  <BusinessSection title="Location count audit" description="Review the history of physical stock counts and adjustments.">
    {countsResult.error?<BusinessAlert>Count history is unavailable.</BusinessAlert>:<div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Location</th><th>Product</th><th>Variance</th><th>Reason</th></tr></thead><tbody>{(countsResult.data||[]).map(c=><tr key={c.id}><td>{new Date(c.counted_at).toLocaleString('en-NG')}</td><td>{locationName.get(c.location_id)||'Location'}</td><td>{productName.get(c.product_id)||'Product'}</td><td>{Number(c.variance)}</td><td>{c.reason}</td></tr>)}</tbody></table></div>}
   </BusinessSection>
  </div>;

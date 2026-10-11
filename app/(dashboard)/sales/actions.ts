@@ -3,13 +3,13 @@ import {revalidatePath} from 'next/cache';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 export type ActionState={error:string;success:string};
-const initialError=(e:unknown)=>e instanceof Error?e.message:'Unexpected error';
+const initialError=(_e:unknown)=>'We couldn’t complete that request. Please try again or contact support.';
 export async function createCustomer(_:ActionState,form:FormData):Promise<ActionState>{
  try{
  const {client,businessId}=await getWorkspace();const name=String(form.get('name')||'').trim(),phone=String(form.get('phone')||'').trim(),email=String(form.get('email')||'').trim();
  if(name.length<2||name.length>150||phone.length>40||email.length>254||Boolean(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))return {error:'Check the name, phone and email fields.',success:''};
  const {error}=await client.rpc('crm_create_customer',{p_business:businessId,p_name:name,p_phone:phone||null,p_email:email||null});
- if(error)return {error:'Unable to create customer. Ensure migration 006 is applied.',success:''};
+ if(error)return {error:'We couldn’t add this customer. Check their details and try again.',success:''};
  revalidatePath('/customers');return {error:'',success:'Customer created successfully.'};
  }catch(e){return {error:initialError(e),success:''}}
 }
@@ -48,7 +48,7 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
    p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
   if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
-   'Order payments on creation require SQL migration 042. Ask the System Owner to install it.':
+   'This order cannot be completed right now. Please try again or contact support.':
    'Order was not created. Check payment amount, customer, business access or reviewed VAT requirements.',success:''};
   if(!data)return {error:'The saved order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);
@@ -61,7 +61,7 @@ export async function recordPayment(_:ActionState,form:FormData):Promise<ActionS
  const {client,businessId}=await getWorkspace();const order=String(form.get('order')||''),amount=Number(form.get('amount')),method=String(form.get('method')||''),reference=String(form.get('reference')||'').trim();
  if(!order||!Number.isFinite(amount)||amount<=0||!['cash','transfer','pos','card','other'].includes(method)||reference.length>150)return {error:'Enter a valid amount and payment method.',success:''};
  const {error}=await client.rpc('crm_record_payment',{p_business:businessId,p_order:order,p_amount:amount,p_method:method,p_reference:reference||null});
- if(error)return {error:'Unable to save payment. Confirm the remaining balance and migration 006.',success:''};
+ if(error)return {error:'Payment could not be saved. Check the outstanding balance and try again.',success:''};
  revalidatePath('/orders');revalidatePath('/customers');revalidatePath(`/orders/${order}`);return {error:'',success:'Payment recorded successfully.'};
  }catch(e){return {error:initialError(e),success:''}}
 }

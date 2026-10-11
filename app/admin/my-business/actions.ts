@@ -31,7 +31,7 @@ export async function createMyBusiness(_previous:OwnWorkspaceState,form:FormData
  });
  if(error){
   if(error.message?.toLowerCase().includes('profile not found'))return {error:'Your account profile is not ready. Sign out, then sign back in and try again.'};
-  return {error:'Your workspace could not be created. Please check the Supabase workspace setup and try again.'};
+  return {error:'Your workspace could not be created right now. Please try again or contact support.'};
  }
  if(typeof businessId!=='string'||!/^[0-9a-f-]{36}$/i.test(businessId))return {error:'The database did not confirm a new workspace.'};
  // Creation RPC records the signed-in person as owner; verify it before selecting the workspace.

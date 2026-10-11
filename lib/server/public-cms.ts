@@ -2,7 +2,7 @@ import 'server-only';
 import {createClient} from '@supabase/supabase-js';
 import {unstable_cache} from 'next/cache';
 export type PublicPage={slug:string;title:string;eyebrow:string;description:string;sections:{heading:string;body:string}[];published:boolean};
-export type PublicPlan={id:string;name:string;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
+export type PublicPlan={id:string;name:string;price_monthly_ngn?:number|null;price_yearly_ngn?:number|null;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
  home:{slug:'home',title:'The clearer way to run your business.',eyebrow:'YOUR BUSINESS, BETTER CONNECTED',description:'Bring customers, orders, payments and business records into one organised workspace. Less chasing information. More room to focus on what matters.',sections:[],published:true},
  features:{slug:'features',title:'Everyday operations, finally connected.',eyebrow:'WHAT YOU CAN DO',description:'From your first customer record to the end-of-day numbers, BusinessOS brings your essential work together without unnecessary complexity.',sections:[
@@ -76,7 +76,7 @@ export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPag
 export const getPublishedPlans=unstable_cache(async ():Promise<PublicPlan[]>=>{
  const client=publicClient();if(!client)return [];
  try{
-  const {data,error}=await client.from('public_site_plans').select('id,name,price_label,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');
+  const {data,error}=await client.from('public_site_plans').select('id,name,price_label,price_monthly_ngn,price_yearly_ngn,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');
   if(error)return [];
   return (data||[]).map(p=>({...p,features:Array.isArray(p.features)?p.features.filter((f:unknown):f is string=>typeof f==='string'):[]})) as PublicPlan[];
  }catch{return []}

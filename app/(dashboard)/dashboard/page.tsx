@@ -53,12 +53,36 @@ function DashboardBody({d,role}:{d:DashboardSnapshot;role:string}){
   </section>}
   <div className="command-bottom-grid"><section className="command-panel"><div className="command-panel-head"><div><span className="command-kicker">PRIORITIES</span><h2>Needs attention</h2></div></div><div className="command-priority-list"><Link href="/orders"><span className="command-priority-icon"><Receipt size={17}/></span><span><strong>{outstandingOrders} orders await payment</strong><small>Review unpaid and partly paid balances</small></span><ArrowUpRight size={15}/></Link><Link href="/inventory"><span className="command-priority-icon"><Package size={17}/></span><span><strong>{Number(d.low_stock)} low-stock products</strong><small>Check restock levels and purchasing</small></span><ArrowUpRight size={15}/></Link><Link href="/support"><span className="command-priority-icon"><ShieldCheck size={17}/></span><span><strong>Get platform support</strong><small>Request help or owner-approved role assistance</small></span><ArrowUpRight size={15}/></Link></div></section>
   <section className="command-panel"><div className="command-panel-head"><div><span className="command-kicker">WORK FASTER</span><h2>Common actions</h2></div></div><div className="command-quick"><Link href="/orders/new"><Plus size={18}/>New order</Link><Link href="/customers/new"><Users size={18}/>Add customer</Link><Link href="/payments"><CreditCard size={18}/>Payments</Link><Link href="/pos"><Receipt size={18}/>Retail POS</Link><Link href="/team"><Users size={18}/>Staff & roles</Link><Link href="/install"><Home size={18}/>Install on phone</Link><Link href="/reports"><BarChart3 size={18}/>Reports</Link></div></section></div>
-  <p className="command-disclaimer">Operational figures come from saved orders, payments and expenses. Estimated POS gross profit is not audited net profit. Dates use the Africa/Lagos reporting calendar. Account and branch access follow your business permissions.</p>
+  <p className="command-disclaimer">Figures reflect saved orders, payments and expenses. Estimated sales margin is not final net profit. Reports use Lagos time. Account and branch access follow your business permissions.</p>
  </main>;
 }
 export default async function Dashboard(){
  const {client,businessId,role}=await getWorkspace();
  const {data,error}=await client.rpc('business_dashboard_command',{p_business:businessId});
- if(error||!data)return <main className="command-centre"><header className="command-heading"><div><span className="command-kicker">BUSINESS PERFORMANCE</span><h1>Business command centre</h1><p>We couldn't verify the financial summary. No incorrect balances are displayed.</p></div><Link href="/orders/new" className="btn btn-primary">New order</Link></header><section className="command-panel" role="alert"><h2>Dashboard data isn't available</h2><p>Apply SQL migration 042 after 041 and confirm your workspace permissions. Try again shortly.</p><Link href="/orders" className="btn">Open order register</Link></section></main>;
+ if(error||!data){
+  // including those affected by a report timeout or a membership/permission error.
+  // Expose only a safe, actionable category, not Postgres internals or customer data.
+  const code=error?.code||'UNAVAILABLE';
+  console.warn('[businessos-dashboard] financial summary unavailable', {code});
+  const missing=['PGRST202','42883'].includes(code);
+  const denied=['42501','PGRST301'].includes(code);
+  const timedOut=['57014','PGRST003','ETIMEDOUT'].includes(code);
+  const explanation=missing
+   ?'Your summary is temporarily unavailable. Please try again soon or contact support.'
+   :denied
+   ?'Your account could not access this financial summary. Ask the business owner or platform administrator to review your workspace access.'
+   :timedOut
+   ?'The financial report took too long to load. Please retry. Your saved orders and payments are not changed.'
+   :'We couldn’t load your verified summary right now. Please try again or contact support.';
+  return <main className="command-centre">
+   <header className="command-heading"><div><span className="command-kicker">BUSINESS PERFORMANCE</span><h1>Business command centre</h1><p>Other workspace pages remain available while reporting is being checked.</p></div><Link href="/orders/new" className="btn btn-primary">Create an order</Link></header>
+   <section className="command-panel" role="alert" aria-labelledby="dashboard-report-failure">
+    <h2 id="dashboard-report-failure">Dashboard summary is temporarily unavailable</h2>
+    <p>{explanation}</p>
+    <p className="small muted">We are not displaying unverified financial amounts. Orders and payments can still be checked from their own registers.</p>
+    <div className="command-actions"><Link href="/dashboard" prefetch={false} className="btn btn-primary">Retry dashboard</Link><Link href="/orders" className="btn">View orders</Link><Link href="/support" className="btn">Get help</Link></div>
+   </section>
+  </main>;
+ }
  return <DashboardBody d={data as DashboardSnapshot} role={role}/>;
 }

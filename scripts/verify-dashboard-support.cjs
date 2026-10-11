@@ -28,7 +28,7 @@ check(dash.includes('business_dashboard_command')&&dash.includes('recent_orders'
 check(dash.includes('Estimated gross profit on covered sales'),'clearly labelled estimate');
 check(dash.includes('Part payment')&&dash.includes('Balance due'),'order status presentation');
 check(dash.includes('missing_cost_orders'),'unknown cost stays unknown');
-check(read('app/(dashboard)/dashboard/loading.tsx').includes('aria-busy'),'streaming route loading');
+check(read('app/(dashboard)/dashboard/loading.tsx').includes('WorkspaceLoadingBrand')&&read('components/workspace-loading-brand.tsx').includes('aria-busy'),'streaming route loading');
 check(team.includes('changeTeamRole')&&team.includes('Invite staff'),'existing team role edit and invite');
 check(supportActions.includes('business_open_support_request')&&support.includes('SupportForm'),'support form');
 check(adminActions.includes('platform_resolve_support_request')&&admin.includes('platform_support_queue'),'admin role assistance');
@@ -36,7 +36,7 @@ check(read('components/admin-workspace.tsx').includes('/admin/support'),'admin n
 check(read('components/shell.tsx').includes('/support'),'business navigation');
 check(!sql.includes('UPDATE public.orders SET')&&!sql.includes('DELETE FROM public.payments'),'migration does not mutate historical financial rows');
 check(read('package.json').includes('check:dashboard-support'),'project check script');
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js');
+const ts=require('./load-typescript.cjs');
 for(const f of ['app/(dashboard)/dashboard/page.tsx','app/(dashboard)/support/page.tsx','app/(dashboard)/support/request-form.tsx','app/(dashboard)/support/actions.ts','app/admin/support/page.tsx','app/admin/support/review-form.tsx','app/admin/support/actions.ts','app/(dashboard)/team/page.tsx','app/(dashboard)/sales/actions.ts','app/(dashboard)/orders/new/reviewed-tax-actions.ts']){
  const sf=ts.createSourceFile(f,read(f),ts.ScriptTarget.Latest,true,f.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  check(sf.parseDiagnostics.length===0,`TypeScript syntax failure ${f}`);

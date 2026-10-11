@@ -11,7 +11,7 @@ export async function savePlatformEmailTemplate(form:FormData){
  const buttonLabel=String(form.get('button_label')||'').trim();
  if(!/^[a-z][a-z0-9_]{1,70}$/.test(templateKey)||!subject||subject.length>200||heading.length>200||bodyText.length>10000||buttonLabel.length>100)throw new Error('Please correct template fields.');
  const {error}=await session.client.from('platform_email_templates').upsert({template_key:templateKey,subject,heading,body_text:bodyText,button_label:buttonLabel,enabled:form.get('enabled')==='on',updated_by:session.user.id,updated_at:new Date().toISOString()},{onConflict:'template_key'});
- if(error)throw new Error('Unable to save email template. Check migration 020 and your administrator permissions.');
+ if(error)throw new Error('Email template could not be saved. Please try again or contact support.');
  revalidatePath('/admin/email');
 }
 
@@ -25,10 +25,10 @@ export async function sendAdminTestEmail(_:EmailTestResult,form:FormData):Promis
   if(process.env.ENABLE_PLATFORM_EMAIL_DELIVERY!=='true')return {error:'Test sending is disabled. Configure the verified sender and delivery flag first.',success:''};
   const {data:template,error:templateError}=await session.client.from('platform_email_templates')
    .select('subject,heading,body_text,button_label,enabled').eq('template_key',templateKey).maybeSingle();
-  if(templateError||!template)return {error:'Template unavailable. Check email settings and migration 020.',success:''};
+  if(templateError||!template)return {error:'This email template is temporarily unavailable. Please try again.',success:''};
   if(!template.enabled)return {error:'This email template is disabled.',success:''};
   const {data:logId,error:queueError}=await session.client.rpc('admin_begin_email_test',{p_template_key:templateKey});
-  if(queueError||typeof logId!=='string')return {error:queueError?.message||'Could not queue test. Confirm migration 025.',success:''};
+  if(queueError||typeof logId!=='string')return {error:'The test email could not be prepared. Please try again or contact support.',success:''};
   const {sendViaConfiguredResend}=await import('@/lib/notifications-email');
   const {getPlatformBrand}=await import('@/lib/server/branding');
   const brand=await getPlatformBrand();
@@ -43,7 +43,7 @@ export async function sendAdminTestEmail(_:EmailTestResult,form:FormData):Promis
   });
   if(finishError)return {error:'The email attempt may have succeeded, but its log could not be updated. Review Resend before retrying.',success:''};
   revalidatePath('/admin/email');
-  if(!result.ok)return {error:`Email could not be delivered to Resend: ${result.error||'provider unavailable'}.`,success:''};
+  if(!result.ok)return {error:'The test email could not be sent. Please review your email settings and try again.',success:''};
   return {error:'',success:'Resend accepted the test message. Check your mailbox and the delivery log for the final status.'};
  }catch{return {error:'Unable to complete the email test. Check server configuration and try later.',success:''};}
 }

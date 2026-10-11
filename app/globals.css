@@ -495,3 +495,106 @@
 .install-success{color:#115e39;background:#eaf8ee;border:1px solid #badfca;padding:14px;border-radius:12px;margin-bottom:14px}
 @media(max-width:760px){.install-page-layout{grid-template-columns:minmax(0,1fr);padding-block:34px;gap:24px}.install-guide-panel{border-radius:16px}.install-intro h1{max-width:19ch}}
 @media(prefers-reduced-motion:reduce){.install-app-button{transition:none!important}}
+
+/* Fast-expenses release: stream entry first; keep registers legible on mobile. */
+.bo-expenses-page{max-width:1140px;margin-inline:auto;min-width:0}
+.bo-expenses-page>h1{letter-spacing:-.04em}
+.bo-expense-workspace-loading{background:#fff;border:1px solid #dee9ef;border-radius:16px;padding:20px;max-width:680px;margin:18px 0}
+.bo-expense-workspace-loading strong{color:#143b54}
+.bo-expense-registry-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.bo-expense-registry-head h2{margin:0 0 5px}
+.bo-expense-page-total{display:grid;gap:4px;background:#eef7f3;border-radius:11px;padding:12px 16px;min-width:190px}
+.bo-expense-page-total span{font-size:11px;font-weight:650;color:#617889}
+.bo-expense-page-total strong{font-size:19px;color:#126a50;overflow-wrap:anywhere}
+.bo-expense-record-skeleton{display:grid;gap:11px;margin:18px 0}
+.bo-expense-record-skeleton i{display:block;height:17px;border-radius:7px;background:#e9f0f5}
+.bo-expense-record-skeleton i:nth-child(2){width:90%}.bo-expense-record-skeleton i:nth-child(3){width:74%}.bo-expense-record-skeleton i:nth-child(4){width:83%}
+.bo-expense-pagination{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+.bo-expense-pagination>div,.bo-expense-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bo-expense-empty{padding:20px 10px;line-height:1.6}
+@media(max-width:620px){
+ .bo-expenses-page{padding-inline:0}.bo-expense-page-total{flex:1;min-width:0}
+ .bo-expense-registry-head{align-items:stretch}
+ .bo-expense-table,.bo-expense-table .table{display:block;overflow:visible;min-width:0}
+ .bo-expense-table thead{display:none}
+ .bo-expense-table tbody{display:grid;gap:11px}
+ .bo-expense-table tr{display:grid;gap:8px;padding:14px;border:1px solid #e0e9ef;border-radius:12px;background:#fff}
+ .bo-expense-table td{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:0!important;border:0!important;text-align:right;overflow-wrap:anywhere}
+ .bo-expense-table td::before{content:attr(data-label);flex:0 0 95px;text-align:left;font-size:11px;font-weight:750;color:#758999}
+ .bo-expense-table td strong{font-variant-numeric:tabular-nums}
+ .bo-expense-pagination .btn{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){.bo-expense-record-skeleton i{animation:none}}
+
+/* Shared premium workspace loading: just a small CSS animation and existing logo asset.
+   The ring rotates; the brand mark stays readable. Accessibility takes precedence. */
+.bo-premium-loader{--loader-size:86px;display:flex;min-height:clamp(210px,42vh,420px);align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:7px;padding:30px 18px;width:100%;color:var(--text-strong)}
+.bo-premium-loader--workspace{min-height:calc(100dvh - 150px)}
+.bo-premium-loader--section{min-height:160px;--loader-size:66px;padding:15px}
+.bo-premium-loader__animation{width:var(--loader-size);height:var(--loader-size);position:relative;display:grid;place-items:center;margin-bottom:6px;isolation:isolate}
+.bo-premium-loader__ring{position:absolute;inset:0;border-radius:50%;border:3px solid #dceaf0;border-top-color:var(--green,#16845b);border-right-color:var(--brand,#123b63);animation:bo-premium-spin 1.7s linear infinite}
+.bo-premium-loader__symbol{height:calc(var(--loader-size) - 24px);width:calc(var(--loader-size) - 24px);display:grid;place-items:center;overflow:hidden;background:#fff;border-radius:16px;box-shadow:0 5px 18px rgba(18,59,99,.09);padding:5px}
+.bo-premium-loader__symbol img{max-width:100%;max-height:100%;object-fit:contain;border-radius:11px}
+.bo-premium-loader__name{font-weight:800;font-size:15px;letter-spacing:-.02em;margin:0;color:var(--brand,#123b63)}
+.bo-premium-loader__label{font-size:12px;margin:0;color:var(--muted);line-height:1.5}
+.bo-premium-loader__slow{max-width:390px;font-size:12px;line-height:1.6;color:var(--muted);margin-top:10px}
+.bo-premium-loader__slow p{margin:0 0 12px}
+.bo-premium-loader__actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.bo-premium-loader__actions button,.bo-premium-loader__actions a{display:inline-flex;align-items:center;min-height:38px;padding:8px 13px;border-radius:9px;border:1px solid var(--line-strong);font-size:12px;font-weight:700;background:#fff;color:var(--brand);text-decoration:none}
+.bo-premium-loader__actions button:focus-visible,.bo-premium-loader__actions a:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+@keyframes bo-premium-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.bo-premium-loader__ring{animation:none;border-color:var(--green)}}
+@media(max-width:640px){.bo-premium-loader{min-height:35vh;padding:24px 12px}.bo-premium-loader--workspace{min-height:calc(100dvh - 145px)}}
+
+/* Enterprise plans/roles administration, clear and mobile-friendly without heavy client bundles */
+.plan-structure-guide{margin-top:18px}.plan-module-detail,.company-feature-item{border:1px solid #d9e5ee;border-radius:11px;padding:14px;background:#fafcfe;margin:4px 0}
+.plan-module-detail summary,.company-feature-item summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:center;list-style-position:inside}
+.plan-module-detail summary:hover,.company-feature-item summary:hover{color:#11634b}
+.plan-module-detail ul,.company-feature-item ul{margin:12px 0 0;padding-left:22px;line-height:1.75;font-size:.88rem;color:#425d72}
+.plan-role-explainer{border:1px solid #dde7ef;border-radius:12px;padding:14px;background:#fff}
+.company-access-overview{margin-top:20px}.company-access-overview>.admin-section-heading{display:flex;flex-wrap:wrap;align-items:start;justify-content:space-between;gap:12px}
+.company-access-overview .company-plan-stat{background:#f3f7fb;border-radius:12px;padding:15px;display:grid;gap:3px;min-width:0}
+.company-plan-stat strong{color:#123a5a;font-size:1.5rem}.company-plan-stat span{color:#627b8e;font-size:.82rem}
+.company-feature-directory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:17px}
+.company-source-label{border-radius:8px;padding:5px 8px;background:#eff3f6;color:#526778;font-size:.75rem;white-space:nowrap}
+.company-source-label.active{background:#e7f5ec;color:#126645}.company-free-extras-note{padding:12px 16px;margin:14px 0;background:#fff8e8;border-left:3px solid #b57b29;border-radius:8px;font-size:.87rem;line-height:1.6;color:#775114}
+.plan-module-role-box{min-width:0;border:1px solid #d9e5ee;border-radius:12px;padding:14px}
+.plan-module-checkbox{display:flex!important;align-items:start!important;gap:10px!important;background:#f9fcff;border:1px solid #dfebf1;border-radius:10px;padding:10px}
+.plan-module-checkbox input[type=checkbox]{width:17px!important;height:17px!important;flex:0 0 17px;margin:3px 0!important;accent-color:#177854}
+.plan-module-checkbox>span{display:grid;gap:5px}.plan-module-checkbox small{color:#62798b;font-size:.76rem;line-height:1.45}
+.company-price-list{margin-top:12px;font-size:.84rem;color:#415c72}
+@media(max-width:860px){.company-feature-directory{grid-template-columns:minmax(0,1fr)}.plan-structure-guide .grid{grid-template-columns:minmax(0,1fr)}}
+/* Phase 030N-F: clear, touch-friendly installation device selector */
+.install-device-picker{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+.install-device-option{min-height:44px;padding:10px 15px;border:1px solid #d7e3ec;border-radius:999px;background:#fff;color:#123b63;font:inherit;font-weight:700;cursor:pointer}
+.install-device-option.active,.install-device-option[aria-pressed="true"]{background:#123b63;color:white;border-color:#123b63}
+.install-device-option:focus-visible{outline:3px solid #1a9b80;outline-offset:3px}
+.install-guide .install-steps h3{font-size:1.12rem;margin:18px 0 12px;color:#102b49}
+.install-guide .install-steps{min-width:0}
+.install-guide .install-steps li{overflow-wrap:anywhere}
+@media(max-width:480px){.install-device-picker{gap:6px}.install-device-option{font-size:.85rem;padding:10px 12px}}
+
+/* Guided iOS browser choice: clear tap targets and a consistent keyboard focus ring. */
+.install-browser-picker{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 12px}
+.install-browser-option{min-height:44px;min-width:105px;padding:10px 16px;border:1px solid #cfdee8;border-radius:12px;background:#f7fafc;color:#123b63;font:inherit;font-weight:700;cursor:pointer}
+.install-browser-option.active,.install-browser-option[aria-pressed="true"]{background:#e5f2ee;color:#0b624c;border-color:#0b8468}
+.install-browser-option:focus-visible{outline:3px solid #1a9b80;outline-offset:3px}
+/* Customer-ready workspace features */
+.bo-task{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:16px 0;border-bottom:1px solid #e4ebf1}
+.bo-task:last-child{border-bottom:0}
+.bo-task .btn{min-width:104px}
+.bo-business-logo{display:block;width:82px;height:82px;border-radius:16px;object-fit:cover;border:1px solid #e0e8f1;background:#f7f9fb}
+.bo-business-logo-fallback{display:grid;place-items:center;font-size:36px;font-weight:800;color:white;background:#123b63}
+.bo-logo-preview{display:flex;align-items:center;gap:18px;margin:18px 0}
+.bo-directory-card{text-decoration:none;color:inherit;transition:transform .16s ease,border-color .16s ease}
+.bo-directory-card:hover{transform:translateY(-3px);border-color:#94b4d2}
+.bo-directory-detail{max-width:780px;display:grid;justify-items:start;gap:16px}
+.bo-directory-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.bo-public-checkbox{display:flex;align-items:center;gap:12px;margin:18px 0;font-weight:600}
+.bo-public-checkbox input{width:20px;height:20px}
+@media(max-width:660px){.bo-task{flex-direction:column}.bo-task .btn{width:100%}.bo-logo-preview{align-items:flex-start}.bo-directory-actions a{width:100%}}
+.bo-step-card{padding:20px;border:1px solid #e2eaf2;border-radius:12px;display:grid;gap:12px;text-decoration:none;color:inherit;background:#fafcfe}
+.bo-step-card:hover{background:#eef5fb}.bo-step-card span{font-size:14px;color:#56718a}.bo-step-card small{color:#136b9a;font-weight:700}
+.bo-quiet-details{margin-top:15px;border-top:1px solid #e2e8f0;padding-top:13px}.bo-quiet-details>summary{cursor:pointer;font-weight:700;color:#123b63;list-style:revert}
+.bo-lesson{border:1px solid #e1e8ef;border-radius:12px;padding:18px}.bo-lesson>summary{cursor:pointer;display:grid;gap:9px;list-style:none}.bo-lesson>summary strong{font-size:17px}.bo-lesson>summary span:last-child{font-size:14px;color:#536b83}
+.bo-lesson>p{line-height:1.65;margin:15px 0}.bo-checkout-form{display:grid;gap:10px;margin-top:18px}.bo-plan-price{font-size:21px;font-weight:800;color:#123b63}

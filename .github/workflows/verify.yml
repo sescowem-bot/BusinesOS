@@ -54,6 +54,12 @@ jobs:
           npm run check:dashboard-support
           npm run check:phase30n-ux
           npm run check:free-pwa
+          npm run check:expenses-speed
+          npm run check:global-loading
+          npm run check:structured-plans
+          npm run check:dashboard-runtime-date
+          npm run check:ios-safe-errors
+          npm run check:customer-ux
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

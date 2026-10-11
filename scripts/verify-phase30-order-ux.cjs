@@ -33,7 +33,7 @@ assert.match(detail,/paymentLabel/);assert.match(detail,/Order saved successfull
 assert.match(newPage,/randomUUID\(\)/);assert.match(newPage,/requestKey=\{(?:reviewedRequestKey|randomUUID\(\))\}/);
 assert.match(read('app/(dashboard)/sales/forms.tsx'),/InitialPaymentFields/);
 assert.match(read('app/(dashboard)/orders/new/reviewed-tax-form.tsx'),/InitialPaymentFields/);
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js');
+const ts=require('./load-typescript.cjs');
 for(const rel of ['components/order-initial-payment.tsx','app/(dashboard)/sales/actions.ts','app/(dashboard)/sales/forms.tsx','app/(dashboard)/orders/new/page.tsx','app/(dashboard)/orders/new/reviewed-tax-actions.ts','app/(dashboard)/orders/new/reviewed-tax-form.tsx','app/(dashboard)/orders/[id]/page.tsx']){
  const source=ts.createSourceFile(rel,read(rel),ts.ScriptTarget.Latest,true,rel.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  assert.equal(source.parseDiagnostics.length,0,`TS syntax: ${rel}`);

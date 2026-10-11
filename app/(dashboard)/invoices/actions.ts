@@ -12,7 +12,7 @@ export async function issueInvoice(_:IssueInvoiceState,form:FormData):Promise<Is
     const {data,error}=await client.rpc('issue_business_invoice',{p_business:businessId,p_order:orderId});
     if(error){
       // Keep internal database details private. Expose only safe, actionable feedback.
-      return {error:error.code==='42883'||error.code==='PGRST202'?'Invoice feature is not installed. Apply SQL migration 022.':
+      return {error:error.code==='42883'||error.code==='PGRST202'?'Invoices are temporarily unavailable. Please try again or contact support.':
         error.code==='42501'?'Your role is not permitted to issue this invoice.':'Invoice could not be issued. Check the order status and try again.',invoiceId:''};
     }
     revalidatePath('/invoices');

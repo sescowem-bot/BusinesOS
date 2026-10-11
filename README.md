@@ -1,3 +1,11 @@
+> Dashboard runtime fix: SQL 045 bounds POS reporting to today instead of requesting future dates; dashboard errors are now explained accurately. See `MD/DASHBOARD_ERROR_042_AND_DATE_FIX.md`. **Do not apply SQL 045 before SQL 041–044 are installed.**
+
+> Latest prepared upgrade: **Phase 030N-D Structured Plans, Business Feature Access, Pricing and Company Roles (SQL 044)**. Read `MD/PHASE_030N_D_PLAN_ROLE_REDESIGN.md` before deployment.
+
+> **Latest no-SQL performance release:** Global Premium Branded Loader & Navigation Prefetch Reduction. Read `MD/GLOBAL_WORKSPACE_SPEED_BRANDED_LOADING.md` before deploying.
+
+> Latest prepared source patch: **Fast Expenses Page & Loading Recovery**. See `MD/FAST_EXPENSES_LOADING_HOTFIX.md`. **No new SQL migration required.**
+
 > **Phase 030N-B — Free by default + installable BusinessOS web app.** Migration 043 auto-assigns the zero-cost Free plan to new workspaces and safely fills missing plans for existing businesses. A lightweight manifest and install guide are added. Read `MD/PHASE_030N_B_FREE_PLAN_AND_PWA.md`.
 
 > **Current prepared usability release:** Phase 030N-A — Mobile-first customer and business workflows. See `MD/PHASE_030N_A_USER_EXPERIENCE.md`. No additional SQL or environment variables; it requires the previous application database migrations to be installed.
@@ -143,3 +151,15 @@ Routes `/retail-reports` and `/wholesale` add bounded, indexed POS operational r
 ## Phase 030M-C
 
 Dashboard uses a compact SQL RPC, shows customer payment statuses and carefully qualified profit estimates. Owners/managers/finance can supply cost evidence; owners can manage existing team roles; Platform Admin can assist through an explicit customer-support workflow. SQL 042 is required. The app has **not** been deployed, migration 042 has **not** been executed, and a full Next.js production build has **not** been verified in this source session.
+
+
+## Phase 030N-D structured entitlements
+The 11 premium modules are distinct from the 8 free/core capabilities and the individual workflows documented under each module. Configure a monthly/annual NGN plan price, restrict modules by built-in plan roles and grant audited extras to one business. Platform administrators may create named role profiles for individual businesses, with those roles restricted to their underlying secure base role; existing Owner authority cannot be transferred using these controls. Migration 044 follows SQL 043. No payment processing or GL posting is added.
+
+## Phase 030N-G — customer language audit and Chrome iOS Home Screen
+
+The newest unpublished source release includes iPhone Chrome and Safari installation guidance, customer-safe error boundaries, and a source-level check for developer-facing UI text and a portable TypeScript verification helper. Use `npm run check:customer-ux` after dependencies are installed. See `MD/PHASE_030N_G_CUSTOMER_EXPERIENCE_AUDIT.md` and `MD/PHASE_030N_G_DEVICE_UAT_CHECKLIST.md` for changes, limitations, and release testing. No database migration is added in this phase.
+
+
+## Latest unpublished UX and self-service changes
+See `MD/PHASE_030N_H_CUSTOMER_PRODUCT_CORRECTION.md` and `MD/PHASE_030N_H_CUSTOMER_ACCEPTANCE.md` for SQL 046/047, owner-managed staff, public directory, business branding, real tasks and Paystack checkout staging requirements. Do not deploy without database/CI verification.

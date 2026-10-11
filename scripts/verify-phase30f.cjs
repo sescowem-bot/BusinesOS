@@ -19,7 +19,7 @@ assert.match(page,/invoiceTaxLabel/);assert.match(page,/invoice-sheet/);assert.m
 assert.match(page,/NRS-validated electronic invoice/);
 assert.match(newOrder,/ReviewedTaxForm/);assert.match(account,/InvoiceIdentityForm/);
 assert.match(helper,/Tax recorded \(unverified\)/);
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js');
+const ts=require('./load-typescript.cjs');
 const js=ts.transpileModule(helper,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
 const mod={exports:{}};new Function('module','exports',js)(mod,mod.exports);const {invoiceTaxLabel,invoiceMoney}=mod.exports;
 const base={tax_recorded:375,tax_context:{treatment:'standard',rate_basis_points:750,vat_amount:375}};

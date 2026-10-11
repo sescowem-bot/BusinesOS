@@ -37,7 +37,7 @@ export default async function AdminPage(){
  ];
  return <main className="admin-area owner-dashboard">
   <div className="owner-page-heading"><div><div className="owner-eyebrow"><ShieldCheck size={14}/> PLATFORM CONTROL CENTRE</div><h1>Welcome to your command centre</h1><p>Manage {brand.name} in one place, from website content to customer businesses and subscription approvals.</p></div><Link href="/admin/health" className="btn owner-action-outline"><MonitorCog size={16}/> System health</Link></div>
-  {incomplete&&<div className="owner-alert" role="alert"><MonitorCog size={19}/><div><strong>Some platform information is unavailable</strong><p>Figures shown as dashes are not verified. Check your database functions, migrations and administrator permissions.</p></div><Link href="/admin/health">Diagnostics <ArrowRight size={15}/></Link></div>}
+  {incomplete&&<div className="owner-alert" role="alert"><MonitorCog size={19}/><div><strong>Some platform information is unavailable</strong><p>Some information could not be verified. Please try again or open system diagnostics for help.</p></div><Link href="/admin/health">Diagnostics <ArrowRight size={15}/></Link></div>}
   <div className="owner-stat-grid">{stats.map(s=>{const Icon=s.icon;return <Link href={s.href} className="owner-stat-card" key={s.name}><div className="owner-stat-label"><span>{s.name}</span><span className="owner-stat-icon"><Icon size={19}/></span></div><strong>{s.value}</strong><small>{s.caption}</small></Link>})}</div>
   <div className="owner-section-title"><div><h2>Your management workspaces</h2><p>Dedicated tools for the platform, its customers and your own business.</p></div></div>
   <div className="owner-destination-grid">

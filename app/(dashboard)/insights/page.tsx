@@ -5,7 +5,7 @@ import {money} from '@/lib/format';
 const asMoney=(kobo:number)=>money(kobo/100);
 async function InternalProtectedPage(){
  let report:Awaited<ReturnType<typeof loadBusinessInsights>>;
- try{report=await loadBusinessInsights()}catch(e){return <div className="tax-page"><h1>Business Intelligence</h1><p role="alert">Insights unavailable. Check your workspace access, database migrations and reporting data.</p><Link href="/dashboard">Return to dashboard</Link></div>}
+ try{report=await loadBusinessInsights()}catch(e){return <div className="tax-page"><h1>Business Intelligence</h1><p role="alert">Business insights are temporarily unavailable. Please try again or ask your business owner to review access.</p><Link href="/dashboard">Return to dashboard</Link></div>}
  const {current:c,previous:p,insights}=report;
  return <div className="tax-page"><p className="muted small">BUSINESS / INTELLIGENCE</p><h1>Business Intelligence</h1><p className="muted">Transaction-based insights for the current calendar month. Figures here are operational, not audited financial statements.</p>
  <div className="grid grid-3">

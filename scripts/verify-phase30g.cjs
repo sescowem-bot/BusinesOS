@@ -24,7 +24,7 @@ const settings=read('app/(dashboard)/pos/tax-mapping/page.tsx');
 assert.match(settings,/current, approved|current approved/);assert.match(settings,/count\.get\(s\.id\)===1/);
 assert.match(read('app/(dashboard)/invoices/issued/[id]/page.tsx'),/VAT breakdown by item/);
 const helper=read('lib/invoice-document.ts');
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js');
+const ts=require('./load-typescript.cjs');
 const js=ts.transpileModule(helper,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
 const mod={exports:{}};new Function('module','exports',js)(mod,mod.exports);
 const {invoiceTaxStatus}=mod.exports;

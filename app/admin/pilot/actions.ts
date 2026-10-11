@@ -17,7 +17,7 @@ export async function recordPilotResult(_previous:PilotSaveResult,form:FormData)
  const {error}=await session.client.rpc('platform_record_pilot_check',{
   p_test_id:testId,p_environment:environment,p_status:status,p_evidence:evidence
  });
- if(error)return {ok:false,message:error.code==='42883'||error.code==='42P01'?'Apply pilot migration 028 first.':'Unable to save. Check your administrator permission and database setup.'};
+ if(error)return {ok:false,message:error.code==='42883'||error.code==='42P01'?'This feature is temporarily unavailable. Please try again.':'Your changes could not be saved. Please check your access and try again.'};
  revalidatePath('/admin/pilot');
  return {ok:true,message:'Review recorded in the pilot audit log.'};
 }

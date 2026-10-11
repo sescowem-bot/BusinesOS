@@ -6,7 +6,7 @@ const admin=read('components/admin-workspace.tsx');
 const css=read('app/globals.css');
 const acss=read('app/admin/owner-console.css');
 const team=read('app/(dashboard)/team/page.tsx');
-for(const link of ['/customers','/orders','/products','/expenses','/team','/inventory','/invoices','/payments','/accounting','/reports','/tax-centre','/communications','/campaigns','/settings','/upgrade'])assert.ok(shell.includes(`href:'${link}'`),'missing business route '+link);
+for(const link of ['/customers','/orders','/products','/expenses','/team','/inventory','/invoices','/payments','/accounting','/reports','/tax-centre','/communications','/settings','/upgrade'])assert.ok(shell.includes(`href:'${link}'`),'missing business route '+link);
 for(const link of ['/admin','/admin/website','/admin/businesses','/admin/my-business','/admin/pilot'])assert.ok(shell.includes(`href:'${link}'`),'missing owner navigation route '+link);
 assert.ok(shell.includes('isPlatformAdmin?[{title:'),'Owner links must be conditional');
 assert.match(shell,/More: show every business module/);

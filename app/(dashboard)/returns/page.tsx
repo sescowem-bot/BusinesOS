@@ -20,7 +20,7 @@ export default async function Returns(){
   client.from('order_items').select('id,order_id,name_snapshot,quantity,unit_price').in('order_id',filterIds).limit(1000)
  ]);
  const loadingError=salesResult.error||returnsResult.error||ordersResult.error||itemsResult.error;
- if(loadingError)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / CONTROL" title="Returns & credit notes" description="Return and refund records"/><BusinessAlert>Return records could not be verified. Confirm SQL 035 is installed and your POS permissions are enabled. No action is available until loading succeeds.</BusinessAlert></div>;
+ if(loadingError)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / CONTROL" title="Returns & credit notes" description="Return and refund records"/><BusinessAlert>We couldn’t verify return records. Please try again or contact support. Actions are paused until records are available.</BusinessAlert></div>;
  const orders=ordersResult.data||[];
  const orderNames=new Map(orders.map(o=>[o.id,o.order_number]));
  const supported=new Set(orders.filter(o=>o.status!=='cancelled'&&Number(o.delivery_fee)===0&&

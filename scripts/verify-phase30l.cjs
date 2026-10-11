@@ -42,7 +42,7 @@ check(form.includes('tenderMode')&&form.includes('invalidTenders'),'split paymen
 check(page.includes('heldResult.error')&&page.includes('heldCarts='),'fail-closed held cart query');
 check(receipt.includes("business_pos_sales")&&receipt.includes('payments(')&&receipt.includes('PrintDocumentButton'),'receipt derived from saved POS sale and payments');
 check(receipt.includes('does not verify bank/card settlement')&&receipt.includes('NRS-validated'),'receipt does not claim validated tax/bank settlement');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const file of ['app/(dashboard)/pos/actions.ts','app/(dashboard)/pos/held-actions.ts','app/(dashboard)/pos/checkout-form.tsx','app/(dashboard)/pos/page.tsx','app/(dashboard)/pos/receipts/[id]/page.tsx']){
  const content=read(file),parsed=ts.createSourceFile(file,content,ts.ScriptTarget.Latest,true,file.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  assert.equal(parsed.parseDiagnostics.length,0,`${file} syntax failure`);count++;

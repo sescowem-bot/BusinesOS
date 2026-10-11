@@ -37,7 +37,7 @@ check(read('app/(dashboard)/dashboard/page.tsx').includes('href="/getting-starte
 check(!newOrder.includes('taxDataUnavailable ? true : false'),'no silent tax fallback');
 check(read('package.json').includes('check:phase30n-ux'),'check in npm scripts');
 check(read('.github/workflows/verify.yml').includes('check:phase30n-ux'),'CI step included');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const f of ['app/(dashboard)/getting-started/page.tsx','app/(dashboard)/orders/new/page.tsx','app/(dashboard)/orders/page.tsx','app/(dashboard)/customers/page.tsx','app/(dashboard)/orders/[id]/page.tsx','app/(dashboard)/orders/new/reviewed-tax-form.tsx','app/(dashboard)/sales/forms.tsx','components/business-records.tsx']){
  const source=ts.createSourceFile(f,read(f),ts.ScriptTarget.Latest,true,f.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  check(source.parseDiagnostics.length===0,`${f}: ${source.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText,' ')).join(', ')}`);

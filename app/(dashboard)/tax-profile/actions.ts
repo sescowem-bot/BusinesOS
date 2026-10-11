@@ -21,7 +21,7 @@ export async function saveTaxProfile(_:TaxActionState, form:FormData):Promise<Ta
  const staff=String(form.get('employs_staff')||'unknown');
  if(!['yes','no','unknown'].includes(staff))return {error:'Invalid staff selection.',success:''};
  const {error}=await client.from('business_tax_profiles').upsert({business_id:businessId,legal_structure:legal,turnover_band:turnover,vat_registration_status:vat,employs_staff:staff==='unknown'?null:staff==='yes',activities:unique,goods_services:goodsServices,notes,classification_status:'needs_review',updated_at:new Date().toISOString()},{onConflict:'business_id'});
- if(error)return {error:'Unable to save. Ensure SQL migration 005 is installed and your account is the business owner.',success:''};
+ if(error)return {error:'Your changes couldn’t be saved. Check your access and try again.',success:''};
  revalidatePath('/tax-profile');return {error:'',success:'Tax discovery profile saved. Your supplies still require classification review.'};
 }
 export async function addSupply(_:TaxActionState,form:FormData):Promise<TaxActionState>{
@@ -31,6 +31,6 @@ export async function addSupply(_:TaxActionState,form:FormData):Promise<TaxActio
  const name=String(form.get('name')||'').trim();const kind=String(form.get('supply_kind')||'');
  if(name.length<2||name.length>120||!['goods','services','mixed'].includes(kind))return {error:'Enter a valid supply name and type.',success:''};
  const {error}=await client.from('business_supply_categories').insert({business_id:id,name,supply_kind:kind,proposed_vat_treatment:'needs_review'});
- if(error)return {error:'Unable to add supply. It may already exist or migration 005 is missing.',success:''};
+ if(error)return {error:'This item couldn’t be added. Check for duplicates and try again.',success:''};
  revalidatePath('/tax-profile');return {error:'',success:'Supply added to the review list.'};
 }

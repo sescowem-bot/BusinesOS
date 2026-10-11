@@ -31,7 +31,7 @@ export default async function ReturnDetails({params}:{params:Promise<{id:string}
   {r.status==='requested'&&(canReview?<BusinessSection title="Manager / owner decision" description="Approval does not automatically refund the customer or restore stock."><ReturnReviewForm returnId={id}/></BusinessSection>:<BusinessAlert>An independent owner or manager must review this request. A manager cannot approve their own request.</BusinessAlert>)}
   {r.status==='approved'&&(canReview?<BusinessSection title="Confirm external refund and stock" description="Complete only after actually paying the customer back outside BusinessOS."><ReturnCompleteForm returnId={id} amount={Number(r.gross_credit)}/></BusinessSection>:<BusinessAlert>The approved return is awaiting owner/manager settlement confirmation.</BusinessAlert>)}
   {r.status==='rejected'&&<BusinessAlert>This return was rejected. No credit note, recorded refund or stock movement was created.</BusinessAlert>}
-  {r.status==='completed'&&<BusinessSection title="Completed refund" description="The refund and credit note were recorded in one database transaction.">
+  {r.status==='completed'&&<BusinessSection title="Completed refund" description="The refund record and credit note were saved together.">
    <p>Recorded refund: <strong>{money(Number(refund?.amount||0))}</strong> · {refund?.method||'Unknown method'}</p>
    <p>Evidence/reference: <strong>{refund?.external_reference||'Unavailable'}</strong></p>
    <p>Saleable inventory restored: <strong>{r.restocked?'Yes':'No'}</strong></p>

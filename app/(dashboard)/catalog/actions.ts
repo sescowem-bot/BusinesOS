@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {getWorkspace} from '@/lib/server/workspace';
 import {requireBusinessFeature} from '@/lib/server/authorization';
@@ -11,7 +12,7 @@ export async function addCatalogItem(_:CatalogState,fd:FormData):Promise<Catalog
  if(!name||name.length>160||sku.length>100||description.length>2000||!['product','service','package'].includes(type)||![price,cost,stock,minimum].every(v=>Number.isFinite(v)&&v>=0)||(!track&&stock!==0))return fail('Check the item, amounts, and inventory tracking settings.');
  if(track||minimum>0){const access=await requireBusinessFeature('inventory');if(!access.allowed)return fail(access.reason);}
  const {error}=await client.rpc('catalog_create_item',{p_business:businessId,p_name:name,p_type:type,p_sku:sku||null,p_description:description||null,p_price:price,p_cost:cost,p_track:track,p_initial_stock:stock,p_minimum:minimum});
- if(error)return fail('Unable to save item. Check permissions, unique SKU, and migration 007.');
+ if(error)return fail('Item could not be saved. Review the details and try again.');
  revalidatePath('/products');revalidatePath('/inventory');return {error:'',success:'Item created successfully.'};
  }catch{return fail('Unable to create item.');}
 }
@@ -19,7 +20,7 @@ export async function adjustStock(_:CatalogState,fd:FormData):Promise<CatalogSta
  try{const access=await requireBusinessFeature('inventory');if(!access.allowed)return fail(access.reason);const {client,businessId}=access;if(!['owner','manager','inventory'].includes(access.role))return fail('Inventory role required.');const item=String(fd.get('item')||''),delta=Number(fd.get('delta')),reason=String(fd.get('reason')||'').trim();
  if(!item||!Number.isFinite(delta)||delta===0||Math.abs(delta)>100000000||Math.round(delta*1000)!==delta*1000||reason.length<3||reason.length>500)return fail('Choose a product, nonzero quantity change, and explanation.');
  const {error}=await client.rpc('inventory_adjust_stock',{p_business:businessId,p_item:item,p_delta:delta,p_reason:reason});
- if(error)return fail('Stock update failed. Check availability, permissions and migration 007.');
+ if(error)return fail('Stock could not be updated. Please check the quantity and try again.');
  revalidatePath('/inventory');revalidatePath('/products');return {error:'',success:'Stock adjusted and movement recorded.'};
  }catch{return fail('Unable to update stock.');}
 }
@@ -40,7 +41,7 @@ export async function recordStockCount(_:CatalogState,fd:FormData):Promise<Catal
   const {error}=await access.client.rpc('inventory_record_stock_count',{
    p_business:access.businessId,p_item:item,p_expected:expected,p_counted:counted,p_reason:reason
   });
-  if(error)return fail(error.code==='40001'?'Stock has changed. Reload the page and count again.':error.message);
+  if(error)return fail(error.code==='40001'?'Stock has changed. Reload the page and count again.':friendlyServiceError('complete this request', error));
   revalidatePath('/inventory');revalidatePath('/products');
   return {error:'',success:counted===expected?'Stock count verified; no adjustment required.':'Stock count saved and difference recorded.'};
  }catch{return fail('Unable to save stock count. Please try again.');}

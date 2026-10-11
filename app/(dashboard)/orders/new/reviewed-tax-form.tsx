@@ -22,7 +22,7 @@ export function ReviewedTaxForm({customers,supplies,requestKey,canRecordCost=fal
    {canRecordCost&&<label className="field">Estimated cost per unit (₦) — optional<input type="number" name="unit_cost" min="0" step="0.01" placeholder="Leave blank if unknown"/><small className="muted">Only owner, manager or finance may record cost evidence. An unknown cost is not zero.</small></label>}
    <label className="field">Payment due date<input type="date" name="due_date"/></label>
   </div>
-  <p className="muted small">The tax rate is selected by the database from ONE approved supply rule effective on the transaction date. Delivery charges are not supported in this reviewed flow until their VAT classification is configured. This does not create a certified NRS e-invoice.</p>
+  <p className="muted small">VAT is calculated from your approved tax settings for the order date. Delivery charges are not available in this flow. This document is not a certified electronic tax invoice.</p>
   <InitialPaymentFields estimatedTotal={estimatedTotal}/>
   <button type="submit" className="btn btn-primary" disabled={pending}>{pending?'Saving reviewed order and payment…':'Save reviewed order and payment'}</button>
   {state.error&&<p role="alert" className="negative">{state.error}</p>}

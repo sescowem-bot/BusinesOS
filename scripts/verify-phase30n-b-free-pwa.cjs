@@ -13,8 +13,8 @@ expect(sql.includes('SECURITY DEFINER SET search_path=public,pg_temp'),'secure t
 expect(sql.includes('REVOKE ALL ON FUNCTION public.assign_default_free_plan()'),'trigger function direct use revoked');
 expect(sql.includes('BEGIN;')&&sql.includes('COMMIT;'),'atomic migration transaction');
 const up=rd('app/(dashboard)/upgrade/page.tsx');
-expect(up.includes("current==='free'")&&up.includes('Active at no cost'),'Free is clearly active on plan page');
-expect(up.includes("plan.id==='free'?")&&up.includes('No request or payment needed'),'Free plan cannot be requested for approval');
+expect(up.includes("current==='free'")&&up.includes('Free forever'),'Free is included at no cost');
+expect(up.includes("plan.id==='free'?")&&up.includes('Included automatically'),'Free plan is assigned automatically without approval');
 expect(!up.includes('No approved plan assigned yet'),'confusing unassigned plan message removed');
 expect(rd('app/onboarding/page.tsx').includes('Free plan and Owner'),'new owner onboarding promise');
 expect(rd('app/onboarding/form.tsx').includes('Your Owner role'),'owner role documented');
@@ -43,7 +43,7 @@ expect(rd('components/public-footer.tsx').includes('href="/install"'),'public si
 expect(rd('app/install/page.tsx').includes('InstallAppGuide'),'accessible guide route');
 expect(rd('app/globals.css').includes('@media(max-width:760px){.install-page-layout'),'mobile layout');
 expect(rd('.github/workflows/verify.yml').includes('npm run check:free-pwa'),'CI coverage');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const file of ['app/manifest.ts','app/install/page.tsx','components/install-app-guide.tsx','app/layout.tsx','app/(dashboard)/upgrade/page.tsx']){
  const sf=ts.createSourceFile(file,rd(file),ts.ScriptTarget.Latest,true,file.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  expect(sf.parseDiagnostics.length===0,`TypeScript/TSX parser: ${file}`);

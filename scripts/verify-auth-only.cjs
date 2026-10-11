@@ -1,5 +1,5 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');const read=p=>fs.readFileSync(p,'utf8');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 const code=read('lib/auth-feedback.ts'),js=ts.transpileModule(code,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const sandboxModule={exports:{}};new Function('module','exports',js)(sandboxModule,sandboxModule.exports);
 const f=sandboxModule.exports.explainAuthError;

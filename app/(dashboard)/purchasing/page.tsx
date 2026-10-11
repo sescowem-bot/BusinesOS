@@ -20,14 +20,14 @@ export default async function PurchasingPage(){
   client.from('products').select('id,name,cost_price,stock_quantity,minimum_stock').eq('business_id',businessId).eq('active',true).eq('track_inventory',true).order('name').limit(500),
   client.from('business_purchase_orders').select('id,reference,supplier_id,status,created_at,received_at').eq('business_id',businessId).order('created_at',{ascending:false}).limit(100)
  ]);
- if(supResult.error||prodResult.error||poResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / PROCUREMENT" title="Suppliers & purchasing" description="Supplier records and goods receiving"/><BusinessAlert>Procurement records could not be loaded. Verify migrations through 038 and access permissions.</BusinessAlert></div>;
+ if(supResult.error||prodResult.error||poResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / PROCUREMENT" title="Suppliers & purchasing" description="Supplier records and goods receiving"/><BusinessAlert>Purchasing records are temporarily unavailable. Please try again or contact support.</BusinessAlert></div>;
  const suppliers=supResult.data||[],products=prodResult.data||[],orders=poResult.data||[];
  const poIds=orders.map(o=>o.id);
  const [itemsResult,billsResult]=await Promise.all([
   poIds.length?client.from('business_purchase_items').select('id,purchase_id,product_id,quantity,received_quantity,unit_cost').in('purchase_id',poIds).limit(2000):Promise.resolve({data:[] as PurchaseLine[],error:null}),
   canApproveBills?client.from('business_supplier_bills').select('id,purchase_id,supplier_id,supplier_invoice_number,invoice_amount,due_on').eq('business_id',businessId).order('created_at',{ascending:false}).limit(200):Promise.resolve({data:[] as SupplierBill[],error:null})
  ]);
- if(itemsResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / PROCUREMENT" title="Suppliers & purchasing" description="Purchase order records"/><BusinessAlert>Purchase lines could not be read. Confirm SQL migration 038 before using goods receiving.</BusinessAlert></div>;
+ if(itemsResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / PROCUREMENT" title="Suppliers & purchasing" description="Purchase order records"/><BusinessAlert>Purchasing records are temporarily unavailable. Please try again before receiving goods.</BusinessAlert></div>;
  const bills=(billsResult.data||[]) as SupplierBill[];
  const billIds=bills.map(b=>b.id);
  const paymentsResult=canApproveBills&&billIds.length&&!billsResult.error?
@@ -59,7 +59,7 @@ export default async function PurchasingPage(){
    })}</tbody></table></div>{orders.length===0&&<p className="muted">No purchase orders yet.</p>}
   </BusinessSection>
   {canApproveBills&&<BusinessSection title="Supplier bills and payments" description="Record a supplier invoice after receiving goods. Payables here are manually registered, not automatically generated from purchase drafts.">
-   {!financialDataReady?<BusinessAlert>Supplier bill or payment records could not be verified. Check migration 038 before recording money.</BusinessAlert>:<>
+   {!financialDataReady?<BusinessAlert>Supplier bills and payments could not be verified. Please try again before recording payments.</BusinessAlert>:<>
     <div className="grid grid-2"><section className="card card-pad"><h3>Register supplier invoice</h3><SupplierBillForm purchases={orders.filter(o=>o.status!=='draft').map(o=>({id:o.id,label:`${o.reference} — ${names.get(o.supplier_id)||'Supplier'}`}))}/></section><section className="card card-pad"><h3>Supplier balance information</h3><p className="small muted">Use the supplier's actual invoice. The purchase-order estimate and received-goods value may differ from the amount billed.</p><p><strong>Outstanding on loaded registered bills: {money(supplierOutstanding)}</strong></p><p className="small muted">This is not a complete accounts payable ledger and does not replace accounting reconciliation.</p></section></div>
     <div className="table-wrap"><table className="table"><thead><tr><th>Supplier / Invoice</th><th>Amount</th><th>Paid</th><th>Outstanding</th><th>Due</th><th>Verified payment</th></tr></thead><tbody>{bills.map(b=>{const paid=paidByBill.get(b.id)||0,outstanding=Math.max(0,Number(b.invoice_amount)-paid);return <tr key={b.id}><td><strong>{names.get(b.supplier_id)||'Supplier'}</strong><div className="small muted">{b.supplier_invoice_number}</div></td><td>{money(Number(b.invoice_amount))}</td><td>{money(paid)}</td><td>{money(outstanding)}</td><td>{b.due_on||'—'}</td><td>{outstanding>0?<details><summary>Record payment</summary><SupplierPaymentForm billId={b.id} outstanding={outstanding}/></details>:'Settled'}</td></tr>})}</tbody></table></div>{!bills.length&&<p className="muted">No supplier invoices registered yet.</p>}
    </>}

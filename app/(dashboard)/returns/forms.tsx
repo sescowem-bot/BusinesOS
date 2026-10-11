@@ -17,7 +17,7 @@ export function RequestReturnForm({items}:{items:EligibleItem[]}){
   <label>Original POS sale item<select value={selected} onChange={e=>setSelected(e.target.value)} required>
    {items.map(i=><option key={i.id} value={`${i.orderId}:${i.id}`}>{i.orderNumber} · {i.name} · sold {i.quantity}</option>)}
   </select></label>
-  {chosen&&<p className="small muted">Originally sold: {chosen.quantity} × {money(chosen.unitPrice)}. Available return quantity is verified from completed returns by the database.</p>}
+  {chosen&&<p className="small muted">Originally sold: {chosen.quantity} × {money(chosen.unitPrice)}. The return limit takes previously completed returns into account.</p>}
   <label>Quantity to return<input type="number" name="quantity" min="0.001" max={chosen?.quantity||1000000} step="0.001" required defaultValue="1"/></label>
   <label>Reason for return<textarea name="reason" required minLength={10} maxLength={500} rows={3} placeholder="Describe the product condition and why it is being returned."/></label>
   <p className="small muted">Only fully paid POS sales without delivery charges are supported in this phase. No stock or payment is changed by a request.</p>

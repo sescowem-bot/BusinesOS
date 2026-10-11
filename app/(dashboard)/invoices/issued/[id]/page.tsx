@@ -11,7 +11,7 @@ export default async function IssuedInvoice({params}:{params:Promise<{id:string}
  const {client,businessId}=await getWorkspace();
  const {data:invoice,error}=await client.from('business_invoices')
   .select('id,invoice_number,issued_at,order_id,snapshot').eq('business_id',businessId).eq('id',id).maybeSingle();
- if(error)throw new Error('Invoice details are unavailable. Confirm invoice migrations.');
+ if(error)throw new Error('This invoice could not be opened right now. Please try again or contact support.');
  if(!invoice)notFound();
  const snap=(invoice.snapshot||{}) as InvoiceSnapshot;
  const seller=snap.seller||{},buyer=snap.customer||{},identity=snap.invoice_identity||{};

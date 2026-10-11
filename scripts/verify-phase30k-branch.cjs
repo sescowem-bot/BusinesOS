@@ -38,7 +38,7 @@ verify(actions.includes('business_transfer_location_stock')&&actions.includes('b
 verify(forms.includes('BranchTransferForm')&&forms.includes('BranchStockCountForm'),'transfer and count forms exist');
 verify(read('components/shell.tsx').includes('/inventory/locations'),'branch stock in navigation');
 verify(read('.github/workflows/verify.yml').includes('check:branch-stock'),'CI check included');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const file of ['app/(dashboard)/inventory/locations/actions.ts','app/(dashboard)/inventory/locations/forms.tsx','app/(dashboard)/inventory/locations/page.tsx','app/(dashboard)/pos/actions.ts','app/(dashboard)/pos/page.tsx','app/(dashboard)/pos/checkout-form.tsx']){
  const source=ts.createSourceFile(file,read(file),ts.ScriptTarget.Latest,true,file.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  assert.equal(source.parseDiagnostics.length,0,`${file}: ${source.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText,' ')).join(', ')}`);n++;

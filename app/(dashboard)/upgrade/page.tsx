@@ -1,41 +1,37 @@
+import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
-import {UpgradeRequestForm} from './request-form';
 import {essentialCapabilities,paidCapabilities} from '@/lib/plan-catalog';
+import {billingReady} from '@/lib/server/billing';
+import {PlanCheckoutForm} from './checkout-form';
 export const dynamic='force-dynamic';
-type Plan={id:string;name:string;description:string|null;price_label:string|null;billing_label:string|null;features:unknown};
-type Request={id:string;plan_id:string;status:string;requested_at:string;review_note:string|null};
+type Plan={id:string;name:string;price_monthly_ngn:number|null;price_yearly_ngn:number|null;description:string|null};
 type PublishedPlanFeature={plan_id:string;feature_key:string};
-function isPublishedPlanFeature(value:unknown):value is PublishedPlanFeature{
- if(typeof value!=='object'||value===null)return false;
- const row=value as Record<string,unknown>;
- return typeof row.plan_id==='string'&&typeof row.feature_key==='string';
-}
-export default async function UpgradePage(){
+export default async function UpgradePage({searchParams}:{searchParams:Promise<{checkout?:string}>}){
  const {client,businessId,role}=await getWorkspace();
- const [plans,requests,assignments,access,grantsResult]=await Promise.all([
-  client.from('public_site_plans').select('id,name,description,price_label,billing_label,features').eq('published',true).order('sort_order'),
-  client.from('business_upgrade_requests').select('id,plan_id,status,requested_at,review_note').eq('business_id',businessId).order('requested_at',{ascending:false}).limit(15),
-  client.from('business_plan_assignments').select('plan_id,approved_at').eq('business_id',businessId).maybeSingle(),
+ const [{data:plans,error:plansError},{data:assignment,error:assignmentError},{data:access},{data:payments}]=await Promise.all([
+  client.from('public_site_plans').select('id,name,description,price_monthly_ngn,price_yearly_ngn').eq('published',true).order('sort_order'),
+  client.from('business_plan_assignments').select('plan_id,expires_at').eq('business_id',businessId).maybeSingle(),
   client.rpc('published_plan_features'),
-  client.from('business_feature_grants').select('feature_key,enabled,expires_at,allowed_roles').eq('business_id',businessId)
+  client.from('business_subscription_payments').select('reference,plan_id,status,paid_at,paid_until,amount_kobo,billing_cycle').eq('business_id',businessId).order('created_at',{ascending:false}).limit(10)
  ]);
- const planRows=(Array.isArray(plans.data)?plans.data:[]) as Plan[];
- const requestRows=(Array.isArray(requests.data)?requests.data:[]) as Request[];
- const availableFeatures:PublishedPlanFeature[]=((Array.isArray(access.data)?access.data:[]) as unknown[]).filter(isPublishedPlanFeature);
- const pending=requestRows.some(r=>r.status==='pending');
- const errors=[plans.error&&'pricing plans',requests.error&&'request history',assignments.error&&'current plan',access.error&&'additional feature access'].filter(Boolean);
- const nameFor=(id:string)=>planRows.find(p=>p.id===id)?.name||id;
- const featuresOf=(input:unknown)=>Array.isArray(input)?input.filter((v):v is string=>typeof v==='string'):[];
- const current=assignments.data?.plan_id;
- return <div className="tax-page"><p className="small muted">BUSINESS / SUBSCRIPTION</p><h1>Plans & upgrades</h1><p className="muted">Plan changes are subject to platform administrator approval. No online payment is processed on this page.</p>
- {errors.length>0&&<section className="tax-panel" role="alert"><strong>Some subscription information could not be loaded.</strong><p className="small muted">Unavailable: {errors.join(', ')}. No plan has been changed. Contact platform support if the issue continues.</p></section>}
- <section className="tax-panel"><h2>Current plan</h2><p className="plan-current-status">{assignments.error?'Cannot verify current plan':current?`${nameFor(current)}${current==='free'?' · Active at no cost':''}`:'Your Free plan is being set up automatically. Refresh soon or contact support if this continues.'}</p>{current==='free'&&<p className="small muted">Your core business tools are available without requesting an upgrade. Paid modules remain optional.</p>}<h3>Request history</h3>
- {requests.error?<p role="alert">History is unavailable; you cannot safely submit another request yet.</p>:requestRows.length?requestRows.map(r=><p key={r.id}><strong>{nameFor(r.plan_id)}</strong> — {r.status}<span className="small muted"> · {Number.isNaN(new Date(r.requested_at).getTime())?'Date unavailable':new Date(r.requested_at).toLocaleDateString('en-NG')}</span>{r.review_note&&<span> · {r.review_note}</span>}</p>):<p className="muted">No previous requests.</p>}</section>
- <section className="tax-panel"><h2>Business-specific extras</h2><p className="small muted">The System Owner can approve extra access for this business without changing your subscription plan.</p>
- {grantsResult.error?<p>Cannot verify extra feature access. Contact support if this continues.</p>:<ul>{(grantsResult.data||[]).filter(g=>g.enabled&&(!g.expires_at||new Date(g.expires_at)>new Date())).map(g=><li key={g.feature_key}>{paidCapabilities.find(f=>f.key===g.feature_key)?.name||g.feature_key} · {g.expires_at?'Until '+new Date(g.expires_at).toLocaleDateString('en-NG'):'No expiry'}</li>)}{!(grantsResult.data||[]).some(g=>g.enabled&&(!g.expires_at||new Date(g.expires_at)>new Date()))&&<li>No extras currently active.</li>}</ul>}
- <a className="btn" href="/automations/requests">Request custom automation →</a></section>
- <div className="grid grid-3">{planRows.map(plan=><section className="tax-panel" key={plan.id}><h2>{plan.name}</h2><p>{plan.price_label||'Contact sales'} {plan.billing_label||''}</p><p>{plan.description||''}</p><h3>Included workspace tools</h3><ul>{essentialCapabilities.map(item=><li key={item.key}>{item.name}</li>)}</ul><h3>Additional modules</h3>{access.error?<p className="small muted">Cannot verify additional modules at this time.</p>:<ul>{paidCapabilities.filter(f=>availableFeatures.some(a=>a.plan_id===plan.id&&a.feature_key===f.key)).map(f=><li key={f.key}>{f.name}</li>)}</ul>}{!access.error&&!availableFeatures.some(a=>a.plan_id===plan.id)&&<p className="small muted">No additional modules enabled.</p>}{featuresOf(plan.features).length>0&&<details><summary>Additional plan notes</summary><ul>{featuresOf(plan.features).map((item,i)=><li key={i}>{item}</li>)}</ul></details>}
- {plan.id==='free'?<p className="small muted">Free access is assigned automatically when you create a business. No request or payment needed.</p>:role==='owner'?<UpgradeRequestForm planId={plan.id} disabled={pending||current===plan.id||Boolean(errors.length)}/>:<p className="muted small">Only the business owner can request a plan change.</p>}
- {current===plan.id&&<p className="small muted">Your current approved plan</p>}
- </section>)}{!planRows.length&&!plans.error&&<p>No published plans are currently available. Contact platform support.</p>}</div></div>;
+ const brandPlans=(plans||[]) as Plan[];
+ const permissions=(Array.isArray(access)?access:[]) as PublishedPlanFeature[];
+ const current=assignment?.plan_id;
+ const expired=!!assignment?.expires_at && new Date(assignment.expires_at)<=new Date();
+ const message=(await searchParams).checkout;
+ const gateway=billingReady();
+ return <main className="tax-page"><div className="page-head"><div><h1>Your plan & billing</h1><p>Choose what works for your business. Paid plans activate automatically after a successful payment.</p></div><Link href="/pricing" className="btn">Compare plans</Link></div>
+ {message==='success'&&<div className="notice" role="status">Your payment was verified and your plan is active. You can start using its features now.</div>}
+ {message&&message!=='success'&&<div className="notice" role="status">{message==='pending'?'Payment is still being confirmed. Your current plan has not changed.':message==='owner'?'Only the business owner can pay for a subscription.':message==='switch'?'Your existing paid plan is still active. Changing to another plan will be available when that billing period ends.':message==='unavailable'?'Online plan payments are temporarily unavailable. Please try again later.':'We could not start or confirm that payment. Your current plan has not changed.'}</div>}
+ <section className="card card-pad" style={{margin:'20px 0'}}><h2>Current subscription</h2>{assignmentError?<p role="alert">We could not confirm your subscription. Please try again.</p>:<><p className="plan-current-status">{brandPlans.find(p=>p.id===current)?.name|| (current==='free'?'Free':'Your plan')} {expired?' · Renewal due':' · Active'}</p>{assignment?.expires_at&&<p className="small muted">{expired?'Previous access ended':'Current period ends'} {new Date(assignment.expires_at).toLocaleDateString('en-NG')}</p>}{current==='free'&&<p className="small muted">You can use the business essentials included with Free without contacting an administrator.</p>}</>}</section>
+ <div className="grid grid-3 bo-plan-grid">{brandPlans.map(plan=>{
+  const active=current===plan.id&&!expired;const samePlan=current===plan.id;
+  const monthly=plan.price_monthly_ngn==null?null:Number(plan.price_monthly_ngn);
+  const yearly=plan.price_yearly_ngn==null?null:Number(plan.price_yearly_ngn);
+  const price=(n:number)=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN'}).format(n);
+  return <section className="card card-pad" key={plan.id}><h2>{plan.name}</h2><p className="bo-plan-price">{plan.id==='free'?'Free forever':monthly!=null&&monthly>0?`${price(monthly)}/month`:yearly!=null&&yearly>0?`${price(yearly)}/year`:'Pricing not available'}</p><p className="small muted">{plan.description}</p><h3>Included tools</h3><ul>{essentialCapabilities.map(x=><li key={x.key}>{x.name}</li>)}</ul>{permissions.some(p=>p.plan_id===plan.id)&&<><h3>More features</h3><ul>{paidCapabilities.filter(x=>permissions.some(p=>p.plan_id===plan.id&&p.feature_key===x.key)).map(x=><li key={x.key}>{x.name}</li>)}</ul></>}
+ {active?<strong className="positive">Your current plan</strong>:plan.id==='free'?<p className="small muted">Included automatically when you create your business.</p>:role!=='owner'?<p className="small muted">Your business owner manages your subscription.</p>:!gateway?<p className="small muted">Online checkout will be available soon.</p>:monthly==null&&yearly==null?<p className="small muted">This plan is not available for online purchase yet.</p>:<PlanCheckoutForm planId={plan.id} monthly={monthly} yearly={yearly} disabled={!!plansError||!!assignmentError}/>}</section>})}</div>
+ {plansError&&<div className="notice" role="alert">Plans are temporarily unavailable. Please try again shortly.</div>}
+ {role==='owner'&&!!payments?.length&&<section className="card card-pad" style={{marginTop:20}}><h2>Payment history</h2><div className="table-wrap"><table className="table"><thead><tr><th>Plan</th><th>Period</th><th>Amount</th><th>Status</th></tr></thead><tbody>{payments.map(p=><tr key={p.reference}><td>{brandPlans.find(v=>v.id===p.plan_id)?.name||p.plan_id}</td><td>{p.billing_cycle}</td><td>{new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN'}).format(p.amount_kobo/100)}</td><td>{p.status==='paid'?'Paid':p.status==='failed'?'Failed':'Awaiting payment'}</td></tr>)}</tbody></table></div></section>}
+ </main>;
 }

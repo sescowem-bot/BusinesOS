@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
 
@@ -16,7 +17,7 @@ export async function openCashierShift(_:CashierActionState,fd:FormData):Promise
   const opening=String(fd.get('opening_cash')||'');
   if(!validMoney(opening,{allowZero:true}))return fail('Enter a valid opening cash float with up to two decimals.');
   const {data,error}=await access.client.rpc('business_open_pos_shift',{p_business:access.businessId,p_opening:Number(opening)});
-  if(error)return fail(`Could not open shift: ${error.message}`);
+  if(error)return fail(friendlyServiceError('open this shift', error));
   refresh(String(data));return {ok:true,message:'Shift opened. Cash POS sales will now be linked to your active shift.',shiftId:String(data)};
  }catch{return fail('Unable to open shift. Check your role and refresh.');}
 }
@@ -31,7 +32,7 @@ export async function recordCashMovement(_:CashierActionState,fd:FormData):Promi
   const {error}=await access.client.rpc('business_add_pos_cash_movement',{
    p_business:access.businessId,p_shift:id,p_kind:kind,p_amount:Number(amount),p_reason:reason,p_reference:reference
   });
-  if(error)return fail(`Cash movement not saved: ${error.message}`);
+  if(error)return fail(friendlyServiceError('record this cash movement', error));
   refresh(id);return {ok:true,message:'Cash movement recorded in the shift audit history.',shiftId:id};
  }catch{return fail('Cash movement failed. Review the shift and voucher reference.');}
 }
@@ -43,7 +44,7 @@ export async function closeCashierShift(_:CashierActionState,fd:FormData):Promis
   const {error}=await access.client.rpc('business_close_pos_shift',{
    p_business:access.businessId,p_shift:id,p_counted:Number(cash),p_note:note
   });
-  if(error)return fail(`Shift could not be closed: ${error.message}`);
+  if(error)return fail(friendlyServiceError('close this shift', error));
   refresh(id);return {ok:true,message:'Shift closed. Expected cash, physical count and variance are now frozen for management review.',shiftId:id};
  }catch{return fail('Unable to close the shift. Recount your cash and try again.');}
 }
@@ -56,7 +57,7 @@ export async function reviewCashierShift(_:CashierActionState,fd:FormData):Promi
   const {error}=await access.client.rpc('business_review_pos_shift',{
    p_business:access.businessId,p_shift:id,p_approve:decision==='approve',p_note:note
   });
-  if(error)return fail(`Review not saved: ${error.message}`);
+  if(error)return fail(friendlyServiceError('save this review', error));
   refresh(id);return {ok:true,message:decision==='approve'?'Cashier shift reviewed. The recorded variance remains unchanged.':'Shift flagged for further investigation.',shiftId:id};
  }catch{return fail('Unable to record review.');}
 }

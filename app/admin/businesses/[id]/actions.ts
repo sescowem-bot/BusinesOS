@@ -1,4 +1,5 @@
 'use server';
+import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {z} from 'zod';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
@@ -17,7 +18,7 @@ export async function saveBusinessReview(_state:ReviewState,form:FormData):Promi
  const {error}=await session.client.rpc('platform_save_business_review',{
   p_business_id:parsed.data.business_id,p_status:parsed.data.status,p_note:parsed.data.note
  });
- if(error)return {ok:false,message:'Review could not be saved: '+error.message};
+ if(error)return {ok:false,message:friendlyServiceError('save this business review', error)};
  revalidatePath('/admin/businesses');
  revalidatePath(`/admin/businesses/${parsed.data.business_id}`);
  return {ok:true,message:'Internal business review saved.'};

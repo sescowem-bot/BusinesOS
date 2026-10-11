@@ -34,7 +34,7 @@ check(actions.includes("requireBusinessFeature('pos')")&&actions.includes("['own
 check(actions.includes('business_set_wholesale_price_tier')&&actions.includes('business_delete_wholesale_price_tier'),'controlled edit RPC calls missing');
 check(read('components/shell.tsx').includes('/retail-reports')&&read('components/shell.tsx').includes('/wholesale'),'menu links missing');
 check(read('.github/workflows/verify.yml').includes('check:phase30m'),'CI regression missing');
-let ts;try{ts=require('typescript')}catch{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}
+const ts=require('./load-typescript.cjs')
 for(const file of ['app/(dashboard)/retail-reports/page.tsx','app/(dashboard)/wholesale/page.tsx','app/(dashboard)/wholesale/forms.tsx','app/(dashboard)/wholesale/actions.ts']){
  const f=ts.createSourceFile(file,read(file),ts.ScriptTarget.Latest,true,file.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  check(f.parseDiagnostics.length===0,`TypeScript syntax failure in ${file}`);

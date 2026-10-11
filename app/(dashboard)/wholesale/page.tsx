@@ -12,7 +12,7 @@ export default async function WholesalePage(){
  client.from('products').select('id,name,sku,selling_price').eq('business_id',businessId).eq('active',true).order('name').limit(200),
  client.from('business_wholesale_price_tiers').select('id,product_id,min_quantity,unit_price,note,updated_at').eq('business_id',businessId).order('updated_at',{ascending:false}).limit(200)
  ]);
- if(productsResult.error||tiersResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / WHOLESALE" title="Wholesale reference pricing" description="Controlled bulk-pricing catalogue"/><BusinessAlert>Wholesale pricing data cannot be verified. Confirm Migration 041 and your POS permissions. No pricing edits are available until it loads.</BusinessAlert></div>;
+ if(productsResult.error||tiersResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / WHOLESALE" title="Wholesale reference pricing" description="Controlled bulk-pricing catalogue"/><BusinessAlert>Wholesale prices could not be loaded. Please try again or ask your business owner to check access. Editing is paused until the records are available.</BusinessAlert></div>;
  const products=(productsResult.data||[]).map(p=>({...p,selling_price:Number(p.selling_price)}));
  const tiers=tiersResult.data||[];
  const productsById=new Map(products.map(p=>[p.id,p]));

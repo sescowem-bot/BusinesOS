@@ -12,7 +12,7 @@ export async function saveInvoiceIdentity(_:InvoiceIdentityState,form:FormData):
   if(fields.some(k=>values[k].length>limits[k]))return {message:'',error:'One or more fields exceed their maximum length.'};
   if(values.logo_url&&!/^https:\/\//.test(values.logo_url))return {message:'',error:'Use an HTTPS logo URL or leave the field empty.'};
   const {error}=await client.from('business_invoice_profiles').upsert({business_id:businessId,...values,updated_at:new Date().toISOString()},{onConflict:'business_id'});
-  if(error)return {message:'',error:'Cannot save invoice identity. Confirm SQL migration 032 and your owner access.'};
+  if(error)return {message:'',error:'Invoice settings could not be saved. Check your access and try again.'};
   revalidatePath('/settings/invoice');revalidatePath('/invoices');
   return {message:'Invoice identity saved. It will appear on NEW invoices; already-issued documents are unchanged.',error:''};
  }catch{return {message:'',error:'Could not save the invoice settings. Please try again.'};}

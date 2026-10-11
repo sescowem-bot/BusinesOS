@@ -10,7 +10,7 @@ export async function savePosTaxMapping(_:MappingState,form:FormData):Promise<Ma
   const access=await requireBusinessFeature('pos');
   if(!access.allowed||!['owner','manager'].includes(access.role))return {error:'Only an authorised POS owner or manager can maintain these mappings.',success:''};
   const {error}=await access.client.rpc('business_set_product_tax_mapping',{p_business:access.businessId,p_product:product,p_supply:supply});
-  if(error)return {error:error.code==='42883'||error.code==='PGRST202'?'Apply SQL 033 in staging first.':'The product mapping could not be saved. Check the product, category and your permissions.',success:''};
+  if(error)return {error:error.code==='42883'||error.code==='PGRST202'?'Tax settings are temporarily unavailable. Please try again later.':'The product mapping could not be saved. Check the product, category and your permissions.',success:''};
   revalidatePath('/pos');revalidatePath('/pos/tax-mapping');
   return {error:'',success:'Product mapped. This does not approve the category or its legal VAT treatment.'};
  }catch{return {error:'Unable to update the product category. Try again.',success:''};}

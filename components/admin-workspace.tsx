@@ -5,6 +5,7 @@ import {usePathname} from 'next/navigation';
 import Link from 'next/link';
 import {Activity, Bell, BookOpenText, Building2, ChevronRight, CreditCard, ExternalLink, Globe2, LayoutDashboard, LogOut, Mail, Menu, PanelTop, ClipboardCheck, ShieldCheck, SlidersHorizontal, UserRound, Wallet, Search, X} from 'lucide-react';
 import {signOut} from '@/app/(auth)/login/actions';
+import {WorkspaceLoadingBrandProvider} from './workspace-loading-brand';
 
 type Branding = {name:string;short_name:string;logo_url:string};
 type IconComponent = typeof LayoutDashboard;
@@ -61,7 +62,7 @@ export function AdminWorkspace({children,brand,email,unreadCount}:{children:Reac
   {menuOpen&&<button className="owner-sidebar-backdrop" aria-label="Close navigation" onClick={handleClose}/>}
   <aside className={'owner-sidebar'+(menuOpen?' owner-sidebar-open':'')} aria-label="System Owner sidebar" role={menuOpen?'dialog':undefined} aria-modal={menuOpen?true:undefined}>
    <div className="owner-brand-row">
-    <Link href="/admin" className="owner-brand" onClick={handleClose} aria-label={`${brand.name} System Owner home`}>
+    <Link href="/admin" prefetch={false} className="owner-brand" onClick={handleClose} aria-label={`${brand.name} System Owner home`}>
      {brand.logo_url?<img src={brand.logo_url} alt="" className="owner-brand-logo"/>:<span className="owner-brand-logo owner-logo-fallback"><ShieldCheck size={21}/></span>}
      <span className="owner-brand-copy"><strong>{brand.short_name||brand.name}</strong><small>System Owner</small></span>
     </Link>
@@ -71,7 +72,7 @@ export function AdminWorkspace({children,brand,email,unreadCount}:{children:Reac
    <nav id="platform-admin-navigation" className="owner-sidebar-links" aria-label="Platform administration">
     {filteredNavigation.map(group=><div className="owner-nav-group" key={group.heading}>
      <p className="owner-nav-heading">{group.heading}</p>
-     {group.items.map(item=>{const Icon=item.icon;const active=isSelected(path,item);return <Link href={item.href} key={item.href} onClick={handleClose} aria-current={active?'page':undefined} className={'owner-side-link'+(active?' is-active':'')}>
+     {group.items.map(item=>{const Icon=item.icon;const active=isSelected(path,item);return <Link href={item.href} prefetch={false} key={item.href} onClick={handleClose} aria-current={active?'page':undefined} className={'owner-side-link'+(active?' is-active':'')}>
        <Icon aria-hidden="true" size={18} strokeWidth={1.9}/><span>{item.label}</span>
        {item.href==='/admin/notifications'&&unreadCount!==null&&unreadCount>0&&<em className="owner-nav-count">{unreadCount>99?'99+':unreadCount}</em>}
        {active&&<ChevronRight className="owner-active-chevron" aria-hidden="true" size={16}/>}
@@ -86,14 +87,14 @@ export function AdminWorkspace({children,brand,email,unreadCount}:{children:Reac
     <div className="owner-topbar-start"><button ref={toggleRef} className="owner-menu-toggle" aria-controls="platform-admin-navigation" aria-label="Open administration menu" aria-expanded={menuOpen} onClick={()=>setMenuOpen(true)}><Menu size={22}/></button><span className="owner-breadcrumb">System Owner <ChevronRight size={15} aria-hidden="true"/> <strong>{currentLabel}</strong></span></div>
     <div className="owner-topbar-actions">
       <button type="button" className="owner-search-shortcut" onClick={focusNavigation} aria-label="Search administration tools"><Search size={17}/><span>Find tools</span></button>
-      <Link href="/admin/my-business" className="owner-workspace-switch" title="Open your business workspace"><Wallet size={17}/><span>My Business</span></Link>
+      <Link href="/admin/my-business" prefetch={false} className="owner-workspace-switch" title="Open your business workspace"><Wallet size={17}/><span>My Business</span></Link>
       <span className="owner-role-chip"><ShieldCheck size={14}/> Verified administrator</span>
-      <Link href="/admin/notifications" aria-label={unreadCount?`${unreadCount} unread notifications`:'Notifications'} className="owner-icon-link"><Bell size={19}/>{unreadCount!==null&&unreadCount>0&&<span className="owner-bell-dot"/>}</Link>
+      <Link href="/admin/notifications" prefetch={false} aria-label={unreadCount?`${unreadCount} unread notifications`:'Notifications'} className="owner-icon-link"><Bell size={19}/>{unreadCount!==null&&unreadCount>0&&<span className="owner-bell-dot"/>}</Link>
       <Link href="/" className="owner-top-link"><ExternalLink size={16}/> Website</Link>
       <form action={signOut}><button type="submit" className="owner-signout"><LogOut size={16}/> <span>Sign out</span></button></form>
     </div>
    </header>
-   <div className="owner-shell-content" data-admin-path={segments[1]||'overview'}>{children}</div>
+   <div className="owner-shell-content" data-admin-path={segments[1]||'overview'}><WorkspaceLoadingBrandProvider branding={{logoUrl:brand.logo_url,platformName:brand.name}}>{children}</WorkspaceLoadingBrandProvider></div>
    <footer className="owner-footer"><span>System Owner workspace</span><span>Administrator actions are permission-controlled and auditable where supported.</span></footer>
   </div>
  </div>;

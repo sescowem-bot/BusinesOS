@@ -1,7 +1,7 @@
 const fs=require('fs');
 const path=require('path');
 const assert=require('node:assert/strict');
-let ts; try { ts=require('typescript'); } catch { ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js'); }
+const ts=require('./load-typescript.cjs')
 // Keep checks executable in CI where TypeScript is installed locally.
 const src=(p)=>fs.readFileSync(path.join(process.cwd(),p),'utf8');
 const sql=src('supabase/migrations/031_pos_supplier_purchasing.sql');

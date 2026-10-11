@@ -38,7 +38,7 @@ export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):P
    p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
   if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
-   'Apply SQL 042 after 041 to enable order cost evidence and payment.':
+   'Orders are temporarily unavailable. Please try again or contact support.':
    'Order not saved. Verify the VAT profile, approved classification, payment details and total.',success:''};
   if(!data)return {error:'Order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);

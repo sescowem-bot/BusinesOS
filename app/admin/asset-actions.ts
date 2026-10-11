@@ -32,7 +32,7 @@ export async function uploadBrandAsset(_:AssetUploadState,data:FormData):Promise
  const {error:uploadError}=await session.client.storage.from(BUCKET).upload(path,bytes,{
   contentType:format.mime,cacheControl:'3600',upsert:false
  });
- if(uploadError)return {ok:false,message:'Upload failed. Check migration 026 and Storage access: '+uploadError.message};
+ if(uploadError)return {ok:false,message:'The image could not be uploaded. Please try again or contact support.'};
  const {data:publicAsset}=session.client.storage.from(BUCKET).getPublicUrl(path);
  const url=publicAsset.publicUrl;
  if(!url.startsWith('https://')){
@@ -43,7 +43,7 @@ export async function uploadBrandAsset(_:AssetUploadState,data:FormData):Promise
   .update(kind==='logo'?{logo_url:url}:{favicon_url:url}).eq('id',true);
  if(saveError){
   await session.client.storage.from(BUCKET).remove([path]);
-  return {ok:false,message:'Asset uploaded but branding could not be updated: '+saveError.message};
+  return {ok:false,message:'The image was uploaded, but your changes could not be saved. Please try again or contact support.'};
  }
  updateTag('businessos-public-brand');
  revalidatePath('/','layout');

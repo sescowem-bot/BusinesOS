@@ -45,7 +45,13 @@
     "check:phase30m": "node scripts/verify-phase30m.cjs",
     "check:dashboard-support": "node scripts/verify-dashboard-support.cjs",
     "check:phase30n-ux": "node scripts/verify-phase30n-ux.cjs",
-    "check:free-pwa": "node scripts/verify-phase30n-b-free-pwa.cjs"
+    "check:free-pwa": "node scripts/verify-phase30n-b-free-pwa.cjs",
+    "check:expenses-speed": "node scripts/verify-expenses-fast.cjs",
+    "check:global-loading": "node scripts/verify-global-brand-loader.cjs",
+    "check:structured-plans": "node scripts/verify-structured-plans-roles.cjs",
+    "check:dashboard-runtime-date": "node scripts/verify-dashboard-runtime-date.cjs",
+    "check:ios-safe-errors": "node scripts/verify-ios-safe-customer-ux.cjs",
+    "check:customer-ux": "node scripts/verify-customer-facing-ux.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
