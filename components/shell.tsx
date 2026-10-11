@@ -12,14 +12,14 @@ type NavigationGroup={title:string;items:NavigationItem[]};
 const groups:NavigationGroup[]=[
  {title:'Overview',items:[{label:'Dashboard',href:'/dashboard',icon:LayoutDashboard},{label:'Getting started',href:'/getting-started',icon:ClipboardList},{label:'Notifications',href:'/notifications',icon:Bell}]},
  {title:'Sales & customers',items:[{label:'Customers',href:'/customers',icon:Users},{label:'Orders & sales',href:'/orders',icon:ClipboardList},{label:'Retail POS',href:'/pos',icon:Store},{label:'Wholesale pricing',href:'/wholesale',icon:Package},{label:'Cashier shifts',href:'/pos/shifts',icon:Wallet},{label:'Returns & credit notes',href:'/returns',icon:Receipt},{label:'Products & services',href:'/products',icon:Package},{label:'Invoices',href:'/invoices',icon:Receipt},{label:'Payments',href:'/payments',icon:CreditCard}]},
- {title:'Operations',items:[{label:'Expenses',href:'/expenses',icon:Wallet},{label:'Inventory',href:'/inventory',icon:Warehouse},{label:'Branch stock & transfers',href:'/inventory/locations',icon:Warehouse},{label:'Suppliers & purchasing',href:'/purchasing',icon:Package},{label:'Tasks',href:'/tasks',icon:Target},{label:'Team & branches',href:'/team',icon:Users}]},
+ {title:'Operations',items:[{label:'Expenses',href:'/expenses',icon:Wallet},{label:'Inventory',href:'/inventory',icon:Warehouse},{label:'Branch stock & transfers',href:'/inventory/locations',icon:Warehouse},{label:'Suppliers & purchasing',href:'/purchasing',icon:Package},{label:'Tasks',href:'/tasks',icon:Target},{label:'My team',href:'/team',icon:Users},{label:'Team updates',href:'/team/updates',icon:Users}]},
  {title:'Finance & compliance',items:[{label:'Accounting',href:'/accounting',icon:Calculator},{label:'Financial reports',href:'/reports',icon:BarChart3},{label:'Retail performance',href:'/retail-reports',icon:BarChart3},{label:'Tax Centre',href:'/tax-centre',icon:Calculator},]},
  {title:'Engagement & growth',items:[{label:'Customer notes',href:'/communications',icon:Users},{label:'Insights',href:'/insights',icon:Activity},{label:'Growth Centre',href:'/growth',icon:BriefcaseBusiness},{label:'Business directory',href:'/directory',icon:Store},]},
- {title:'Workspace',items:[{label:'Plans & upgrades',href:'/upgrade',icon:CreditCard},{label:'Install on phone',href:'/install',icon:Home},{label:'Help & support',href:'/support',icon:ShieldCheck},{label:'Settings',href:'/settings',icon:Settings}]}
+ {title:'Workspace',items:[{label:'Plans & billing',href:'/upgrade',icon:CreditCard},{label:'Export records',href:'/exports',icon:FileText},{label:'Install on phone',href:'/install',icon:Home},{label:'Help & support',href:'/support',icon:ShieldCheck},{label:'Settings',href:'/settings',icon:Settings}]}
 ];
 const ownerLinks:NavigationItem[]=[
  {label:'Admin Console',href:'/admin',icon:ShieldCheck},
- {label:'Manage website',href:'/admin/website',icon:Home},
+ {label:'Brand & website',href:'/admin/website',icon:Home},
  {label:'Manage businesses',href:'/admin/businesses',icon:Building2},{label:'Support & roles',href:'/admin/support',icon:ShieldCheck},
  {label:'Manage plans and pricing',href:'/admin/plans',icon:CreditCard},{label:'Automation service requests',href:'/admin/automations',icon:Target},
  {label:'Pilot readiness',href:'/admin/pilot',icon:ShieldCheck},

@@ -13,11 +13,11 @@ export const paidCapabilities=[
  {key:'pos',name:'Software POS',group:'Sales',detail:'Record retail checkout, optional payment and stock movement on one sale'},
  {key:'purchasing',name:'Suppliers and purchasing',group:'Operations',detail:'Manage suppliers, draft purchase orders and goods receipts'},
  {key:'inventory',name:'Stock and inventory',group:'Operations',detail:'Review quantities, low-stock records and stock movements'},
- {key:'team',name:'Team and branches',group:'Operations',detail:'Member invitations, branch records and internal approval requests'},
+ {key:'team',name:'Advanced team and branches',group:'Operations',detail:'Member invitations, branch records and internal approval requests'},
  {key:'accounting',name:'Accounting workspace',group:'Finance',detail:'Manual ledgers and journal records; transaction auto-posting is under development'},
  {key:'financial_reports',name:'Financial reports',group:'Finance',detail:'Available financial summaries and exports; formal reporting requires review'},
  {key:'tax',name:'Tax records and reminders',group:'Finance',detail:'Tax-related recordkeeping and estimates; not automatic tax filing'},
- {key:'communications',name:'Customer conversations',group:'Communications',detail:'Internal conversation notes and draft messages; external sending is not yet live'},
+ {key:'communications',name:'Customer follow-up notes',group:'Communications',detail:'Internal conversation notes and draft messages; external sending is not yet live'},
  {key:'campaigns',name:'Campaign planning',group:'Communications',detail:'Create campaign records and drafts; external dispatch is not yet live'},
  {key:'insights',name:'Business insights',group:'Growth',detail:'Available business trends and summaries based on recorded data'},
  {key:'growth',name:'Growth resources',group:'Growth',detail:'Business resources, templates and growth planning tools'}
@@ -39,3 +39,6 @@ export const defaultFeatureRoleAccess:Record<PaidFeature,readonly PlanRole[]>={
 export const capabilityKeys=paidCapabilities.map(x=>x.key);
 export function isPaidFeature(value:string):value is PaidFeature{return paidCapabilities.some(f=>f.key===value)}
 export function isPlanRole(value:string):value is PlanRole{return planRoles.some(r=>r.key===value)}
+
+/** Only working, customer-facing modules can be advertised as subscription benefits. */
+export const releasedPaidCapabilities=paidCapabilities.filter(x=>x.key!=='campaigns');

@@ -598,3 +598,8 @@
 .bo-quiet-details{margin-top:15px;border-top:1px solid #e2e8f0;padding-top:13px}.bo-quiet-details>summary{cursor:pointer;font-weight:700;color:#123b63;list-style:revert}
 .bo-lesson{border:1px solid #e1e8ef;border-radius:12px;padding:18px}.bo-lesson>summary{cursor:pointer;display:grid;gap:9px;list-style:none}.bo-lesson>summary strong{font-size:17px}.bo-lesson>summary span:last-child{font-size:14px;color:#536b83}
 .bo-lesson>p{line-height:1.65;margin:15px 0}.bo-checkout-form{display:grid;gap:10px;margin-top:18px}.bo-plan-price{font-size:21px;font-weight:800;color:#123b63}
+/* Compact document export actions, and readable PDF cover sheet when printed. */
+.bo-export-item{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #dbe4ed;border-radius:14px;padding:14px}
+.bo-export-item h3{margin:0 0 5px}.bo-export-item p{margin:0}
+@media(max-width:640px){.bo-export-item{align-items:stretch;flex-direction:column}.bo-export-item .btn{align-self:flex-start}}
+@media print{.work-sidebar,.work-topbar,.bo-export-page a.btn,.bo-export-page button,.work-menu-toggle{display:none!important}.work-layout,.layout,.bo-export-page{display:block!important;width:100%!important;margin:0!important;max-width:none!important}.bo-export-page .card{box-shadow:none!important;border:1px solid #ddd!important}}

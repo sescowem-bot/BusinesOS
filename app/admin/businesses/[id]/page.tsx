@@ -7,6 +7,7 @@ import {FeatureGrantForm} from './feature-grant-form';
 import {paidCapabilities,essentialCapabilities} from '@/lib/plan-catalog';
 import {moduleWorkflows} from '@/lib/feature-directory';
 import {CompanyPriceForm,CompanyRoleForm,CompanyRoleAssignmentForm} from './company-access-forms';
+import {ManualPlanForm} from './manual-plan-form';
 export const dynamic='force-dynamic';
 type Member={user_id:string;full_name:string|null;role:string;joined_at:string};
 type Review={status:string;note:string;updated_at:string};
@@ -21,14 +22,16 @@ export default async function BusinessDetails({params}:{params:Promise<{id:strin
  if(error)return <main className="admin-area"><Link href="/admin/businesses">← Business directory</Link><section className="card card-pad" role="alert"><h1>Unable to load business</h1><p>Please try again. If the issue continues, contact support.</p><p className="muted">Make sure you are signed in with an authorised administrator account.</p></section></main>;
  if(!data)notFound();
  const b=data as Detail;
- const [grantsResult,auditResult,planFeaturesResult,parentResult,roleProfilesResult,roleAssignmentsResult,pricesResult]=await Promise.all([
+ const [grantsResult,auditResult,planFeaturesResult,parentResult,roleProfilesResult,roleAssignmentsResult,pricesResult,availablePlansResult,manualAuditResult]=await Promise.all([
   session.client.from('business_feature_grants').select('feature_key,enabled,allowed_roles,expires_at,note,updated_at').eq('business_id',id).order('feature_key'),
   session.client.from('business_feature_grant_audit').select('id,feature_key,changed_at,changed_by').eq('business_id',id).order('changed_at',{ascending:false}).limit(20),
   session.client.from('platform_plan_features').select('plan_id,feature_key,enabled').eq('enabled',true).limit(500),
   session.client.from('plan_parent_links').select('plan_id,parent_plan_id').limit(100),
   session.client.from('business_company_role_profiles').select('id,name,description,base_role,allowed_modules,active').eq('business_id',id).order('name').limit(75),
   session.client.from('business_company_role_assignments').select('user_id,profile_id').eq('business_id',id).limit(150),
-  session.client.from('business_feature_prices').select('feature_key,price_monthly_ngn,price_yearly_ngn,note').eq('business_id',id).limit(50)
+  session.client.from('business_feature_prices').select('feature_key,price_monthly_ngn,price_yearly_ngn,note').eq('business_id',id).limit(50),
+  session.client.from('public_site_plans').select('id,name').eq('published',true).order('sort_order').limit(80),
+  session.client.from('business_admin_plan_audit').select('id,previous_plan_id,new_plan_id,reason,changed_at').eq('business_id',id).order('changed_at',{ascending:false}).limit(12)
  ]);
  const profiles=(roleProfilesResult.data||[]) as {id:string;name:string;description:string;base_role:string;allowed_modules:string[];active:boolean}[];
  const assignments=(roleAssignmentsResult.data||[]) as {user_id:string;profile_id:string}[];
@@ -45,6 +48,11 @@ export default async function BusinessDetails({params}:{params:Promise<{id:strin
    <section className="card card-pad"><h2>Workspace information</h2><p><strong>Email:</strong> {b.email||'Not provided'}</p><p><strong>Phone:</strong> {b.phone||'Not provided'}</p><p><strong>Location:</strong> {[b.city,b.state,b.country].filter(Boolean).join(', ')||'Not provided'}</p><p><strong>Publicly listed:</strong> {b.published?'Yes':'No'}</p><p><strong>Verified flag:</strong> {b.verified?'Yes':'No'}</p><p className="muted small">Verification controls public discovery only. A registered business can use its subscribed tools without waiting for listing verification.</p><form action={setVerifiedListing} style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:12}}><input type="hidden" name="business_id" value={b.id}/><button className="btn btn-primary" type="submit" name="verified" value={b.verified?"false":"true"}>{b.verified?"Remove verification":"Verify for public listing"}</button></form></section>
    <section className="card card-pad"><BusinessReviewForm businessId={b.id} status={b.review?.status||'open'} note={b.review?.note||''}/></section>
   </div>
+  <section className="card card-pad" style={{marginTop:20}}><h2>Subscription management</h2>
+   <p className="small muted">Customers can pay and upgrade from their own billing page. As System Owner, you can also grant or change a plan directly for an agreed pilot or exception. Your access is limited to subscription administration, not their private transactions.</p>
+   {availablePlansResult.error?<p role="alert">Plan choices are temporarily unavailable.</p>:<ManualPlanForm businessId={b.id} planId={b.plan_id} plans={availablePlansResult.data||[]}/>}
+   {!manualAuditResult.error&&!!manualAuditResult.data?.length&&<details><summary>Recent manual subscription changes</summary><ul>{manualAuditResult.data.map(v=><li key={v.id}>{v.previous_plan_id||'Unassigned'} → {v.new_plan_id} · {new Date(v.changed_at).toLocaleDateString('en-NG')} · {v.reason}</li>)}</ul></details>}
+  </section>
   <section className="card card-pad" style={{marginTop:20}}><h2>Business team</h2><div style={{overflowX:'auto'}}><table style={{width:'100%'}}><thead><tr><th align="left">Member</th><th align="left">Role</th><th align="left">Joined</th></tr></thead><tbody>{b.members.map(m=><tr key={m.user_id}><td style={{padding:'10px 6px'}}>{m.full_name?.trim()||'Name not provided'}<div className="small muted">{m.user_id}</div></td><td>{m.role}</td><td>{new Date(m.joined_at).toLocaleDateString('en-NG')}</td></tr>)}</tbody></table></div>{!b.members.length&&<p>No members found.</p>}</section>
   <section className="card card-pad company-access-overview"><div className="admin-section-heading"><div><h2>What this company can actually use</h2><p className="muted small">Source of access: approved plan, inherited plan, or a separate company add-on. Built-in staff roles and named company roles can narrow access further.</p></div><Link href="/admin/plan-access" className="btn">Plan permissions</Link></div>
    <div className="grid grid-3"><div className="company-plan-stat"><strong>{essentialCapabilities.length}</strong><span>Core tools in every plan</span></div><div className="company-plan-stat"><strong>{paidCapabilities.filter(f=>fromPlan.has(f.key)).length}</strong><span>Modules from approved plan</span></div><div className="company-plan-stat"><strong>{activeExtras.size}</strong><span>Approved business extras</span></div></div>

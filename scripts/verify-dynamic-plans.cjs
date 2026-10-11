@@ -16,6 +16,6 @@ assert.ok(auth.includes("rpc('business_has_feature'"),'Server feature checks mus
 assert.ok(!auth.includes('featureRoles[feature]'),'Frontend role allowlist must not override configured database roles');
 assert.ok(plans.includes('PlanEditor')&&plans.includes('New business plan'),'Admin can create custom plans');
 assert.ok(access.includes('PlanPermissionEditor'),'Role editor must be available');
-assert.ok(pricing.includes('essentialCapabilities')&&pricing.includes('paidCapabilities')&&pricing.includes('plan-comparison'),'Public plan comparison should enumerate actual features');
+assert.ok(pricing.includes('essentialCapabilities')&&pricing.includes('releasedPaidCapabilities')&&pricing.includes('plan-comparison'),'Public plan comparison should enumerate actual features');
 assert.ok(publicCms.includes("if(!client)return []")&&!publicCms.includes('return error?demoPlans'),'Public pricing must not invent fallback plans');
 console.log('Dynamic plans source / permission invariants passed. Live RLS and migrations require Supabase tests.');
