@@ -1,6 +1,6 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const rd=p=>fs.readFileSync(p,'utf8');
-const files=['app/admin/asset-actions.ts','app/admin/branding-assets.tsx','app/admin/website/page.tsx','app/layout.tsx','components/shell.tsx','supabase/migrations/026_platform_brand_assets.sql','public/favicon.svg'];
+const files=['app/admin/asset-actions.ts','app/admin/branding-assets.tsx','app/admin/branding/page.tsx','app/layout.tsx','components/shell.tsx','supabase/migrations/026_platform_brand_assets.sql','public/favicon.svg'];
 files.forEach(f=>assert(fs.existsSync(f),`Missing ${f}`));
 const action=rd(files[0]),ui=rd(files[1]),sql=rd(files[5]);
 assert.match(action,/requirePlatformAdmin\(\)/);

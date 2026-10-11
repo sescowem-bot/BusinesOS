@@ -20,9 +20,9 @@ for(const p of ['/admin/plans','/admin/businesses','/admin/website','/admin/pilo
 for(const kind of ['features','solutions','how-it-works','about','resources'])assert(art.includes("kind==='"+kind+"'")||(kind==='features'&&art.includes('interior-features')),'Missing page-specific hero '+kind);
 assert(interior.includes('<PublicHeroArt kind='),'Interior pages must use distinct artwork');
 assert(!interior.includes('<PublicWorkspacePreview/>'),'Interior pages should not repeat the home preview');
-for(const n of ['Starter','Growth','Professional','Enterprise'])assert(prices.includes("name:'"+n+"'"),'Missing pricing category '+n);
+assert(!prices.includes('planPaths'),'Public pricing should present actual published plans, not static suggested tiers');
 assert(prices.includes('getPublishedPlans()')&&prices.includes('getPublishedPlanCapabilities()'),'Actual plan catalogue must remain database driven');
 assert(prices.includes('Pricing on request'),'Published plans must not require invented price figures');
-assert(prices.includes('suggested categories, not automatically activated subscriptions'),'Suggested categories must be distinguished from approved plans');
+assert(prices.includes('getPublishedPlanCapabilities()'),'Published plans must determine actual displayed module access');
 assert(!fs.readdirSync(root).some(f=>f.endsWith('.md')&&f!=='README.md'),'Keep documentation in MD/');
 console.log('Phase 030B checks passed: admin visibility, mobile navigation, hero variants, pricing separation and docs.');

@@ -21,5 +21,6 @@ export async function savePlatformBrand(_previous:SaveState,data:FormData):Promi
  if(error)return {ok:false,message:friendlyServiceError('save these settings', error)};
  updateTag('businessos-public-brand');
  revalidatePath('/', 'layout');
+ revalidatePath('/admin/branding');
  return {ok:true,message:'Platform identity saved and published.'};
 }

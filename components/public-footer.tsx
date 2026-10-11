@@ -1,10 +1,14 @@
 import Link from 'next/link';
-import {ArrowUpRight} from 'lucide-react';
-export default function PublicFooter({name,tagline,email}:{name:string;tagline:string;email:string}){
- return <footer className="marketing-footer"><div className="marketing-container"><div className="marketing-footer-top">
-  <div className="public-footer-brand"><Link prefetch={false} href="/" className="public-footer-logo"><span aria-hidden="true">{name.slice(0,1).toUpperCase()}</span>{name}</Link><p>{tagline||'The simpler way to keep your business moving.'}</p><p className="public-footer-small">Clarity for the work behind every business.</p></div>
-  <div><strong>Explore</strong><Link prefetch={false} href="/features">Features</Link><Link prefetch={false} href="/directory">Business directory</Link><Link prefetch={false} href="/solutions">Solutions</Link><Link prefetch={false} href="/how-it-works">How it works</Link><Link prefetch={false} href="/pricing">Plans & pricing</Link></div>
-  <div><strong>Company</strong><Link prefetch={false} href="/about">About</Link><Link prefetch={false} href="/resources">Resources</Link><Link prefetch={false} href="/contact">Contact</Link>{email&&<a href={`mailto:${email}`}>Email support <ArrowUpRight size={13}/></a>}</div>
-  <div><strong>Account & legal</strong><Link prefetch={false} href="/login">Sign in</Link><Link prefetch={false} href="/signup">Create workspace</Link><Link prefetch={false} href="/install">Install on your phone</Link><Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms of service</Link><Link prefetch={false} href="/cookies">Cookies</Link></div>
- </div><div className="marketing-footer-bottom"><span>© {new Date().getFullYear()} {name}. All rights reserved.</span><span><Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms</Link><Link prefetch={false} href="/cookies">Cookies</Link></span></div></div></footer>
+import {ArrowUpRight, MessageCircle, Phone} from 'lucide-react';
+import {whatsappUrl,phoneUrl} from '@/lib/public-contact';
+import {PublicContactDock} from './public-contact-dock';
+export default function PublicFooter({name,tagline,email,phone='',logo=''}:{name:string;tagline:string;email:string;phone?:string;logo?:string}){
+ const whatsApp=whatsappUrl(phone,`Hello ${name}, I would like to know more about your services.`);
+ const call=phoneUrl(phone);
+ return <><footer className="marketing-footer"><div className="marketing-container"><div className="marketing-footer-top">
+  <div className="public-footer-brand"><Link prefetch={false} href="/" className="public-footer-logo">{logo&&/^https:\/\//.test(logo)?<img src={logo} width={37} height={37} alt="" className="site-footer-logo-img"/>:<span aria-hidden="true">{name.slice(0,1).toUpperCase()}</span>}{name}</Link><p>{tagline||'The simpler way to keep your business moving.'}</p><p className="public-footer-small">Customers. Sales. Stock. Payments. Clearer everyday operations.</p></div>
+  <div><strong>Product</strong><Link prefetch={false} href="/features">What you can do</Link><Link prefetch={false} href="/solutions">Who it is for</Link><Link prefetch={false} href="/how-it-works">How it works</Link><Link prefetch={false} href="/pricing">Plans & pricing</Link></div>
+  <div><strong>Contact & company</strong><Link prefetch={false} href="/about">About the platform</Link><Link prefetch={false} href="/contact">Talk to our team</Link>{whatsApp&&<a href={whatsApp} target="_blank" rel="noopener noreferrer"><MessageCircle size={14}/> WhatsApp support <ArrowUpRight size={13}/></a>}{call&&<a href={call}><Phone size={13}/> Call us</a>}{email&&<a href={`mailto:${email}`}>Email us <ArrowUpRight size={13}/></a>}</div>
+  <div><strong>Your account</strong><Link prefetch={false} href="/login">Sign in</Link><Link prefetch={false} href="/signup">Start free</Link><Link prefetch={false} href="/install">Install {name}</Link><Link prefetch={false} href="/resources">Guides</Link><Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms</Link></div>
+ </div><div className="marketing-footer-bottom"><span>© {new Date().getFullYear()} {name}. All rights reserved.</span><span><Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms</Link><Link prefetch={false} href="/cookies">Cookies</Link></span></div></div></footer><PublicContactDock phone={phone} email={email} brandName={name}/></>;
 }

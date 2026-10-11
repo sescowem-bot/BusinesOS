@@ -48,6 +48,7 @@ export async function uploadBrandAsset(_:AssetUploadState,data:FormData):Promise
  updateTag('businessos-public-brand');
  revalidatePath('/','layout');
  revalidatePath('/admin/website');
+ revalidatePath('/admin/branding');
  revalidatePath('/admin/email');
  return {ok:true,message:`${kind==='logo'?'Logo':'Favicon'} uploaded and published. Refresh the website to see the change.`};
 }

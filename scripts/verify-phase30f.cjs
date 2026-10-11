@@ -16,7 +16,7 @@ assert.match(sql,/BEFORE INSERT ON public\.business_invoices/);
 assert.doesNotMatch(sql,/UPDATE public\.business_invoices|ALTER TABLE public\.business_invoices.*DROP/);
 assert.match(sql,/p_discount>v_subtotal/);
 assert.match(page,/invoiceTaxLabel/);assert.match(page,/invoice-sheet/);assert.match(page,/invoice-total/);
-assert.match(page,/NRS-validated electronic invoice/);
+assert.doesNotMatch(page,/NRS-validated electronic invoice/);
 assert.match(newOrder,/ReviewedTaxForm/);assert.match(account,/InvoiceIdentityForm/);
 assert.match(helper,/Tax recorded \(unverified\)/);
 const ts=require('./load-typescript.cjs');

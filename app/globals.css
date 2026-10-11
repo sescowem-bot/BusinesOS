@@ -603,3 +603,48 @@
 .bo-export-item h3{margin:0 0 5px}.bo-export-item p{margin:0}
 @media(max-width:640px){.bo-export-item{align-items:stretch;flex-direction:column}.bo-export-item .btn{align-self:flex-start}}
 @media print{.work-sidebar,.work-topbar,.bo-export-page a.btn,.bo-export-page button,.work-menu-toggle{display:none!important}.work-layout,.layout,.bo-export-page{display:block!important;width:100%!important;margin:0!important;max-width:none!important}.bo-export-page .card{box-shadow:none!important;border:1px solid #ddd!important}}
+
+/* Professional invoice output: no website chrome, no screen-sized cards, proper A4 printing.
+   Browser print headers/footers may additionally be controlled by the user's print dialog. */
+.invoice-action-group{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media print{
+ @page{size:A4;margin:0}
+ html,body{margin:0!important;padding:0!important;max-width:none!important;overflow:visible!important}
+ .invoice-view{margin:0!important;padding:0!important;width:100%!important}
+ .invoice-sheet{box-shadow:none!important;border:0!important;border-radius:0!important;overflow:visible!important;width:100%!important}
+ .invoice-sheet-footer{background:#fff!important}
+ .invoice-view-actions,.invoice-action-group,.print-hidden{display:none!important}
+}
+
+/* Clear feature differences in the live data-driven public plan cards. */
+.plan-benefit-detail{display:block;color:#647589;font-size:.76rem;font-weight:400;line-height:1.45;margin-top:3px}
+.plan-capability-list li span{min-width:0}
+
+
+/* Phase 030N-K: focused System Owner CMS and public conversion UX */
+.site-refresh .bo-product-suite{background:linear-gradient(180deg,#f5f8fb,#fff)}
+.bo-suite-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.bo-suite-card{display:flex;flex-direction:column;padding:26px;border-radius:17px;background:#fff;border:1px solid #e0e9ef;box-shadow:0 7px 24px rgba(13,49,76,.035);min-height:224px;gap:13px;transition:transform .18s,border-color .18s,box-shadow .18s}
+.bo-suite-card:hover{transform:translateY(-3px);border-color:#a2c9c0;box-shadow:0 16px 35px rgba(13,49,76,.095)}
+.bo-suite-card h3{font-size:19px;line-height:1.3;color:#123b63;letter-spacing:-.025em;margin:0}.bo-suite-card p{color:#5c7182;line-height:1.66;font-size:13px;flex:1;margin:0}
+.bo-suite-card>span:last-child{display:flex;align-items:center;gap:6px;font-weight:750;font-size:12px;color:#117a58}.bo-suite-index{font-weight:850;letter-spacing:.1em;font-size:11px;color:#2e9880}
+.bo-suite-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.bo-suite-cta>a{display:inline-flex;align-items:center;gap:9px}
+.site-contact-links{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.site-contact-links .marketing-btn-primary,.site-contact-links .marketing-btn-outline{display:inline-flex;align-items:center;gap:9px}
+.site-contact-dock{position:fixed;z-index:80;bottom:23px;right:22px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.site-contact-dock a{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;padding:13px 18px;border-radius:999px;box-shadow:0 13px 36px rgba(5,42,49,.2);font-size:13px;font-weight:800;transition:transform .18s}
+.site-contact-dock a:hover{transform:translateY(-2px)}.site-contact-dock-whatsapp{background:#147a53;color:white}.site-contact-dock-email{background:#fff;color:#143b5a;border:1px solid #dbe8ed}
+.site-footer-logo-img{object-fit:contain;border-radius:7px;background:#fff}
+.owner-website-focus-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:6px 0 24px}
+.owner-website-focus-grid>div{border-radius:14px;padding:20px;background:#fff;border:1px solid #e1eaf0;display:flex;flex-direction:column;gap:9px;min-width:0}
+.owner-website-focus-grid>div>span{font-size:12px;color:#667f8f;font-weight:650}.owner-website-focus-grid strong{font-size:20px;overflow-wrap:anywhere;letter-spacing:-.025em;color:#193950}.owner-website-focus-grid a{font-size:11px;display:flex;gap:6px;align-items:center;color:#087458;font-weight:750}
+.owner-website-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:20px}
+.owner-website-tool{border:1px solid #e2eaf0;background:white;border-radius:14px;padding:22px;display:flex;flex-direction:column;min-height:200px;gap:13px}.owner-website-tool:hover{border-color:#9abeb4;background:#f7fbf9}
+.owner-website-tool>span:first-child{color:#16845b;width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:#eaf7f1}
+.owner-website-tool strong{font-size:16px;color:#163954}.owner-website-tool small{font-size:12px;color:#637b8f;line-height:1.55;flex:1}.owner-website-tool-link{font-size:11px;color:#087458;display:flex;gap:6px;align-items:center;font-weight:800}
+.owner-website-next{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:22px;padding:24px;border-radius:14px;background:#eaf4f8;border:1px solid #d8e7eb}.owner-website-next h2{font-size:17px;margin:0 0 6px}.owner-website-next p{font-size:12px;color:#526d80;max-width:740px;line-height:1.6;margin:0}.owner-website-next .btn{flex-shrink:0}
+.owner-page-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.owner-page-card{display:flex;flex-direction:column;background:white;border:1px solid #e2eaf0;border-radius:15px;padding:24px;min-height:235px;gap:12px;box-shadow:0 4px 20px rgba(15,43,70,.03)}
+.owner-page-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.owner-page-state{font-size:10px;font-weight:850;color:#846622;background:#fbf4dc;border-radius:20px;padding:5px 9px}.owner-page-state[data-published=true]{color:#10724b;background:#e7f6ec}.owner-page-card h2{font-size:19px;color:#183b54;margin:0}.owner-page-card p{font-size:12px;color:#62798d;line-height:1.65;flex:1;margin:0}.owner-page-card-actions{display:flex;gap:9px;align-items:center}.owner-page-footnote{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:23px 0;font-size:12px;color:#637a8e}.owner-page-footnote a,.owner-editor-notes a{color:#087458;text-decoration:underline}
+.owner-editor-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,.8fr);gap:22px}.owner-editor-screen .cms-form{max-width:none}.owner-editor-screen .cms-form h3{margin:0;font-size:19px}.owner-editor-screen .cms-form textarea{min-height:95px}.owner-editor-notes{align-self:start;position:sticky;top:95px;line-height:1.7;color:#5d7284;font-size:12px}.owner-editor-notes h2{font-size:18px;color:#15344d}.owner-back-link{display:inline-flex;align-items:center;gap:6px;color:#0b805d;font-size:12px;font-weight:750}.owner-brand-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(270px,.8fr);gap:22px}.owner-brand-side{align-self:start;position:sticky;top:100px}.owner-brand-side h2{font-size:18px;margin:0 0 18px}.owner-brand-side p{font-size:12px;line-height:1.6;color:#6d8091}.owner-brand-side .owner-brand-example{display:flex;align-items:center;gap:14px;padding:18px;background:#f6fafb;border:1px solid #e2ebef;border-radius:12px;margin:14px 0 19px}.owner-brand-example>img{object-fit:contain}.owner-brand-example strong{font-size:17px;color:#123b63}.owner-brand-example p{margin:5px 0 0}.owner-website-shortcuts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+@media(max-width:1000px){.bo-suite-grid,.owner-page-grid,.owner-website-tools{grid-template-columns:repeat(2,minmax(0,1fr))}.owner-website-focus-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.owner-brand-layout,.owner-editor-grid{grid-template-columns:1fr}.owner-brand-side,.owner-editor-notes{position:static}}
+@media(max-width:650px){.bo-suite-grid,.owner-page-grid,.owner-website-tools,.owner-website-focus-grid{grid-template-columns:1fr}.owner-website-next{flex-direction:column;align-items:flex-start}.bo-suite-cta{flex-direction:column}.bo-suite-cta a{justify-content:center}.site-contact-dock{right:14px;bottom:17px}.site-contact-dock a{padding:12px 13px;font-size:12px}.site-contact-dock-email span{display:none}.owner-website-focus-grid{gap:10px}.site-contact-links{flex-direction:column;align-items:stretch}}
+@media(prefers-reduced-motion:reduce){.bo-suite-card,.site-contact-dock a{transition:none!important}}

@@ -10,6 +10,6 @@ export default async function InstallPage(){
   <section className="marketing-section"><div className="marketing-container install-page-layout">
    <div className="install-intro"><span className="marketing-kicker">YOUR BUSINESS APP</span><h1>Your business, one tap away.</h1><p>Add {brand.name} to your phone or computer. Open customers, orders and your dashboard straight from your Home Screen.</p><div className="install-benefits"><span>✓ Add from Chrome or Safari on iPhone</span><span>✓ Works with your existing account</span><span>✓ Faster access from the home screen</span></div><Link href="/dashboard" className="marketing-btn-primary">Open my workspace →</Link></div>
    <div className="install-guide-panel"><img src="/app-icon-192.png" alt={`${brand.name} app icon`} width={88} height={88}/><h2>Add to Home Screen</h2><InstallAppGuide name={brand.name}/></div>
-  </div></section><PublicFooter name={brand.name} tagline={brand.tagline} email={brand.support_email}/>
+  </div></section><PublicFooter name={brand.name} tagline={brand.tagline} email={brand.support_email} phone={brand.support_phone} logo={brand.logo_url}/>
  </main>;
 }

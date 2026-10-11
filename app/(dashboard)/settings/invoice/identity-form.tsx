@@ -16,7 +16,7 @@ export function InvoiceIdentityForm({defaults,owner}:{defaults:Record<string,str
  const [state,action,pending]=useActionState(saveInvoiceIdentity,initial);
  return <form className="tax-panel" action={action} style={{display:'grid',gap:16}}>
   <h2 style={{margin:0}}>Invoice appearance and payment details</h2>
-  <p className="muted small">These details are captured when an invoice is first issued. Enter only your business's correct identity and bank information. A TIN here does not certify a tax invoice.</p>
+  <p className="muted small">These details are captured when an invoice is first issued. Enter only your business's correct identity and bank information. Review your details before issuing invoices.</p>
   <div className="form-grid">{fields.map(f=><label className="field" key={f.key}>{f.label}<input name={f.key} maxLength={f.max} defaultValue={defaults[f.key]||''} disabled={!owner} autoComplete="off"/></label>)}</div>
   {owner?<button className="btn btn-primary" disabled={pending}>{pending?'Saving…':'Save invoice identity'}</button>:<p className="muted">Only business owners can edit invoice identity.</p>}
   {state.error&&<p role="alert" className="negative">{state.error}</p>}{state.message&&<p role="status" className="positive">{state.message}</p>}

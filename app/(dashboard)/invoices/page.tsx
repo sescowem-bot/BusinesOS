@@ -25,7 +25,8 @@ export default async function Invoices(){
    {text:customer},{text:money(Number(s.total)||0),kind:'amount'},
    {text:new Date(i.issued_at).toLocaleDateString('en-NG'),kind:'muted'},
    {text:'Issued',kind:'status',tone:'success'},
-   {text:'View / print',href:`/invoices/issued/${i.id}`}
+   {text:'View invoice',href:`/invoices/issued/${i.id}`},
+   {text:'Download PDF',href:`/api/invoices/${i.id}/pdf`}
   ]};
  });
  let pending=0;
@@ -44,15 +45,15 @@ export default async function Invoices(){
  });
  return <div className="bo-page">
   <p className="small" style={{textAlign:"right"}}><Link href="/settings/invoice">Edit invoice identity and payment details →</Link></p>
-  <BusinessPageHeading eyebrow="SALES / DOCUMENTS" title="Invoices & statements" description="Issue numbered commercial invoices from existing orders and print payment statements. These documents are not certified statutory tax invoices." action={{href:'/orders/new',label:'New order'}}/>
+  <BusinessPageHeading eyebrow="SALES / DOCUMENTS" title="Invoices & statements" description="Issue professional invoices, download PDFs and review payment statements for your orders." action={{href:'/orders/new',label:'New order'}}/>
   <BusinessSummary items={[{label:'Issued invoices in loaded list',value:available?issued.length:'Unavailable',detail:'Latest 100 maximum'},{label:'Orders awaiting issuance',value:available?pending:'Unavailable',detail:'Within listed orders'},{label:'Orders in loaded list',value:orders.length,detail:'Latest 100 maximum'}]}/>
   {!available&&<BusinessAlert>Invoices are temporarily unavailable. You can still open individual order statements below.</BusinessAlert>}
   {(issued.length===100||orders.length===100)&&<BusinessAlert>The invoice or order list is capped at the newest 100 records. Counters are not complete-period financial totals.</BusinessAlert>}
-  {available&&<BusinessSection title="Issued commercial invoices" description="These numbered documents retain the amounts and customer details captured when issued.">
-   <BusinessRecordsTable columns={['Invoice','Customer','Total at issue','Issued','Status','Document']} rows={issuedRows} searchLabel="Search invoice number or customer" emptyTitle="No invoices issued yet" emptyDescription="Open an existing order to issue its first commercial invoice." emptyHref="/orders" emptyAction="Open orders" limitNote="Amounts shown here are issuance snapshots; later payments do not change the original invoice total."/>
+  {available&&<BusinessSection title="Issued invoices" description="Your invoices keep the agreed item prices and totals as recorded on their issue date.">
+   <BusinessRecordsTable columns={['Invoice','Customer','Total','Issued','Status','Document','PDF']} rows={issuedRows} searchLabel="Search invoice number or customer" emptyTitle="No invoices issued yet" emptyDescription="Open an existing order to issue its first commercial invoice." emptyHref="/orders" emptyAction="Open orders" limitNote="For the latest payments, open the related order statement."/>
   </BusinessSection>}
   <BusinessSection title="Orders & payment statements" description="Open an order to issue an invoice, or print its current statement.">
-   <BusinessRecordsTable columns={['Order','Customer','Order value','Balance','Invoice state','Order action','Statement']} rows={orderRows} searchLabel="Search orders or customers" emptyTitle="No orders available" emptyDescription="Create a customer order to start issuing documents." emptyHref="/orders/new" emptyAction="Create order" limitNote="Payment statements reflect the current payments recorded against an order. Commercial invoice documents preserve the original issuance values."/>
+   <BusinessRecordsTable columns={['Order','Customer','Order value','Balance','Invoice state','Order action','Statement']} rows={orderRows} searchLabel="Search orders or customers" emptyTitle="No orders available" emptyDescription="Create a customer order to start issuing documents." emptyHref="/orders/new" emptyAction="Create order" limitNote="Payment statements reflect the current payments recorded against an order. Invoices retain the amounts recorded when issued."/>
   </BusinessSection>
  </div>;
 }

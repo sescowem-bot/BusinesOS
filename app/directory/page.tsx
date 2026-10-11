@@ -73,6 +73,6 @@ export default async function BusinessDirectory() {
         </div>}
       </div>
     </section>
-    <PublicFooter name={brand.name} tagline={brand.tagline} email={brand.support_email}/>
+    <PublicFooter name={brand.name} tagline={brand.tagline} email={brand.support_email} phone={brand.support_phone} logo={brand.logo_url}/>
   </main>;
 }

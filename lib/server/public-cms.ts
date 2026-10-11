@@ -5,24 +5,28 @@ export type PublicPage={slug:string;title:string;eyebrow:string;description:stri
 export type PublicPlan={id:string;name:string;price_monthly_ngn?:number|null;price_yearly_ngn?:number|null;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
  home:{slug:'home',title:'The clearer way to run your business.',eyebrow:'YOUR BUSINESS, BETTER CONNECTED',description:'Bring customers, orders, payments and business records into one organised workspace. Less chasing information. More room to focus on what matters.',sections:[],published:true},
- features:{slug:'features',title:'Everyday operations, finally connected.',eyebrow:'WHAT YOU CAN DO',description:'From your first customer record to the end-of-day numbers, BusinessOS brings your essential work together without unnecessary complexity.',sections:[
+ features:{slug:'features',title:'Everyday operations, finally connected.',eyebrow:'WHAT YOU CAN DO',description:'From your first customer record to the end-of-day numbers, the platform brings your essential work together without unnecessary complexity.',sections:[
  {heading:'Customers and relationships',body:'Keep customer details, order histories and amounts owed close at hand. Give your team one reliable place to find the next action.'},
  {heading:'Orders and collections',body:'Record what was sold, capture full or partial payments, and keep track of outstanding balances without piecing together separate spreadsheets.'},
  {heading:'Products and stock',body:'Maintain your product catalogue, monitor available stock and review movements as your operations grow.'},
  {heading:'Invoices and business records',body:'Prepare order-linked commercial invoices and printable payment acknowledgements, with a clearer history of each transaction.'},
- {heading:'Accounting and reporting',body:'Organise expenses, journals and financial reports in a dedicated workspace. Accounting automation is being expanded and should be reviewed before formal reporting.'},
- {heading:'Tax and compliance records',body:'Keep tax-relevant information organised for professional review. BusinessOS does not currently submit tax returns or replace qualified tax advice.'}],published:true},
- solutions:{slug:'solutions',title:'Built around your day, not another complicated process.',eyebrow:'SOLUTIONS FOR HOW YOU WORK',description:'Every business has its own rhythm. BusinessOS gives retailers, service teams and growing companies a simpler way to stay on top of the work that keeps them moving.',sections:[
+ {heading:'Expenses and financial records',body:'Record everyday spending and review business performance. Selected plans include journal records and expanded financial reporting.'},
+ {heading:'Retail checkout and receipts',body:'On plans with software POS, record checkout activity and prepare customer receipts while tracking the sale in one place.'},
+ {heading:'Purchasing and stock movement',body:'On eligible plans, keep supplier records, purchase orders, goods receipts and movements between locations connected.'},
+ {heading:'Tasks and team updates',body:'Where available, assign tasks and share private notes with the people working in your business.'},
+ {heading:'Exports for your records',body:'Business owners can download available transaction records in Excel-compatible format and print business documents.'},
+ {heading:'Tax and compliance records',body:'Keep tax-relevant information organised for professional review. This software does not submit tax returns or replace qualified tax advice.'}],published:true},
+ solutions:{slug:'solutions',title:'Built around your day, not another complicated process.',eyebrow:'SOLUTIONS FOR HOW YOU WORK',description:'Every business has its own rhythm. This software gives retailers, service teams and growing companies a simpler way to stay on top of the work that keeps them moving.',sections:[
  {heading:'Retail and trading',body:'Bring products, stock, sales and customer balances into one daily workflow. See what has been sold and what still needs to be collected.'},
- {heading:'Service businesses',body:'Keep client details, service orders, quotations and payments connected from enquiry to completion.'},
- {heading:'Creative and independent brands',body:'Keep made-to-order requests, deposits and customer communication organised so important details do not get lost.'},
+ {heading:'Service businesses',body:'Keep client details, service orders, issued invoices and payment records connected from request to completion.'},
+ {heading:'Creative and independent brands',body:'Keep made-to-order requests, deposits and customer follow-up notes organised so important details do not get lost.'},
  {heading:'Growing teams',body:'Give authorised team members access to the business records they need, while business owners maintain oversight of operations.'}],published:true},
  'how-it-works':{slug:'how-it-works',title:'Set up once. Stay organised every day.',eyebrow:'A SIMPLER WORKFLOW',description:'Start with the essentials, build a consistent daily routine and add more capabilities as your business grows.',sections:[
  {heading:'01 · Create your workspace',body:'Register your account and add your business information to create a dedicated place for your records.'},
  {heading:'02 · Bring in the essentials',body:'Add customers, products or services, and begin recording the work your business actually does.'},
  {heading:'03 · Record each transaction',body:'Keep orders, payments and expenses organised as they happen, including partial payments and outstanding balances.'},
  {heading:'04 · Review and improve',body:'Use available summaries and reports to review activity, identify outstanding work and make more informed decisions.'}],published:true},
- about:{slug:'about',title:'Making the business side of business feel simpler.',eyebrow:'WHY WE ARE BUILDING',description:'BusinessOS is designed around a practical belief: growing a business should not mean losing track of the details that matter.',sections:[
+ about:{slug:'about',title:'Making the business side of business feel simpler.',eyebrow:'WHY WE ARE BUILDING',description:'This platform is designed around a practical belief: growing a business should not mean losing track of the details that matter.',sections:[
  {heading:'Clarity before complexity',body:'We focus on straightforward workflows that help teams record what happened, understand what is outstanding and know what to do next.'},
  {heading:'Built for everyday work',body:'Customers, orders, payments and records belong together. Our goal is to make those connections natural, whether you work on a laptop or a phone.'},
  {heading:'Designed to grow with you',body:'Start with the core tools. Add team members and advanced capabilities when your business is ready.'}],published:true},
@@ -31,7 +35,7 @@ const defaults:Record<string,PublicPage>={
  {heading:'Know the difference between sales and cash',body:'An order can be recorded before the money is fully collected. Track both so your business decisions reflect reality.'},
  {heading:'Keep expenses close to the transaction',body:'Record everyday business spending promptly, with dates, descriptions and supporting documents whenever possible.'},
  {heading:'Plan for tax review',body:'Maintain consistent financial records and confirm current obligations with official guidance and a qualified adviser before filing.'}],published:true},
- contact:{slug:'contact',title:'Questions? We are here to help.',eyebrow:'GET IN TOUCH',description:'Whether you are exploring the platform or need help with an existing workspace, reach the BusinessOS team through the official contact details below.',sections:[
+ contact:{slug:'contact',title:'Questions? We are here to help.',eyebrow:'GET IN TOUCH',description:'Whether you are exploring the platform or need help with an existing workspace, reach our team through the official contact details below.',sections:[
  {heading:'Business enquiries',body:'Ask about getting started, the available business plans or what a particular feature supports.'},
  {heading:'Account assistance',body:'For sign-in, workspace or account questions, contact the support team using the email configured by the platform owner.'}],published:true},
  privacy:{slug:'privacy',title:'Privacy notice',eyebrow:'LEGAL INFORMATION',description:'Information about how personal data is handled on this platform.',sections:[

@@ -8,7 +8,7 @@ const checks={
  ],
  'app/(dashboard)/invoices/actions.ts':['issue_business_invoice','businessId'],
  'app/(dashboard)/invoices/issued/[id]/page.tsx':[".eq('business_id',businessId)",'invoice.snapshot'],
- 'app/(dashboard)/invoices/page.tsx':['business_invoices','Issued commercial invoices'],
+ 'app/(dashboard)/invoices/page.tsx':['business_invoices','Issued invoices'],
  'app/(dashboard)/orders/[id]/page.tsx':['IssueInvoiceForm','business_invoices']
 };
 for(const [file,phrases] of Object.entries(checks)){

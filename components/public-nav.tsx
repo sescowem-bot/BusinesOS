@@ -4,8 +4,8 @@ import {usePathname} from 'next/navigation';
 import {useEffect,useState} from 'react';
 import {Menu,X,ArrowUpRight,ChevronDown,ShieldCheck,LayoutDashboard} from 'lucide-react';
 import type {ViewerAccess} from '@/lib/viewer-access';
-const core=[{label:'Features',href:'/features'},{label:'Solutions',href:'/solutions'},{label:'How it works',href:'/how-it-works'},{label:'Pricing',href:'/pricing'}];
-const company=[{label:'About us',href:'/about'},{label:'Resources',href:'/resources'},{label:'Contact',href:'/contact'}];
+const core=[{label:'Features',href:'/features'},{label:'Solutions',href:'/solutions'},{label:'How it works',href:'/how-it-works'},{label:'Pricing',href:'/pricing'},{label:'Contact',href:'/contact'}];
+const company=[{label:'About us',href:'/about'},{label:'Resources',href:'/resources'}];
 export default function PublicNav({name,logo,access='guest'}:{name:string;logo?:string;access?:ViewerAccess}){
  const [open,setOpen]=useState(false);
  const pathname=usePathname();

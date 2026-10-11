@@ -163,3 +163,8 @@ The newest unpublished source release includes iPhone Chrome and Safari installa
 
 ## Latest unpublished UX and self-service changes
 See `MD/PHASE_030N_H_CUSTOMER_PRODUCT_CORRECTION.md` and `MD/PHASE_030N_H_CUSTOMER_ACCEPTANCE.md` for SQL 046/047, owner-managed staff, public directory, business branding, real tasks and Paystack checkout staging requirements. Do not deploy without database/CI verification.
+
+
+## Phase 030N-K public website / CMS update
+
+Brand Studio now lives at `/admin/branding`, page-by-page content editing at `/admin/content`, and public contact/WhatsApp links use the existing platform `support_phone` field. Full installation details and UAT: `MD/PHASE_030N_K_PUBLIC_WEBSITE_ADMIN_CMS.md`. No SQL migration is added in this phase.

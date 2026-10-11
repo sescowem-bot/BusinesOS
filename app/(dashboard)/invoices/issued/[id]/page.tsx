@@ -25,7 +25,7 @@ export default async function IssuedInvoice({params}:{params:Promise<{id:string}
  return <div className="invoice-view">
   <nav className="invoice-view-actions print-hidden" aria-label="Invoice actions">
    <Link href="/invoices" className="btn">← All invoices</Link>
-   <PrintDocumentButton/>
+   <div className="invoice-action-group"><a className="btn btn-primary" href={`/api/invoices/${encodeURIComponent(id)}/pdf`} download>Download PDF</a><PrintDocumentButton/></div>
   </nav>
   <article className="invoice-sheet" aria-label={`Invoice ${invoice.invoice_number}`}>
    <div className="invoice-accent"/>
@@ -48,24 +48,25 @@ export default async function IssuedInvoice({params}:{params:Promise<{id:string}
    </tbody></table></div>
    <div className="invoice-settlement">
     <div className="invoice-help"><span className="invoice-field-label">PAYMENT DETAILS</span>{identity.bank_name?<><strong>{identity.bank_name}</strong><p>{identity.account_name}</p><p>{identity.account_number}</p></>:<p>Contact the business for payment instructions.</p>}
-     <p className="invoice-tax-note">{tax.reviewed?`Tax recorded from an approved classification dated ${snap.tax_context?.tax_date||snap.pos_tax_lines?.[0]?.tax_date||'on the transaction date'}.`:'Tax classification was not verified in the saved invoice. Review before relying on this document for VAT compliance.'}</p>
+     
     </div>
     <div className="invoice-amounts">
      <div><span>Subtotal</span><strong>{money(snap.subtotal)}</strong></div>
      {Number(snap.discount||0)>0&&<div><span>Discount</span><strong>− {money(snap.discount)}</strong></div>}
      {Number(snap.delivery_fee||0)>0&&<div><span>Delivery</span><strong>{money(snap.delivery_fee)}</strong></div>}
-     <div><span>{invoiceTaxLabel(snap)}</span><strong>{money(snap.tax_recorded)}</strong></div>
-     <div className="invoice-total"><span>Total due at issue</span><strong>{money(total)}</strong></div>
-     <div><span>Payments at issue</span><strong>− {money(paid)}</strong></div>
-     <div className="invoice-due"><span>Outstanding at issue</span><strong>{money(due)}</strong></div>
+     <div><span>{tax.reviewed?invoiceTaxLabel(snap):'Tax'}</span><strong>{money(snap.tax_recorded)}</strong></div>
+     <div className="invoice-total"><span>Invoice total</span><strong>{money(total)}</strong></div>
+     <div><span>Paid when issued</span><strong>− {money(paid)}</strong></div>
+     <div className="invoice-due"><span>Balance when issued</span><strong>{money(due)}</strong></div>
     </div>
    </div>
-   {snap.pos_pricing_context&&<p className="invoice-pricing-note">POS catalogue prices were {snap.pos_pricing_context.price_mode==='inclusive'?'VAT-inclusive':'VAT-exclusive'} at checkout. The invoice displays their net values, with any pre-tax discount and assessed VAT shown separately.</p>}
+
+   {snap.pos_pricing_context&&tax.reviewed&&<p className="invoice-pricing-note">{snap.pos_pricing_context.price_mode==='inclusive'?'Shelf prices included VAT. VAT is shown separately on this invoice.':'VAT is shown separately from item prices.'}</p>}
    {tax.reviewed&&snap.pos_tax_lines?.length?<section className="invoice-pos-tax-summary" aria-label="VAT breakdown"><h3>VAT breakdown by item</h3><div className="table-wrap"><table className="invoice-items"><thead><tr><th>Item</th><th>VAT treatment</th><th>Taxable base</th><th>VAT</th></tr></thead><tbody>{snap.pos_tax_lines.map((line,i)=><tr key={i}><td>{line.product_name}</td><td>{line.treatment.replaceAll('_',' ')} ({(line.rate_basis_points/100).toFixed(1)}%)</td><td>{money(line.taxable_base)}</td><td>{money(line.vat_amount)}</td></tr>)}</tbody></table></div></section>:null}
    <footer className="invoice-sheet-footer">
     {identity.footer_note&&<p>{identity.footer_note}</p>}
     <p>Thank you for your business.</p>
-    <p className="invoice-legal-caption">BusinessOS commercial invoice. Not an NRS-validated electronic invoice or evidence of tax filing. This is an immutable issuance snapshot; payments made afterward may change the current order balance.</p>
+
    </footer>
   </article>
  </div>;
