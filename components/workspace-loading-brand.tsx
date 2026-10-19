@@ -13,7 +13,7 @@ export function WorkspaceLoadingBrand({label='Loading page',mode='page'}:{label?
  const {logoUrl,businessName,platformName}=useContext(BrandContext);
  const [waiting,setWaiting]=useState(false);
  useEffect(()=>{
-  const id=window.setTimeout(()=>setWaiting(true),10000);
+  const id=window.setTimeout(()=>setWaiting(true),8000);
   return()=>window.clearTimeout(id);
  },[label]);
  const safeLogo=logoUrl&&/^https:\/\//i.test(logoUrl)?logoUrl:null;
@@ -26,8 +26,8 @@ export function WorkspaceLoadingBrand({label='Loading page',mode='page'}:{label?
   <strong className="bo-premium-loader__name">{title}</strong>
   <p className="bo-premium-loader__label">{label}…</p>
   {waiting&&<div className="bo-premium-loader__slow" role="status">
-   <p>This is taking longer than expected. Your connection or the server may be busy.</p>
-   <div className="bo-premium-loader__actions"><button type="button" onClick={()=>window.location.reload()}>Retry page</button><Link href="/support" prefetch={false}>Get support</Link></div>
+   <p>This page is taking a little longer to open. You can retry or return to the website.</p>
+   <div className="bo-premium-loader__actions"><button type="button" onClick={()=>window.location.reload()}>Retry page</button><Link href="/" prefetch={false}>Back to website</Link></div>
   </div>}
  </section>;
 }
