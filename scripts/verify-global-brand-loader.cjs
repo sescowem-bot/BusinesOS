@@ -8,7 +8,7 @@ check(shell.includes('WorkspaceLoadingBrandProvider'),'brand provider not wired 
 check(shell.includes('brand?.logo_url'),'must reuse existing platform branding, not fetch at loading time');
 check(loader.includes('/app-icon-192.png'),'local icon fallback missing');
 check(!loader.includes('supabase')&&!loader.includes('fetch('),'loading spinner must not query a database or network');
-check(loader.includes('setTimeout')&&loader.includes('Retry page')&&loader.includes('Get support'),'slow server state recovery missing');
+check(loader.includes('setTimeout')&&loader.includes('Retry page')&&loader.includes('Back to website'),'slow server state recovery missing');
 check(loader.includes('aria-live')&&loader.includes('aria-busy'),'loader must be accessible');
 check(css.includes('bo-premium-spin')&&css.includes('prefers-reduced-motion:reduce'),'reduced-motion animation guard missing');
 check(css.includes('--loader-size')&&css.includes('bo-premium-loader--section'),'mobile and nested layout missing');
