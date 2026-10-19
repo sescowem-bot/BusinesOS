@@ -73,4 +73,4 @@ jobs:
         with:
           deno-version: v2.x
       - name: Typecheck Supabase Auth Email Hook independently
-        run: deno check supabase/functions/send-email/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/send-email/index.ts
