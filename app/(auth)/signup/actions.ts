@@ -1,6 +1,7 @@
 'use server';
 import {redirect} from 'next/navigation';
 import {getServerSupabase} from '@/lib/server/supabase';
+import {getActiveTerms} from '@/lib/server/legal-documents';
 import {explainAuthError} from '@/lib/auth-feedback';
 export type SignupState={error:string;success:string;retryAfterSeconds:number;reason:string};
 const failed=(error:string):SignupState=>({error,success:'',retryAfterSeconds:0,reason:'general'});
@@ -12,12 +13,18 @@ export async function signUp(_state:SignupState,data:FormData):Promise<SignupSta
  if(name.length<2||name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<12||password.length>128)
   return failed('Enter your full name, a valid email and a password of 12–128 characters.');
  if(password!==confirm)return failed('The two passwords do not match. Please check and try again.');
+ const terms=await getActiveTerms();
+ if(!terms.available)return failed('Registration is temporarily unavailable while legal document availability is checked.');
+ if(terms.document&&(data.get('accept_terms')!=='on'||data.get('terms_document_id')!==terms.document.id))
+  return failed('Read and accept the current Terms of Service to create your account.');
  const client=await getServerSupabase();
  if(!client)return failed('Registration is temporarily unavailable. Please contact BusinessOS support.');
  const site=process.env.NEXT_PUBLIC_SITE_URL||process.env.NEXT_PUBLIC_APP_URL;
  const redirectUrl=site&&/^https:\/\/[^/]+/.test(site)?`${site.replace(/\/$/,'')}/auth/callback?next=/onboarding`:undefined;
+ const metadata:Record<string,string|boolean>={full_name:name};
+ if(terms.document){metadata.businessos_terms_accepted=true;metadata.businessos_terms_document_id=terms.document.id;}
  let result;
- try{result=await client.auth.signUp({email,password,options:{data:{full_name:name},...(redirectUrl?{emailRedirectTo:redirectUrl}:{})}})}
+ try{result=await client.auth.signUp({email,password,options:{data:metadata,...(redirectUrl?{emailRedirectTo:redirectUrl}:{})}})}
  catch{return failed('Registration is temporarily unavailable. Please try again later.');}
  if(result.error){const feedback=explainAuthError(result.error,'signup');return {error:feedback.message,success:'',retryAfterSeconds:feedback.retryAfterSeconds,reason:feedback.reason};}
  if(!result.data.session)return {error:'',success:'Registration request received. Check your email (and Spam/Junk) for a verification link before signing in.',retryAfterSeconds:0,reason:''};
