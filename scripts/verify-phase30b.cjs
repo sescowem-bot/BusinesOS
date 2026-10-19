@@ -21,7 +21,7 @@ for(const kind of ['features','solutions','how-it-works','about','resources'])as
 assert(interior.includes('<PublicHeroArt kind='),'Interior pages must use distinct artwork');
 assert(!interior.includes('<PublicWorkspacePreview/>'),'Interior pages should not repeat the home preview');
 assert(!prices.includes('planPaths'),'Public pricing should present actual published plans, not static suggested tiers');
-assert(prices.includes('getPublishedPlans()')&&prices.includes('getPublishedPlanCapabilities()'),'Actual plan catalogue must remain database driven');
+assert(prices.includes('getPublicPricingResult()')&&prices.includes('getPublishedPlanCapabilities()'),'Actual plan catalogue must remain database driven and distinguish data failures');
 assert(prices.includes('Custom quote')&&prices.includes('price_monthly_ngn')&&prices.includes('price_yearly_ngn'),'Published plans must use configured amounts or ask for a quote, never invented prices');
 assert(prices.includes('getPublishedPlanCapabilities()'),'Published plans must determine actual displayed module access');
 assert(!fs.readdirSync(root).some(f=>f.endsWith('.md')&&f!=='README.md'),'Keep documentation in MD/');
