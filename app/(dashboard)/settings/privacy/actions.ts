@@ -14,8 +14,8 @@ export async function submitPrivacyRequest(_:PrivacyRequestState,form:FormData):
    return {ok:false,message:'Describe your request in 10–2000 characters.'};
   if(!['mine','business'].includes(scope)||(scope==='business'&&w.role!=='owner'))
    return {ok:false,message:'Only an authorised business owner can submit a business-wide request.'};
-  const {error}=await w.client.from('privacy_rights_requests').insert({
-   requested_by:w.userId,business_id:scope==='business'?w.businessId:null,kind,details
+  const {error}=await w.client.rpc('submit_privacy_rights_request',{
+   p_business:scope==='business'?w.businessId:null,p_kind:kind,p_details:details
   });
   if(error){console.error('[privacy] submit',{code:error.code});return {ok:false,message:'We could not submit the request. Check that database migration 051 is installed.'};}
   revalidatePath('/settings/privacy');
