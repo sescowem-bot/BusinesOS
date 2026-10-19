@@ -43,8 +43,8 @@ export function PlanEditor({plan}:{plan:PublicPlan}){
   <label>Plan identifier<input name="id" defaultValue={isNew?'':plan.id} placeholder="e.g. professional" readOnly={!isNew} required/><span className="muted small">Existing identifiers cannot be renamed here because assigned business plans reference them.</span></label>
   <label>Plan name<input name="name" defaultValue={plan.name} maxLength={80} required/></label>
   <label>Price message when no monthly/annual amount is set<input name="price_label" defaultValue={plan.price_label} maxLength={70}/></label>
-  {isNew&&<div className="grid grid-2"><label>Monthly price (₦)<input name="price_monthly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_monthly_ngn?:number|null}).price_monthly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label><label>Annual price (₦)<input name="price_yearly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_yearly_ngn?:number|null}).price_yearly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label></div>}
-  <p className="small muted">Prices for existing plans are saved separately at the top of the Pricing page. Editing this plan description will not reset them.</p>
+  <div className="grid grid-2"><label>Monthly price (₦)<input name="price_monthly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_monthly_ngn?:number|null}).price_monthly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label><label>Annual price (₦)<input name="price_yearly_ngn" type="number" min="0" step="0.01" defaultValue={plan.id==='free'?'0':String((plan as PublicPlan & {price_yearly_ngn?:number|null}).price_yearly_ngn??'')} readOnly={plan.id==='free'} placeholder="Leave empty for a custom quote"/></label></div>}
+  <p className="small muted">Prices saved here are used on the website and during checkout. Leave an amount empty for a custom quote. Changing a displayed price does not charge an existing customer.</p>
   <label>Billing note<input name="billing_label" defaultValue={plan.billing_label} maxLength={2000}/></label>
   <label>Description<textarea name="description" defaultValue={plan.description} maxLength={2000}/></label>
   <label>Additional marketing notes (one per line)<textarea name="features" rows={6} maxLength={5000} defaultValue={Array.isArray(plan.features)?plan.features.join('\n'):''}/></label>
@@ -52,7 +52,7 @@ export function PlanEditor({plan}:{plan:PublicPlan}){
   <label>CTA label<input name="cta_label" maxLength={90} defaultValue={plan.cta_label}/></label>
   <label>CTA path<input name="cta_url" defaultValue={plan.cta_url} pattern="/[a-z0-9/-]*"/></label>
   <label>Display order<input type="number" name="sort_order" min={0} max={1000} defaultValue={plan.sort_order}/></label>
-  <label className="cms-check"><input name="published" type="checkbox" defaultChecked={plan.published}/> Published</label>
+  <label className="cms-check"><input name="published" type="checkbox" defaultChecked={plan.published}/> Show this plan on the pricing page</label>
   <button type="submit" className="btn btn-primary" disabled={pending}>{pending?'Saving…':'Save plan'}</button>
   {state.message&&<span role="status" className={state.ok?'positive':'negative'}>{state.message}</span>}
  </form>;
