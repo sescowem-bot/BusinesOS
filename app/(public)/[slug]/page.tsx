@@ -4,6 +4,7 @@ import type {Metadata} from 'next';
 import {ArrowRight,ArrowUpRight,BookOpen,CheckCircle2,ChevronRight,ClipboardCheck,FileText,Info,LockKeyhole,Mail,ShieldCheck,Store,Users,Wallet,Boxes,BriefcaseBusiness,Scissors} from 'lucide-react';
 import PublicNav from '@/components/public-nav';
 import PublicFooter from '@/components/public-footer';
+import {CookieSettingsButton} from '@/components/cookie-preferences';
 import {FeatureShowcase,SolutionShowcase,HowShowcase,AboutShowcase,ResourcesShowcase,ContactShowcase} from '@/components/public-product-showcase';
 import {PublicHeroArt} from '@/components/public-hero-art';
 import {getPlatformBrand} from '@/lib/server/branding';
