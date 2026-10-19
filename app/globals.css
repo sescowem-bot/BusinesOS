@@ -776,3 +776,10 @@
  .bo-cookie-dialog{padding:20px}
  .bo-cookie-category{flex-wrap:wrap}
 }
+
+/* Privacy controls must remain accessible in every signup and settings view. */
+.bo-legal-cookies-link,.bo-privacy-open-cookies{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:#145c8f;text-decoration:underline;text-underline-offset:3px;font-family:inherit;font-size:12px;font-weight:750;cursor:pointer;text-align:left}
+.bo-privacy-open-cookies{font-size:13px}
+.bo-legal-links a{display:inline-flex;align-items:center;gap:3px}
+.bo-legal-cookies-link:hover,.bo-privacy-open-cookies:hover{color:#0f456f}
+.bo-legal-cookies-link:focus-visible,.bo-privacy-open-cookies:focus-visible{outline:3px solid #59a2da;outline-offset:2px}
