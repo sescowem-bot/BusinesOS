@@ -17,5 +17,8 @@ assert.ok(!auth.includes('featureRoles[feature]'),'Frontend role allowlist must 
 assert.ok(plans.includes('PlanEditor')&&plans.includes('New business plan'),'Admin can create custom plans');
 assert.ok(access.includes('PlanPermissionEditor'),'Role editor must be available');
 assert.ok(pricing.includes('essentialCapabilities')&&pricing.includes('releasedPaidCapabilities')&&pricing.includes('plan-comparison'),'Public plan comparison should enumerate actual features');
-assert.ok(publicCms.includes("if(!client)return []")&&!publicCms.includes('return error?demoPlans'),'Public pricing must not invent fallback plans');
+assert.ok(publicCms.includes('return {plans:[],available:false}')&&publicCms.includes('normalizePublicPlans')&&!publicCms.includes('return error?demoPlans'),'Public pricing must neither invent plans nor hide lookup errors');
+const sql054=read('supabase/migrations/054_public_pricing_read_repair.sql');
+assert.ok(sql054.includes('WHERE p.published IS TRUE')&&sql054.includes('GRANT EXECUTE ON FUNCTION public.published_subscription_plan_catalog() TO anon,authenticated'),'Public pricing RPC must expose only published plans');
+assert.ok(sql054.includes('USING (published IS TRUE)'),'Anonymous read policy must not query private administrator tables');
 console.log('Dynamic plans source / permission invariants passed. Live RLS and migrations require Supabase tests.');
