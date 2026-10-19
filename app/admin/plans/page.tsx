@@ -12,10 +12,11 @@ const newPlan:PublicPlan={id:'new-plan',name:'New business plan',price_label:'Co
 export default async function PlansAdmin(){
  const session=await requirePlatformAdmin();
  if(!session)return <main className="admin-access"><h1>Platform administrator access required</h1><Link href="/login">Sign in</Link></main>;
- const [plansResult,featuresResult,parentsResult]=await Promise.all([
+ const [plansResult,featuresResult,parentsResult,auditResult]=await Promise.all([
   session.client.from('public_site_plans').select('id,name,description,price_label,price_monthly_ngn,price_yearly_ngn,billing_label,features,cta_label,cta_url,sort_order,published').order('sort_order'),
   session.client.from('platform_plan_features').select('plan_id,feature_key,enabled'),
-  session.client.from('plan_parent_links').select('plan_id,parent_plan_id')
+  session.client.from('plan_parent_links').select('plan_id,parent_plan_id'),
+  session.client.from('platform_subscription_audit').select('id,entity_type,entity_key,event_type,changed_at').order('changed_at',{ascending:false}).limit(20)
  ]);
  const plans=(plansResult.data||[]) as PublicPlan[];
  const enabled=(featuresResult.data||[]).filter(f=>f.enabled===true);
@@ -37,5 +38,8 @@ export default async function PlansAdmin(){
   <div className="plan-card-directory">{plans.map(plan=><details className="card card-pad cms-panel plan-management-card" key={plan.id}><summary><strong>{plan.name}</strong><span className="small muted">{(plan as PublicPlan & {price_monthly_ngn?:number|null}).price_monthly_ngn!=null?new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN'}).format(Number((plan as PublicPlan & {price_monthly_ngn?:number|null}).price_monthly_ngn))+'/month':plan.price_label||'Contact sales'} · {plan.published?'Published':'Draft'} · {enabled.filter(f=>f.plan_id===plan.id).length}/{paidCapabilities.length} modules enabled</span></summary><div className="plan-card-links"><Link href="/admin/plan-access">Edit module and staff permissions →</Link><Link href="/admin/businesses">Assign to a business →</Link></div><PlanEditor plan={plan}/>{plan.id==='free'?<p className="small muted">Free cannot inherit premium plans. Company-specific extras are managed from Registered businesses.</p>:!parentsResult.error?<ParentPlanForm key={`${plan.id}-${parentLinks.get(plan.id)||'none'}`} planId={plan.id} selected={parentLinks.get(plan.id)||''} plans={plans.map(p=>({id:p.id,name:p.name}))}/>:<p role="alert">Plan relationships are temporarily unavailable.</p>}</details>)}</div>
   <section className="card card-pad"><h2>Create a subscription plan</h2><p className="muted small">Set the name and optional prices, save as a draft, configure its features, then publish it when ready.</p><PlanEditor plan={newPlan}/></section>
   </>}
+  <section className="card card-pad" style={{marginTop:20}}><div className="page-head"><div><h2>Subscription change history</h2><p className="small muted">Recent changes to plan prices, publication and inheritance. Visible to platform administrators only.</p></div><Link className="btn" href="/admin/health">System health</Link></div>
+  {auditResult.error?<p className="small muted">Change history is unavailable. Check migration 053 in System Health.</p>:!auditResult.data?.length?<p className="small muted">No subscription changes recorded since audit tracking was enabled.</p>:<div className="table-wrap"><table className="table"><thead><tr><th>Time</th><th>Plan</th><th>Change</th></tr></thead><tbody>{auditResult.data.map(event=><tr key={event.id}><td>{new Date(event.changed_at).toLocaleString('en-NG')}</td><td>{event.entity_key}</td><td>{event.entity_type==='inheritance'?'Inherited access':'Plan details'} · {event.event_type}</td></tr>)}</tbody></table></div>}
+ </section>
  </main>;
 }
