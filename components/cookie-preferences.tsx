@@ -19,6 +19,8 @@ export function CookieSettingsButton({className=''}:{className?:string}){
 }
 
 export function CookiePreferences(){
+ const pathname=usePathname();
+ const showPublicBanner=!/^\/(admin|dashboard|settings|upgrade|orders|customers|expenses|inventory|pos|accounting|reports|tax|products|communications)(?:\/|$)/.test(pathname||'');
  const dialogRef=useRef<HTMLDialogElement>(null);
  const [showBanner,setShowBanner]=useState(false);
  const [open,setOpen]=useState(false);
