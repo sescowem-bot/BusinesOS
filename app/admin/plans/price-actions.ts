@@ -23,7 +23,7 @@ export async function savePlanPrices(_:PlanPriceState,form:FormData):Promise<Pla
  const {data,error}=await admin.client.from('public_site_plans').update({price_monthly_ngn:id==='free'?0:monthly,price_yearly_ngn:id==='free'?0:annual,updated_by:admin.user.id,updated_at:new Date().toISOString()}).eq('id',id).select('id').maybeSingle();
  if(error){console.error('[plan-pricing] save failed',{code:error.code,plan:id});
   if(['42703','42P01','PGRST204'].includes(error.code||''))return {ok:false,message:'The monthly and annual price columns are unavailable. Verify that subscription migration 044 was installed before saving prices.'};
-  if(error.code==='42501'||error.status===403)return {ok:false,message:'Your administrator session cannot update plan prices. Check your System Owner permissions.'};
+  if(error.code==='42501')return {ok:false,message:'Your administrator session cannot update plan prices. Check your System Owner permissions.'};
   return {ok:false,message:friendlyServiceError('save these plan prices',error)};
  }
  if(!data)return {ok:false,message:'This plan was not found. Refresh the list and try again.'};
