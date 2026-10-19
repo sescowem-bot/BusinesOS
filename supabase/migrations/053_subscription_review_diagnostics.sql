@@ -65,4 +65,70 @@ BEGIN
 END;$$;
 REVOKE ALL ON FUNCTION public.admin_subscription_diagnostics() FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_subscription_diagnostics() TO authenticated;
+
+-- Append-only changes for subscription pricing and plan hierarchy.
+CREATE TABLE public.platform_subscription_audit (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ entity_type text NOT NULL CHECK(entity_type IN ('plan','inheritance')),
+ entity_key text NOT NULL,
+ event_type text NOT NULL CHECK(event_type IN ('created','changed','removed')),
+ previous_value jsonb,
+ new_value jsonb,
+ actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+ changed_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX platform_subscription_audit_latest ON public.platform_subscription_audit(changed_at DESC);
+ALTER TABLE public.platform_subscription_audit ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.platform_subscription_audit FROM PUBLIC,anon,authenticated;
+GRANT SELECT ON public.platform_subscription_audit TO authenticated;
+CREATE POLICY platform_subscription_audit_admin_read ON public.platform_subscription_audit
+ FOR SELECT TO authenticated USING(EXISTS(
+  SELECT 1 FROM public.platform_admins p WHERE p.user_id=auth.uid() AND p.active
+ ));
+
+CREATE FUNCTION public.record_subscription_plan_change()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+DECLARE v_before jsonb;v_after jsonb;
+BEGIN
+ IF TG_OP<>'INSERT' THEN
+  v_before=jsonb_build_object('name',OLD.name,'monthly',OLD.price_monthly_ngn,
+   'yearly',OLD.price_yearly_ngn,'published',OLD.published,
+   'label',OLD.price_label,'sort',OLD.sort_order);
+ END IF;
+ v_after=jsonb_build_object('name',NEW.name,'monthly',NEW.price_monthly_ngn,
+  'yearly',NEW.price_yearly_ngn,'published',NEW.published,
+  'label',NEW.price_label,'sort',NEW.sort_order);
+ IF TG_OP='INSERT' OR v_before IS DISTINCT FROM v_after THEN
+  INSERT INTO public.platform_subscription_audit(entity_type,entity_key,event_type,
+   previous_value,new_value,actor_id)
+  VALUES('plan',NEW.id,CASE WHEN TG_OP='INSERT' THEN 'created' ELSE 'changed' END,
+   v_before,v_after,auth.uid());
+ END IF;
+ RETURN NEW;
+END;$$;
+REVOKE ALL ON FUNCTION public.record_subscription_plan_change() FROM PUBLIC,anon,authenticated;
+CREATE TRIGGER log_subscription_plan_changes AFTER INSERT OR UPDATE ON public.public_site_plans
+ FOR EACH ROW EXECUTE FUNCTION public.record_subscription_plan_change();
+
+CREATE FUNCTION public.record_subscription_parent_change()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+DECLARE v_before jsonb;v_after jsonb;v_key text;
+BEGIN
+ v_key=CASE WHEN TG_OP='DELETE' THEN OLD.plan_id ELSE NEW.plan_id END;
+ IF TG_OP<>'INSERT' THEN v_before=jsonb_build_object('parent',OLD.parent_plan_id);END IF;
+ IF TG_OP<>'DELETE' THEN v_after=jsonb_build_object('parent',NEW.parent_plan_id);END IF;
+ IF TG_OP='INSERT' OR TG_OP='DELETE' OR v_before IS DISTINCT FROM v_after THEN
+  INSERT INTO public.platform_subscription_audit(entity_type,entity_key,event_type,
+   previous_value,new_value,actor_id)
+  VALUES('inheritance',v_key,CASE WHEN TG_OP='INSERT' THEN 'created'
+  WHEN TG_OP='DELETE' THEN 'removed' ELSE 'changed' END,
+  v_before,v_after,auth.uid());
+ END IF;
+ IF TG_OP='DELETE' THEN RETURN OLD;END IF;
+ RETURN NEW;
+END;$$;
+REVOKE ALL ON FUNCTION public.record_subscription_parent_change() FROM PUBLIC,anon,authenticated;
+CREATE TRIGGER log_subscription_parent_changes AFTER INSERT OR UPDATE OR DELETE ON public.plan_parent_links
+ FOR EACH ROW EXECUTE FUNCTION public.record_subscription_parent_change();
+
 COMMIT;
