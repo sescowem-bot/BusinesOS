@@ -4,11 +4,15 @@ import {getServerSupabase} from '@/lib/server/supabase';
 import {cookies} from 'next/headers';
 import {ACTIVE_BUSINESS_COOKIE} from '@/lib/server/workspace-selection';
 import {explainAuthError} from '@/lib/auth-feedback';
+import {DEVICE_SESSION_COOKIE,REMEMBER_DEVICE_MAX_AGE} from '@/lib/auth-session-preference';
 export type LoginState={error:string;retryAfterSeconds:number;reason:string};
 const fail=(error:string):LoginState=>({error,retryAfterSeconds:0,reason:'general'});
 export async function signIn(_previous:LoginState,form:FormData):Promise<LoginState>{
  const email=String(form.get('email')||'').trim().toLowerCase(),password=String(form.get('password')||'');
  if(!email||!password)return fail('Enter your email and password.');
+ const remember=form.get('remember_device')==='on';
+ const store=await cookies();
+ store.set(DEVICE_SESSION_COOKIE,remember?'remember':'session',{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',path:'/',...(remember?{maxAge:REMEMBER_DEVICE_MAX_AGE}:{})});
  const supabase=await getServerSupabase();
  if(!supabase)return fail('Sign in is temporarily unavailable. Please contact BusinessOS support.');
  let result;
@@ -25,4 +29,4 @@ export async function signIn(_previous:LoginState,form:FormData):Promise<LoginSt
  if(member?.length)redirect('/dashboard');
  redirect('/onboarding');
 }
-export async function signOut(){const supabase=await getServerSupabase();if(supabase)await supabase.auth.signOut();(await cookies()).delete(ACTIVE_BUSINESS_COOKIE);redirect('/login');}
+export async function signOut(){const supabase=await getServerSupabase();if(supabase)await supabase.auth.signOut();(await cookies()).delete(ACTIVE_BUSINESS_COOKIE);(await cookies()).delete(DEVICE_SESSION_COOKIE);redirect('/login');}

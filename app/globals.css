@@ -783,3 +783,12 @@
 .bo-legal-links a{display:inline-flex;align-items:center;gap:3px}
 .bo-legal-cookies-link:hover,.bo-privacy-open-cookies:hover{color:#0f456f}
 .bo-legal-cookies-link:focus-visible,.bo-privacy-open-cookies:focus-visible{outline:3px solid #59a2da;outline-offset:2px}
+
+/* Phase 031C — clear device-session choice, stronger password guidance */
+.bo-login-remember{display:flex!important;align-items:flex-start!important;gap:11px!important;cursor:pointer;padding:13px;border:1px solid #d9e5ed;border-radius:12px;background:#f7fafc}
+.bo-login-remember input{width:18px;height:18px;min-width:18px;accent-color:#157f5a;margin:2px 0 0}
+.bo-login-remember span{display:grid;gap:5px;line-height:1.5}
+.bo-login-remember strong{color:#163b53;font-size:13px}
+.bo-login-remember small{font-size:12px;color:#5a7181;line-height:1.55}
+.bo-password-progress{height:5px;border-radius:999px;background:#e4edf2;overflow:hidden}
+.bo-password-progress>span{display:block;height:100%;background:#17836b;transition:width 180ms ease}

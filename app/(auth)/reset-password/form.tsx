@@ -1,2 +1,14 @@
-'use client';import {useActionState} from 'react';import {changePassword} from './actions';
-export default function PasswordForm(){const [state,action,pending]=useActionState(changePassword,{message:''});return <form action={action} style={{display:'grid',gap:14,marginTop:20}}><div className="field"><label htmlFor="password">New password</label><input id="password" name="password" type="password" minLength={12} autoComplete="new-password" required/></div><button className="btn btn-primary" disabled={pending}>Update password</button>{state.message&&<p role="status" className="notice">{state.message}</p>}</form>}
+'use client';
+import {useActionState,useState} from 'react';
+import {changePassword} from './actions';
+export default function PasswordForm(){
+ const [state,action,pending]=useActionState(changePassword,{message:''});
+ const [showPassword,setShowPassword]=useState(false);
+ const [showConfirm,setShowConfirm]=useState(false);
+ return <form action={action} className="auth-friendly-form">
+  <div className="field"><label htmlFor="password">New password</label><div className="auth-password-wrap"><input id="password" name="password" type={showPassword?'text':'password'} minLength={12} maxLength={128} autoComplete="new-password" required/><button type="button" className="auth-password-toggle" onClick={()=>setShowPassword(v=>!v)}>{showPassword?'Hide':'Show'}</button></div><p className="auth-field-help">Use at least 12 characters. A unique, memorable passphrase is recommended.</p></div>
+  <div className="field"><label htmlFor="password_confirm">Confirm new password</label><div className="auth-password-wrap"><input id="password_confirm" name="password_confirm" type={showConfirm?'text':'password'} minLength={12} maxLength={128} autoComplete="new-password" required/><button type="button" className="auth-password-toggle" onClick={()=>setShowConfirm(v=>!v)}>{showConfirm?'Hide':'Show'}</button></div></div>
+  <button className="btn btn-primary auth-submit" disabled={pending}>{pending?'Updating…':'Update password'}</button>
+  {state.message&&<p role="status" className="notice">{state.message}</p>}
+ </form>;
+}
