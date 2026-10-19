@@ -26,7 +26,7 @@ const checks=[
 for(const [ok,reason] of checks)assert(ok,reason);
 const workflow=read('.github/workflows/verify.yml');
 for(const task of ['check:phase21','check:phase22','check:phase23','check:phase24','check:website','check:plans','test:accounting','check:admin-ui','check:phase26','check:branding-assets','check:phase27','check:phase28','check:phase28b','check:phase29','typecheck','build'])assert(workflow.includes(task),`CI missing ${task}`);
-assert(workflow.includes('deno check supabase/functions/send-email/index.ts'),'Auth email hook must be checked in its own runtime');
+assert(workflow.includes('deno check --node-modules-dir=auto supabase/functions/send-email/index.ts'),'Auth email hook must be checked in its own runtime');
 const docs=fs.readdirSync(root).filter(f=>f.endsWith('.md')&&f!=='README.md');
 assert.equal(docs.length,0,'README must be the only root Markdown file');
 const config=JSON.parse(read('package.json'));
