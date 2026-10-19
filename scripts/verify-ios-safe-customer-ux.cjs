@@ -32,7 +32,7 @@ recurse('app');recurse('components');
 for(const f of files){const code=read(f);
  const source=ts.createSourceFile(f,code,ts.ScriptTarget.Latest,true,f.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  check(source.parseDiagnostics.length===0,'TS/TSX parse failed: '+f);
- if(f.endsWith('/page.tsx')||f.endsWith('/error.tsx')){
+ if(!f.includes('app/admin/')&&(f.endsWith('/page.tsx')||f.endsWith('/error.tsx'))){
   // End users should never be told migration identifiers while attempting a normal workflow.
   check(!/(?:apply|confirm|verify|check|install|requires?)\s+(?:an?\s+)?(?:sql\s*)?(?:database\s+)?migrations?\s*\d+/i.test(code),'technical migration advice in UI: '+f);
  }

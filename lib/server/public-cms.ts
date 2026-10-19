@@ -1,7 +1,7 @@
 import 'server-only';
 import {createClient} from '@supabase/supabase-js';
 import {unstable_cache} from 'next/cache';
-export type PublicPage={slug:string;title:string;eyebrow:string;description:string;sections:{heading:string;body:string}[];published:boolean};
+export type PublicPage={slug:string;title:string;eyebrow:string;description:string;sections:{key?:string;heading:string;body:string}[];published:boolean};
 export type PublicPlan={id:string;name:string;price_monthly_ngn?:number|null;price_yearly_ngn?:number|null;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
  home:{slug:'home',title:'Run sales, track payments and keep your business moving.',eyebrow:'YOUR BUSINESS, ONE ORGANISED WORKSPACE',description:'Keep customers, orders, part payments, invoices, products and expenses connected. Start with Free and add more business tools when you need them.',sections:[],published:true},
@@ -88,7 +88,7 @@ export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPag
   const updatedTitle=fallback&&data.title===stockTitles[slug]?fallback.title:data.title;
   const updatedDescription=fallback&&data.description===stockDescriptions[slug]?fallback.description:data.description;
   const updatedEyebrow=fallback&&data.title===stockTitles[slug]?fallback.eyebrow:data.eyebrow;
-  return {...data,title:updatedTitle,description:updatedDescription,eyebrow:updatedEyebrow,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown)=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
+  return {...data,title:updatedTitle,description:updatedDescription,eyebrow:updatedEyebrow,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown):section is {key?:unknown;heading:string;body:string}=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')).map(section=>({heading:section.heading,body:section.body,...(typeof section.key==='string'?{key:section.key}:{})})):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
  }catch{return draft||(fallback?.published?fallback:null)}
 },['businessos-public-pages-v1'],{revalidate:60,tags:['businessos-public-pages']});
 export const getPublishedPlans=unstable_cache(async ():Promise<PublicPlan[]>=>{

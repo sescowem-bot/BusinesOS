@@ -30,7 +30,7 @@ for(const requirement of [
 const detail=fs.readFileSync(path.join(root,'app/admin/businesses/[id]/page.tsx'),'utf8');
 if(!detail.includes('requirePlatformAdmin'))failures.push('Business detail must require admin');
 const form=fs.readFileSync(path.join(root,'app/admin/cms-form.tsx'),'utf8');
-if(!form.includes('JSON.stringify(sections)')||!form.includes('Add section'))failures.push('CMS section editor missing');
+if(!form.includes('JSON.stringify([...sections,...cards')||!form.includes('Add section'))failures.push('CMS section editor missing');
 console.log(`Parsed ${count} TypeScript/TSX files`);
 if(failures.length){console.error(failures.join('\n'));process.exit(1)}
 console.log('Phase 022 source and migration safety checks passed.');

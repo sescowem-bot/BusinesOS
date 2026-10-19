@@ -699,3 +699,28 @@
 .bo-balance-reminder .btn {white-space:normal; text-align:center; min-height:40px}
 .bo-balance-reminder p {max-width:270px; margin:2px 0}
 @media(max-width:720px){.bo-tier-align-form {display:grid}.bo-tier-align-form input{width:100%;max-width:none}.bo-installment-details{min-width:0}.bo-installment-form{min-width:0}}
+
+/* Admin pricing, page-card CMS: focused actions rather than a single long settings form. */
+.owner-plan-price-top{display:flex;justify-content:space-between;align-items:start;gap:18px;flex-wrap:wrap}
+.owner-plan-price-top p{max-width:780px;color:#526578;margin-top:8px}
+.owner-plan-price-list{display:grid;gap:14px;margin:22px 0 12px}
+.owner-plan-price-form{border:1px solid #dae4ec;background:#f9fbfd;border-radius:14px;padding:18px;display:grid;gap:10px}
+.owner-plan-price-heading{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.owner-plan-price-heading strong{font-size:1.08rem;color:#123b63}
+.owner-plan-price-heading span{font-size:.87rem;color:#576a7c}
+.owner-plan-price-inputs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:12px}
+.owner-plan-price-inputs label{font-weight:600;font-size:.87rem;display:grid;gap:5px;min-width:0}
+.owner-plan-price-inputs input,.owner-card-editor input,.owner-card-editor textarea{width:100%;min-width:0;border:1px solid #cdd8e4;border-radius:10px;padding:11px;color:#123b63;background:#fff;font:inherit}
+.owner-plan-price-inputs .btn{min-height:44px}
+.owner-plan-details-title{margin:30px 0 7px}
+.owner-cms-structured{border-top:1px solid #dfe7ee;padding-top:15px;margin-top:8px}
+.owner-card-editor{border:1px solid #dfe7ee;border-radius:12px;padding:12px 15px;margin:10px 0;background:#f9fbfd}
+.owner-card-editor summary{cursor:pointer;display:flex;justify-content:space-between;gap:14px;align-items:baseline;flex-wrap:wrap}
+.owner-card-editor[open] summary{padding-bottom:10px;border-bottom:1px solid #e6edf3;margin-bottom:12px}
+.owner-card-editor label{display:grid;gap:6px;margin:10px 0;font-weight:600;font-size:.9rem}
+.owner-cms-preview{border:1px solid #cdd8e4;border-radius:12px;padding:18px;background:linear-gradient(140deg,#f4f8fc,#fff);display:grid;gap:8px}
+.owner-cms-preview>strong{font-size:1.25rem;color:#123b63}
+.owner-cms-preview p{margin:0;color:#51677f}
+.owner-cms-preview ul{margin:8px 0 0;padding-left:18px}
+@media(max-width:780px){.owner-plan-price-inputs{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.owner-plan-price-inputs .btn{grid-column:1/-1}.owner-card-editor summary{display:block}}
+@media(max-width:520px){.owner-plan-price-inputs{grid-template-columns:1fr}.owner-plan-price-inputs .btn{grid-column:auto}}
