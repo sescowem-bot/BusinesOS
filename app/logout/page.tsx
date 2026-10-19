@@ -19,7 +19,7 @@ export default async function LogoutPage() {
         </Link>
         <h1 id="logout-heading">{user ? 'Sign out of your account?' : 'Sign out'}</h1>
         <p className="muted">
-          {user ? 'You'll be signed out on this device. Your saved work won't be affected.'
+          {user ? "You will be signed out on this device. Your saved work will not be affected."
             : 'You can sign out and return to the login page.'}
         </p>
         {user?.email && <p className="small muted">Signed in as <strong>{user.email}</strong></p>}
