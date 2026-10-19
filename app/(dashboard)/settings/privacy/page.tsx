@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
 import {PrivacyRightsForm} from './request-form';
+import {CookieSettingsButton} from '@/components/cookie-preferences';
 export const dynamic='force-dynamic';
 type RequestRow={id:string;kind:string;details:string;status:string;admin_response:string|null;created_at:string};
 export default async function PrivacySettings(){
