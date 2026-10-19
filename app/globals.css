@@ -724,3 +724,62 @@
 .owner-cms-preview ul{margin:8px 0 0;padding-left:18px}
 @media(max-width:780px){.owner-plan-price-inputs{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.owner-plan-price-inputs .btn{grid-column:1/-1}.owner-card-editor summary{display:block}}
 @media(max-width:520px){.owner-plan-price-inputs{grid-template-columns:1fr}.owner-plan-price-inputs .btn{grid-column:auto}}
+
+/* BusinessOS privacy acknowledgement: signup disclosure and global cookie controls. */
+.bo-legal-agreement{border:1px solid #d4e1ea;border-radius:14px;background:linear-gradient(150deg,#f5f9fc,#fff);padding:18px;display:grid;gap:11px}
+.bo-legal-agreement-head{display:flex;align-items:flex-start;gap:11px}
+.bo-legal-agreement-head svg{color:#16845b;flex-shrink:0;margin-top:3px}
+.bo-legal-agreement-head strong{display:block;font-size:14px;color:#153d57}
+.bo-legal-agreement-head p{margin:4px 0 0;color:#556b7b;font-size:12px;line-height:1.6}
+.bo-legal-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;font-size:12px}
+.bo-legal-links a,.bo-legal-links button{color:#145c8f;text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:700}
+.bo-legal-choice{display:flex!important;align-items:flex-start!important;gap:12px!important;font-size:13px!important;font-weight:500!important;line-height:1.55;color:#19374c;cursor:pointer}
+.bo-legal-choice input{width:19px!important;height:19px!important;min-width:19px!important;flex-shrink:0;margin:2px 0 0;accent-color:#16845b}
+.bo-legal-pending{padding:11px 12px;border-radius:9px;background:#fff5df;color:#75520b;font-size:12px;line-height:1.55}
+.bo-legal-small{color:#637a8a;font-size:12px;line-height:1.5;margin:0}
+.bo-cookie-banner{box-sizing:border-box;position:fixed;z-index:1500;left:20px;bottom:20px;width:min(480px,calc(100vw - 40px));display:flex;align-items:flex-start;gap:14px;padding:22px;border-radius:18px;border:1px solid #d4e5ec;background:#fff;box-shadow:0 20px 72px rgba(12,32,53,.23);color:#172f42}
+.bo-cookie-icon{border-radius:12px;width:44px;height:44px;flex:0 0 44px;background:#e8f4ef;color:#0d7154;display:grid;place-items:center}
+.bo-cookie-banner-copy{min-width:0;flex:1}
+.bo-cookie-banner-copy strong{display:block;font-size:17px;line-height:1.35;letter-spacing:-.02em}
+.bo-cookie-banner-copy p{color:#516879;font-size:13px;line-height:1.6;margin:8px 0 16px}
+.bo-cookie-banner a,.bo-cookie-dialog a{color:#155c88;text-decoration:underline;text-underline-offset:2px;font-weight:700}
+.bo-cookie-banner-actions,.bo-cookie-dialog-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.bo-cookie-primary,.bo-cookie-outline{font:inherit;cursor:pointer;border-radius:10px;min-height:42px;padding:9px 14px;font-size:12px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1.4}
+.bo-cookie-primary{color:#fff;background:#145777;border:1px solid #145777}
+.bo-cookie-primary:hover{background:#10435f}
+.bo-cookie-outline{color:#145777;background:#fff;border:1px solid #c9d9e3}
+.bo-cookie-outline:hover{background:#f0f6fa}
+.bo-cookie-primary:focus-visible,.bo-cookie-outline:focus-visible,.bo-cookie-close:focus-visible,.bo-cookie-footer-trigger:focus-visible{outline:3px solid #59a2da;outline-offset:2px}
+.bo-cookie-dialog{box-sizing:border-box;width:min(560px,calc(100vw - 32px));max-height:min(86dvh,760px);overflow-y:auto;border:1px solid #d5e1e8;border-radius:18px;padding:24px 25px;color:#19364a;background:#fff;box-shadow:0 30px 90px rgba(0,0,0,.3)}
+.bo-cookie-dialog::backdrop{background:rgba(10,32,50,.64)}
+.bo-cookie-dialog-top{display:flex;justify-content:space-between;align-items:center}
+.bo-cookie-dialog-icon{display:grid;place-items:center;background:#e7f4ed;color:#157150;width:46px;height:46px;border-radius:13px}
+.bo-cookie-close{display:grid;place-items:center;width:40px;height:40px;cursor:pointer;background:#f2f6f8;border:0;color:#536c7c;border-radius:9px}
+.bo-cookie-dialog h2{margin:14px 0 9px;font-size:24px;letter-spacing:-.03em;line-height:1.3}
+.bo-cookie-dialog>p{color:#586e7f;font-size:13px;line-height:1.65}
+.bo-cookie-category{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 0;border-top:1px solid #e6edf1}
+.bo-cookie-category strong{font-size:13px;color:#183b53}
+.bo-cookie-category p{margin:4px 0 0;font-size:12px;color:#687d8a;line-height:1.55}
+.bo-cookie-pill{flex-shrink:0;white-space:nowrap;padding:5px 9px;border-radius:999px;background:#e8f4eb;color:#18683c;font-size:11px;font-weight:750}
+.bo-cookie-pill.bo-cookie-off{color:#6c7480;background:#eef1f3}
+.bo-cookie-dialog .bo-cookie-dialog-note{padding:12px;border-radius:9px;background:#f4f8fa;font-size:12px;color:#597084}
+.bo-cookie-dialog-actions{margin-top:20px;justify-content:space-between}
+.bo-cookie-footer-trigger{appearance:none;border:0;background:none;color:#98aabd;cursor:pointer;font:inherit;font-size:11px;padding:0;text-decoration:underline;text-underline-offset:3px}
+.bo-cookie-footer-trigger:hover{color:#fff}
+.marketing-footer-bottom>span:last-child{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+@media(max-width:600px){
+ .bo-cookie-banner{left:12px;bottom:12px;width:calc(100vw - 24px);padding:16px;gap:10px}
+ .bo-cookie-icon{width:35px;height:35px;flex-basis:35px}
+ .bo-cookie-banner-copy strong{font-size:15px}
+ .bo-cookie-banner-actions{flex-direction:column;align-items:stretch}
+ .bo-cookie-banner-actions button{width:100%}
+ .bo-cookie-dialog{padding:20px}
+ .bo-cookie-category{flex-wrap:wrap}
+}
+
+/* Privacy controls must remain accessible in every signup and settings view. */
+.bo-legal-cookies-link,.bo-privacy-open-cookies{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:#145c8f;text-decoration:underline;text-underline-offset:3px;font-family:inherit;font-size:12px;font-weight:750;cursor:pointer;text-align:left}
+.bo-privacy-open-cookies{font-size:13px}
+.bo-legal-links a{display:inline-flex;align-items:center;gap:3px}
+.bo-legal-cookies-link:hover,.bo-privacy-open-cookies:hover{color:#0f456f}
+.bo-legal-cookies-link:focus-visible,.bo-privacy-open-cookies:focus-visible{outline:3px solid #59a2da;outline-offset:2px}
