@@ -20,5 +20,5 @@ export async function requestUpgrade(_previous:UpgradeResult,form:FormData):Prom
   return {ok:false,message:'The upgrade request could not be saved. Please try again or contact platform support.'};
  }
  revalidatePath('/upgrade');revalidatePath('/admin/upgrades');
- return {ok:true,message:'Your request has been submitted for platform administrator review. Your current plan remains unchanged.'};
+ return {ok:true,message:'Your upgrade request has been sent. Our team will review it, and you can follow its progress here. Your current plan remains active.'};
 }

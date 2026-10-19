@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import {usePathname} from 'next/navigation';
 import {Cookie,ShieldCheck,SlidersHorizontal,X} from 'lucide-react';
 
 // No optional tracking tags are activated by BusinessOS in this release.
@@ -18,6 +19,8 @@ export function CookieSettingsButton({className=''}:{className?:string}){
 }
 
 export function CookiePreferences(){
+ const pathname=usePathname();
+ const showPublicBanner=!/^\/(admin|dashboard|settings|upgrade|orders|customers|expenses|inventory|pos|accounting|reports|tax|products|communications)(?:\/|$)/.test(pathname||'');
  const dialogRef=useRef<HTMLDialogElement>(null);
  const [showBanner,setShowBanner]=useState(false);
  const [open,setOpen]=useState(false);
@@ -45,7 +48,7 @@ export function CookiePreferences(){
  }
 
  return <>
-  {showBanner&&<aside className="bo-cookie-banner" aria-label="Cookie information" role="region">
+  {showBanner&&showPublicBanner&&<aside className="bo-cookie-banner" aria-label="Cookie information" role="region">
    <div className="bo-cookie-icon" aria-hidden="true"><Cookie size={22}/></div>
    <div className="bo-cookie-banner-copy">
     <strong>Your privacy matters</strong>
