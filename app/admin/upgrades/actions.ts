@@ -7,7 +7,7 @@ export async function reviewUpgrade(_previous:ReviewResult,form:FormData):Promis
  const id=String(form.get('request_id')||'');
  const decision=String(form.get('decision')||'');
  const note=String(form.get('note')||'').trim();
- if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)||!['approve','reject'].includes(decision)||note.length>1200)return {ok:false,message:'Review details are invalid.'};
+ if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)||!['approve','reject'].includes(decision)||note.length<5||note.length>1200)return {ok:false,message:'Choose a decision and write a brief response (5–1,200 characters).'};
  const {error}=await session.client.rpc('review_business_upgrade',{p_request_id:id,p_approve:decision==='approve',p_note:note});
  if(error){
   const msg=error.message.toLowerCase();
@@ -16,5 +16,5 @@ export async function reviewUpgrade(_previous:ReviewResult,form:FormData):Promis
   return {ok:false,message:'The review could not be saved. Check database permissions or contact support.'};
  }
  revalidatePath('/admin/upgrades');revalidatePath('/admin/businesses');revalidatePath('/upgrade');
- return {ok:true,message:`Request ${decision==='approve'?'approved':'rejected'} successfully.`};
+ return {ok:true,message:decision==='approve'?'Request accepted. Plan access is unchanged until the customer completes verified payment or an authorised administrator makes a separate audited assignment.':'Request declined. The customer can see your response in their billing page.'};
 }
