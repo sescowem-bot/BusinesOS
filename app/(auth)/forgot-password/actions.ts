@@ -17,5 +17,5 @@ export async function requestReset(_state:ResetState,form:FormData):Promise<Rese
   }
  }catch{return {message:'Password recovery is temporarily unavailable. Please try again later.',retryAfterSeconds:0,rateLimited:false};}
  // Prevent account enumeration: always give the same success text for unknown addresses.
- return {message:'If an account exists for that address, a reset link will be sent. Check your inbox and Spam/Junk folder.',retryAfterSeconds:0,rateLimited:false};
+ return {message:'If this email is linked to an account, we'll send you a reset link. Check your inbox and junk folder.',retryAfterSeconds:0,rateLimited:false};
 }

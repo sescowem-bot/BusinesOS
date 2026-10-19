@@ -17,8 +17,8 @@ export async function submitPrivacyRequest(_:PrivacyRequestState,form:FormData):
   const {error}=await w.client.rpc('submit_privacy_rights_request',{
    p_business:scope==='business'?w.businessId:null,p_kind:kind,p_details:details
   });
-  if(error){console.error('[privacy] submit',{code:error.code});return {ok:false,message:'We could not submit the request. Check that database migration 051 is installed.'};}
+  if(error){console.error('[privacy] submit',{code:error.code});return {ok:false,message:'We couldn't send your request right now. Please try again or contact support.'};}
   revalidatePath('/settings/privacy');
-  return {ok:true,message:'Your request was received. We will review it securely and may ask you to verify your identity.'};
+  return {ok:true,message:'Your request has been received. We'll review it and contact you if we need more information.'};
  }catch{return {ok:false,message:'Unable to submit your request. Please sign in and try again.'};}
 }

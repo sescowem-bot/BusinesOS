@@ -19,8 +19,8 @@ export default async function LogoutPage() {
         </Link>
         <h1 id="logout-heading">{user ? 'Sign out of your account?' : 'Sign out'}</h1>
         <p className="muted">
-          {user ? 'This will end your current session on this browser. Your business records will remain safe.'
-            : 'Use the button below to end any current session and return to the sign-in page.'}
+          {user ? 'You'll be signed out on this device. Your saved work won't be affected.'
+            : 'You can sign out and return to the login page.'}
         </p>
         {user?.email && <p className="small muted">Signed in as <strong>{user.email}</strong></p>}
         <form action={signOut} style={{ marginTop: 24 }}>
