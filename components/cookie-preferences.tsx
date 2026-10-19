@@ -49,9 +49,9 @@ export function CookiePreferences(){
    <div className="bo-cookie-icon" aria-hidden="true"><Cookie size={22}/></div>
    <div className="bo-cookie-banner-copy">
     <strong>Your privacy matters</strong>
-    <p>BusinessOS uses essential cookies for account sign-in and security. Optional analytics and advertising cookies are not enabled in this release. Read our <Link href="/cookies">Cookie Notice</Link>.</p>
+    <p>We use essential cookies to keep the site working and protect your account. We don't currently use advertising or analytics cookies. Read our <Link href="/cookies">Cookie Notice</Link>.</p>
     <div className="bo-cookie-banner-actions">
-     <button type="button" className="bo-cookie-primary" onClick={acknowledge}>Continue with essential cookies</button>
+     <button type="button" className="bo-cookie-primary" onClick={acknowledge}>Continue</button>
      <button type="button" className="bo-cookie-outline" onClick={()=>setOpen(true)}><SlidersHorizontal size={15}/> View cookie settings</button>
     </div>
    </div>
@@ -62,9 +62,9 @@ export function CookiePreferences(){
     <button type="button" className="bo-cookie-close" onClick={()=>setOpen(false)} aria-label="Close cookie settings"><X size={20}/></button>
    </div>
    <h2 id="bo-cookie-heading">Cookie preferences</h2>
-   <p id="bo-cookie-description">Your choices should be clear. The current BusinessOS application uses essential account and security cookies; it does not activate optional analytics or advertising cookies.</p>
+   <p id="bo-cookie-description">We use essential cookies for sign-in and security. Optional analytics and advertising cookies are not currently in use.</p>
    <div className="bo-cookie-category">
-    <div><strong>Strictly necessary</strong><p>Supports sessions, authentication and account security.</p></div>
+    <div><strong>Essential cookies</strong><p>Helps you sign in safely and use the site.</p></div>
     <span className="bo-cookie-pill">Always active</span>
    </div>
    <div className="bo-cookie-category">
@@ -75,9 +75,9 @@ export function CookiePreferences(){
     <div><strong>Advertising &amp; marketing</strong><p>Optional advertising and tracking cookies are not enabled.</p></div>
     <span className="bo-cookie-pill bo-cookie-off">Not in use</span>
    </div>
-   <p className="bo-cookie-dialog-note">We won't treat acknowledgement of essential cookies as marketing consent. If optional cookies are introduced, we'll provide a separate opt-in choice before using them.</p>
+   <p className="bo-cookie-dialog-note">You can reopen these settings from the footer whenever you need them.</p>
    <div className="bo-cookie-dialog-actions">
-    <button type="button" className="bo-cookie-primary" onClick={acknowledge}>Save essential-only preference</button>
+    <button type="button" className="bo-cookie-primary" onClick={acknowledge}>Save preferences</button>
     <Link href="/cookies" onClick={()=>setOpen(false)}>Read Cookie Notice</Link>
    </div>
   </dialog>

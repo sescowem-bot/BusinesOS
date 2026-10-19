@@ -12,9 +12,9 @@ export default function LoginForm(){
  return <form action={action} className="auth-friendly-form">
    <div className="field"><label htmlFor="login-email">Email address</label><input id="login-email" name="email" type="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" required placeholder="you@example.com"/></div>
    <div className="field"><div className="auth-label-row"><label htmlFor="login-password">Password</label><Link href="/forgot-password">Forgot password?</Link></div><div className="auth-password-wrap"><input id="login-password" name="password" type={showPassword?'text':'password'} autoComplete="current-password" required/><button type="button" className="auth-password-toggle" onClick={()=>setShowPassword(x=>!x)} aria-label={showPassword?'Hide password':'Show password'} aria-pressed={showPassword}>{showPassword?'Hide':'Show'}</button></div></div>
-   <label className="bo-login-remember"><input type="checkbox" name="remember_device" value="on"/><span><strong>Stay signed in on this device</strong><small>Choose this only on a personal device. On shared devices, leave it off and sign out when finished.</small></span></label>
+   <label className="bo-login-remember"><input type="checkbox" name="remember_device" value="on"/><span><strong>Keep me signed in</strong><small>Use this only on your own device.</small></span></label>
    <button className="btn btn-primary auth-submit" type="submit" disabled={pending||countdown>0}>{pending?'Signing you in…':countdown>0?`Try again in ${countdown}s`:'Sign in'}</button>
-   {state.error&&<div role="alert" className="auth-feedback auth-feedback-error"><strong>Unable to sign in</strong><p>{state.error}</p>{state.reason==='unconfirmed'&&<p>Check your inbox and Spam/Junk folder for the confirmation email.</p>}</div>}
-   <p className="auth-field-help">New to BusinessOS? <Link href="/signup">Create a business account</Link>.</p>
+   {state.error&&<div role="alert" className="auth-feedback auth-feedback-error"><strong>We couldn't sign you in</strong><p>{state.error}</p>{state.reason==='unconfirmed'&&<p>Check your inbox and Spam/Junk folder for the confirmation email.</p>}</div>}
+   <p className="auth-field-help">New here? <Link href="/signup">Create an account</Link>.</p>
  </form>;
 }

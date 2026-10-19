@@ -11,8 +11,8 @@ check(!proxy.slice(proxy.indexOf('export const config')).includes('login'), 'log
 check(!root.includes("dynamic='force-dynamic'"),'root forces dynamic rendering');
 check(root.includes('revalidate=60'), 'root cache window absent');
 for(const [name,page] of [['home',home],['slug',publicPage],['pricing',pricing]]){
- check(page.includes('revalidate=60'),name+' public revalidation absent');
- check(!page.includes('getViewerAccess()'),name+' unnecessarily reads auth cookies');
+ check(page.includes("dynamic='force-dynamic'"),name+' must render account-aware navigation on each request');
+ check(page.includes('getViewerAccess()'),name+' must show the correct signed-in workspace navigation');
 }
 check(brand.includes('unstable_cache')&&brand.includes("tags:['businessos-public-brand']"),'brand cache missing');
 check(cms.includes('unstable_cache')&&cms.includes("tags:['businessos-public-pages']"),'public CMS cache missing');

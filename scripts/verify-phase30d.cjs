@@ -16,7 +16,7 @@ for(const guard of ['AUTOMATION_RUNNER_SECRET','ENABLE_AUTOMATION_RUNS','ENABLE_
 assert(admin.includes('requirePlatformAdmin')&&admin.includes('AutomationRuleForm'),'Admin UI must be restricted');
 assert(owner.includes(".eq('business_id',businessId)"),'Customer query must be tenant-scoped');
 assert.deepStrictEqual(fs.readdirSync(root).filter(f=>f.endsWith('.md')),['README.md']);
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');let n=0;
+const ts=require('./load-typescript.cjs');let n=0;
 for(const p of ['app/api/internal/automation-dispatch/route.ts','app/admin/automations/page.tsx','app/admin/automations/rule-form.tsx','app/admin/automations/actions.ts','app/(dashboard)/automations/requests/page.tsx','app/api/webhooks/resend/route.ts']){
  const f=ts.createSourceFile(p,read(p),ts.ScriptTarget.Latest,true,p.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  assert.equal(f.parseDiagnostics.length,0,`TS syntax issue ${p}`);n++;

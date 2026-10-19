@@ -28,7 +28,7 @@ const secret='whsec_'+crypto.randomBytes(24).toString('base64');
 const sig='v1,'+crypto.createHmac('sha256',Buffer.from(secret.slice(6),'base64')).update(`${id}.${stamp}.${body}`).digest('base64');
 // Use the global TypeScript install when available; assertion also checks wire format.
 try{
- const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
+ const ts=require('typescript');
  const source=ts.transpileModule(p,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
  const Module=require('node:module'),m=new Module('verify-ts',module);m.filename='verify-ts';m.paths=module.paths;m._compile(source,'verify-ts');
  assert(m.exports.verifyResendSignature(body,new Headers({'svix-id':id,'svix-timestamp':stamp,'svix-signature':sig}),secret));

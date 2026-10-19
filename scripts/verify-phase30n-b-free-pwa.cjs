@@ -16,8 +16,8 @@ const up=rd('app/(dashboard)/upgrade/page.tsx');
 expect(up.includes("current==='free'")&&up.includes('Free forever'),'Free is included at no cost');
 expect(up.includes("plan.id==='free'?")&&up.includes('Included automatically'),'Free plan is assigned automatically without approval');
 expect(!up.includes('No approved plan assigned yet'),'confusing unassigned plan message removed');
-expect(rd('app/onboarding/page.tsx').includes('Free plan and Owner'),'new owner onboarding promise');
-expect(rd('app/onboarding/form.tsx').includes('Your Owner role'),'owner role documented');
+expect(rd('app/onboarding/page.tsx').includes('Tell us about your business'),'friendly workspace introduction');
+expect(rd('app/onboarding/form.tsx').includes('Start with the Free plan'),'Free plan clearly explained without internal roles');
 const manifest=rd('app/manifest.ts');
 for(const needle of ["start_url:'/dashboard'","display:'standalone'","scope:'/'","purpose:'maskable'","getPlatformBrand"])
  expect(manifest.includes(needle),`manifest: ${needle}`);

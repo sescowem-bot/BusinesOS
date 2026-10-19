@@ -20,13 +20,13 @@ export function PrivacyRightsForm({owner}:{owner:boolean}){
   <label>Data concerned
    <select name="scope" defaultValue="mine">
     <option value="mine">My account data</option>
-    {owner&&<option value="business">Records held for my business workspace</option>}
+    {owner&&<option value="business">My business records</option>}
    </select>
   </label>
   <label>Describe the request
-   <textarea name="details" minLength={10} maxLength={2000} rows={5} required placeholder="Explain which records or processing you mean. Never include passwords, tokens or payment card details."/>
+   <textarea name="details" minLength={10} maxLength={2000} rows={5} required placeholder="Tell us what you'd like help with. Don't include passwords or card details."/>
   </label>
-  <p className="small muted">Submitting a request does not automatically delete legal or financial records. We verify identity, examine applicable legal obligations and explain the outcome. For data your business controls about its own customers, your business remains responsible for its lawful handling.</p>
+  <p className="small muted">We'll check your identity before taking action. Some records may need to be kept for legal or accounting reasons.</p>
   <button className="btn btn-primary" type="submit" disabled={pending}>{pending?'Submitting…':'Send privacy request'}</button>
   {state.message&&<p role="status" className={state.ok?'positive':'negative'}>{state.message}</p>}
  </form>;
