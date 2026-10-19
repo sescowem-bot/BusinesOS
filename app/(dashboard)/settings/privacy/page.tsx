@@ -17,7 +17,7 @@ export default async function PrivacySettings(){
    <section className="card card-pad"><h2>Your information</h2>
     <p>Your sign-in information and business records can have different data controllers. We review each request according to its scope and the law.</p>
     <p>Account closure and data deletion are subject to identity checks, applicable legal record-keeping and backup schedules. No deletion occurs simply because you submit this form.</p>
-    <p className="small muted">See <Link href="/privacy">Privacy Notice</Link>, <Link href="/terms">Terms</Link> and <Link href="/cookies">Cookie Notice</Link>. Check if each document has received final approval before relying on it.</p>
+    <p><CookieSettingsButton className="bo-privacy-open-cookies"/></p><p className="small muted">See <Link href="/privacy">Privacy Notice</Link>, <Link href="/terms">Terms</Link> and <Link href="/cookies">Cookie Notice</Link>. Check if each document has received final approval before relying on it.</p>
     <p className="small muted">Do not send sensitive personal or payment details in your request text.</p>
    </section>
   </div>
