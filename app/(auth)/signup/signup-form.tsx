@@ -2,8 +2,9 @@
 import {useActionState,useEffect,useState} from 'react';
 import Link from 'next/link';
 import {signUp,type SignupState} from './actions';
+import type {ActiveTerms} from '@/lib/server/legal-documents';
 const initial:SignupState={error:'',success:'',retryAfterSeconds:0,reason:''};
-export default function SignupForm(){
+export default function SignupForm({terms,available}:{terms:ActiveTerms|null;available:boolean}){
  const [state,action,pending]=useActionState(signUp,initial);
  const [showPassword,setShowPassword]=useState(false);
  const [showConfirm,setShowConfirm]=useState(false);
@@ -16,7 +17,8 @@ export default function SignupForm(){
   <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" required maxLength={254} placeholder="you@example.com"/></div>
   <div className="field"><label htmlFor="password">Create password</label><div className="auth-password-wrap"><input id="password" name="password" type={showPassword?'text':'password'} required minLength={12} maxLength={128} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} aria-describedby="password-guidance"/><button type="button" className="auth-password-toggle" onClick={()=>setShowPassword(x=>!x)} aria-label={showPassword?'Hide password':'Show password'} aria-pressed={showPassword}>{showPassword?'Hide':'Show'}</button></div><p className="auth-field-help" id="password-guidance">Use at least 12 characters. A longer, unique password is safer.</p></div>
   <div className="field"><label htmlFor="confirm_password">Confirm password</label><div className="auth-password-wrap"><input id="confirm_password" name="confirm_password" type={showConfirm?'text':'password'} required minLength={12} maxLength={128} autoComplete="new-password"/><button type="button" className="auth-password-toggle" onClick={()=>setShowConfirm(x=>!x)} aria-label={showConfirm?'Hide confirmation':'Show confirmation'} aria-pressed={showConfirm}>{showConfirm?'Hide':'Show'}</button></div></div>
-  <button className="btn btn-primary auth-submit" disabled={pending||countdown>0||password.length<12||Boolean(state.success)}>{pending?'Creating your account…':countdown>0?`Try again in ${countdown}s`:'Create account'}</button>
+  {terms&&<div className="field"><input type="hidden" name="terms_document_id" value={terms.id}/><label className="cms-check"><input name="accept_terms" type="checkbox" required/> I have read and agree to the <Link href="/terms" target="_blank">Terms of Service (version {terms.version_label})</Link>.</label><p className="auth-field-help">Read our <Link href="/privacy" target="_blank">Privacy Notice</Link>. Marketing consent is not required for registration.</p></div>}
+  <button className="btn btn-primary auth-submit" disabled={!available||pending||countdown>0||password.length<12||Boolean(state.success)}>{pending?'Creating your account…':countdown>0?`Try again in ${countdown}s`:'Create account'}</button>
   {state.error&&<div role="alert" className="auth-feedback auth-feedback-error"><strong>We couldn't complete this request.</strong><p>{state.error}</p>{state.reason==='rate_limit'&&<p>Please avoid repeated attempts while email delivery is restricted.</p>}</div>}
   {state.success&&<div role="status" className="auth-feedback auth-feedback-success"><strong>Check your email</strong><p>{state.success}</p><Link href="/login">Continue to sign in →</Link></div>}
   <p className="auth-field-help">By registering, you can securely set up a business workspace after verifying your email.</p>
