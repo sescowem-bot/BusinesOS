@@ -15,18 +15,19 @@ export async function signUp(_state:SignupState,data:FormData):Promise<SignupSta
  if(password!==confirm)return failed('The two passwords do not match. Please check and try again.');
  const terms=await getActiveTerms();
  if(!terms.available)return failed('Registration is temporarily unavailable while legal document availability is checked.');
- if(terms.document&&(data.get('accept_terms')!=='on'||data.get('terms_document_id')!==terms.document.id))
-  return failed('Read and accept the current Terms of Service to create your account.');
+ if(data.get('accept_terms')!=='on')return failed('Please review and acknowledge the Terms information and Privacy Notice before creating your account.');
+ if(terms.document&&data.get('terms_document_id')!==terms.document.id)return failed('The Terms have changed. Please review the current version before continuing.');
  const client=await getServerSupabase();
  if(!client)return failed('Registration is temporarily unavailable. Please contact BusinessOS support.');
  const site=process.env.NEXT_PUBLIC_SITE_URL||process.env.NEXT_PUBLIC_APP_URL;
  const redirectUrl=site&&/^https:\/\/[^/]+/.test(site)?`${site.replace(/\/$/,'')}/auth/callback?next=/onboarding`:undefined;
  const metadata:Record<string,string|boolean>={full_name:name};
+ // Unapproved notices acknowledgement is NOT recorded as binding legal consent.
  if(terms.document){metadata.businessos_terms_accepted=true;metadata.businessos_terms_document_id=terms.document.id;}
  let result;
  try{result=await client.auth.signUp({email,password,options:{data:metadata,...(redirectUrl?{emailRedirectTo:redirectUrl}:{})}})}
  catch{return failed('Registration is temporarily unavailable. Please try again later.');}
  if(result.error){const feedback=explainAuthError(result.error,'signup');return {error:feedback.message,success:'',retryAfterSeconds:feedback.retryAfterSeconds,reason:feedback.reason};}
- if(!result.data.session)return {error:'',success:'Registration request received. Check your email (and Spam/Junk) for a verification link before signing in.',retryAfterSeconds:0,reason:''};
+ if(!result.data.session)return {error:'',success:`We've sent an account verification link to ${email}. Open the email and select Confirm to activate your account. If you don't see it after a few minutes, check your spam folder.`,retryAfterSeconds:0,reason:''};
  redirect('/onboarding');
 }
