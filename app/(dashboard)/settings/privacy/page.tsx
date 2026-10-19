@@ -25,7 +25,7 @@ export default async function PrivacySettings(){
    {error?<p role="alert">We couldn't load your requests right now. Please refresh this page or contact support.</p>:
    requests.length===0?<p className="muted">You have no submitted privacy requests.</p>:
    <div className="table-wrap"><table className="table"><thead><tr><th>Submitted</th><th>Request</th><th>Status</th><th>Response</th></tr></thead><tbody>
-    {requests.map(r=><tr key={r.id}><td>{new Date(r.created_at).toLocaleDateString('en-NG')}</td><td><strong>{r.kind.replace(/_/g,' ')}</strong><p className="small muted">{r.details}</p></td><td>{r.status.replace(/_/g,' ')}</td><td>{r.admin_response||'We'll update you here'}</td></tr>)}
+    {requests.map(r=><tr key={r.id}><td>{new Date(r.created_at).toLocaleDateString('en-NG')}</td><td><strong>{r.kind.replace(/_/g,' ')}</strong><p className="small muted">{r.details}</p></td><td>{r.status.replace(/_/g,' ')}</td><td>{r.admin_response||"We will update you here"}</td></tr>)}
    </tbody></table></div>}
   </section>
  </main>;
