@@ -5,6 +5,7 @@ export type PublicPage={slug:string;title:string;eyebrow:string;description:stri
 export type PublicPlan={id:string;name:string;price_monthly_ngn?:number|null;price_yearly_ngn?:number|null;price_label:string;billing_label:string;description:string;features:string[];cta_label:string;cta_url:string;sort_order:number;published:boolean};
 const defaults:Record<string,PublicPage>={
  home:{slug:'home',title:'Run sales, track payments and keep your business moving.',eyebrow:'YOUR BUSINESS, ONE ORGANISED WORKSPACE',description:'Keep customers, orders, part payments, invoices, products and expenses connected. Start with Free and add more business tools when you need them.',sections:[],published:true},
+ pricing:{slug:'pricing',title:'Choose a plan that fits your business.',eyebrow:'SIMPLE, TRANSPARENT PRICING',description:'Compare our Free, Starter, Growth and Professional plans. See monthly and annual prices and what each plan includes.',sections:[],published:true},
  features:{slug:'features',title:'One place for sales, customers, invoices and everything in between.',eyebrow:'EXPLORE THE PLATFORM',description:'See what you can actually do in BusinessOS: manage everyday business records, follow customer payments, issue documents and expand into POS, stock and finance when your plan includes them.',sections:[
  {heading:'Customers and relationships',body:'Keep customer details, order histories and amounts owed close at hand. Give your team one reliable place to find the next action.'},
  {heading:'Orders and collections',body:'Record what was sold, capture full or partial payments, and keep track of outstanding balances without piecing together separate spreadsheets.'},
@@ -91,14 +92,54 @@ export const getPublicPage=unstable_cache(async (slug:string):Promise<(PublicPag
   return {...data,title:updatedTitle,description:updatedDescription,eyebrow:updatedEyebrow,sections:Array.isArray(data.sections)?data.sections.filter((section:unknown):section is {key?:unknown;heading:string;body:string}=>Boolean(section&&typeof section==='object'&&'heading' in section&&'body' in section&&typeof section.heading==='string'&&typeof section.body==='string')).map(section=>({heading:section.heading,body:section.body,...(typeof section.key==='string'?{key:section.key}:{})})):[],reviewRequired:false} as PublicPage & {reviewRequired?:boolean};
  }catch{return draft||(fallback?.published?fallback:null)}
 },['businessos-public-pages-v1'],{revalidate:60,tags:['businessos-public-pages']});
-export const getPublishedPlans=unstable_cache(async ():Promise<PublicPlan[]>=>{
- const client=publicClient();if(!client)return [];
+/** Public catalog result. Database failures are NOT treated as "no plans published". */
+export type PublicPricingResult={plans:PublicPlan[];available:boolean};
+function normalizePublicPlans(rows:unknown):PublicPlan[]{
+ if(!Array.isArray(rows))return [];
+ return rows.filter((x):x is Record<string,unknown>=>!!x&&typeof x==='object'&&!Array.isArray(x)&&typeof (x as Record<string,unknown>).id==='string'&&(x as Record<string,unknown>).published===true)
+  .map(p=>({
+   id:String(p.id),name:String(p.name??''),price_label:String(p.price_label??''),
+   price_monthly_ngn:p.price_monthly_ngn==null?null:Number(p.price_monthly_ngn),
+   price_yearly_ngn:p.price_yearly_ngn==null?null:Number(p.price_yearly_ngn),
+   billing_label:String(p.billing_label??''),description:String(p.description??''),
+   features:Array.isArray(p.features)?p.features.filter((f:unknown):f is string=>typeof f==='string'):[],
+   cta_label:String(p.cta_label??''),cta_url:String(p.cta_url??'/contact'),
+   sort_order:Number(p.sort_order??0),published:true
+  })).sort((x,y)=>x.sort_order-y.sort_order);
+}
+/**
+ * Fetch live pricing each request instead of caching an empty array after an RLS
+ * error. Migration 054 adds the explicit published-only RPC and repairs anon RLS.
+ * The original direct SELECT is retained to support rolling deployments.
+ */
+export async function getPublicPricingResult():Promise<PublicPricingResult>{
+ const client=publicClient();
+ if(!client){
+  console.error('[public-pricing] Supabase public URL or publishable key not configured');
+  return {plans:[],available:false};
+ }
  try{
-  const {data,error}=await client.from('public_site_plans').select('id,name,price_label,price_monthly_ngn,price_yearly_ngn,billing_label,description,features,cta_label,cta_url,sort_order,published').eq('published',true).order('sort_order');
-  if(error)return [];
-  return (data||[]).map(p=>({...p,features:Array.isArray(p.features)?p.features.filter((f:unknown):f is string=>typeof f==='string'):[]})) as PublicPlan[];
- }catch{return []}
-},['businessos-public-plans-v1'],{revalidate:60,tags:['businessos-public-plans']});
+  const {data:catalog,error:rpcError}=await client.rpc('published_subscription_plan_catalog');
+  if(!rpcError&&Array.isArray(catalog))return {plans:normalizePublicPlans(catalog),available:true};
+  if(rpcError&&rpcError.code!=='PGRST202'&&rpcError.code!=='42883'){
+   console.error('[public-pricing] catalog RPC failed',{code:rpcError.code,message:rpcError.message});
+  }
+  const {data,error}=await client.from('public_site_plans')
+   .select('id,name,price_label,price_monthly_ngn,price_yearly_ngn,billing_label,description,features,cta_label,cta_url,sort_order,published')
+   .eq('published',true).order('sort_order');
+  if(error){
+   console.error('[public-pricing] direct published-plan SELECT failed',{code:error.code,message:error.message});
+   return {plans:[],available:false};
+  }
+  return {plans:normalizePublicPlans(data),available:true};
+ }catch(e){
+  console.error('[public-pricing] public plan lookup unexpected error',e instanceof Error?e.message:'unknown');
+  return {plans:[],available:false};
+ }
+}
+export async function getPublishedPlans():Promise<PublicPlan[]>{
+ return (await getPublicPricingResult()).plans;
+}
 /** Published feature lookup is intentionally limited to published plans and enabled modules. */
 export const getPublishedPlanCapabilities=unstable_cache(async ():Promise<{byPlan:Record<string,string[]>;available:boolean}>=>{
  const client=publicClient();
