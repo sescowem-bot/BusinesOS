@@ -5,6 +5,8 @@
 export const DEVICE_SESSION_COOKIE='businessos_device_session';
 export const REMEMBER_DEVICE_MAX_AGE=60*60*24*30;
 export function authCookieOptions<T extends {maxAge?:number;expires?:Date}>(original:T,remember:boolean):T{
+ // Preserve Supabase cookie deletion instructions (Max-Age=0) exactly.
+ if(original.maxAge===0 || (original.expires instanceof Date&&original.expires.getTime()<=Date.now()))return original;
  const options={...original};
  delete options.maxAge;
  delete options.expires;
