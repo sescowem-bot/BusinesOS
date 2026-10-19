@@ -41,7 +41,8 @@ CREATE FUNCTION public.prevent_published_legal_edits() RETURNS trigger
 BEGIN
  IF TG_OP='DELETE' AND OLD.published THEN RAISE EXCEPTION 'Published legal evidence is immutable'; END IF;
  IF TG_OP='UPDATE' AND OLD.published THEN RAISE EXCEPTION 'Published legal evidence is immutable'; END IF;
- RETURN CASE WHEN TG_OP='DELETE' THEN OLD ELSE NEW END;
+ IF TG_OP='DELETE' THEN RETURN OLD; END IF;
+ RETURN NEW;
 END$$;
 REVOKE ALL ON FUNCTION public.prevent_published_legal_edits() FROM PUBLIC,anon,authenticated;
 CREATE TRIGGER legal_versions_immutable BEFORE UPDATE OR DELETE ON public.legal_document_versions
@@ -149,4 +150,61 @@ BEGIN
 END$$;
 REVOKE ALL ON FUNCTION public.review_privacy_rights_request(uuid,text,text) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.review_privacy_rights_request(uuid,text,text) TO authenticated;
+
+-- Server-validated submission only; prevent automatic submission spam and tenant spoofing.
+CREATE FUNCTION public.submit_privacy_rights_request(p_business uuid,p_kind text,p_details text)
+ RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE v_user uuid:=auth.uid();v_id uuid;v_count integer;
+BEGIN
+ IF v_user IS NULL THEN RAISE EXCEPTION 'Authentication required' USING ERRCODE='42501'; END IF;
+ IF p_kind NOT IN ('access','correction','portability','deletion','restriction','objection','consent','other')
+  OR length(trim(coalesce(p_details,'')))<10 OR length(p_details)>2000
+ THEN RAISE EXCEPTION 'Invalid privacy request' USING ERRCODE='22023'; END IF;
+ IF p_business IS NOT NULL AND NOT public.is_business_owner(p_business)
+ THEN RAISE EXCEPTION 'Only the business owner may submit for a workspace' USING ERRCODE='42501'; END IF;
+ -- Serialise requests per account, avoiding concurrent bypass of the daily limit.
+ PERFORM pg_advisory_xact_lock(hashtext(v_user::text),5171);
+ SELECT count(*) INTO v_count FROM public.privacy_rights_requests
+ WHERE requested_by=v_user AND created_at>now()-interval '24 hours';
+ IF v_count>=10 THEN RAISE EXCEPTION 'Daily privacy request limit reached; contact support for urgent issues' USING ERRCODE='P0001'; END IF;
+ INSERT INTO public.privacy_rights_requests(requested_by,business_id,kind,details)
+ VALUES(v_user,p_business,p_kind,trim(p_details)) RETURNING id INTO v_id;
+ RETURN v_id;
+END$$;
+REVOKE INSERT ON public.privacy_rights_requests FROM authenticated;
+REVOKE ALL ON FUNCTION public.submit_privacy_rights_request(uuid,text,text) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.submit_privacy_rights_request(uuid,text,text) TO authenticated;
+
+-- Append-only audit trail; no frontend permission to forge audit events.
+CREATE TABLE public.privacy_rights_request_events(
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ request_id uuid NOT NULL REFERENCES public.privacy_rights_requests(id) ON DELETE CASCADE,
+ actor_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+ event_type text NOT NULL CHECK(event_type IN ('submitted','status_changed')),
+ previous_status text,
+ new_status text NOT NULL,
+ occurred_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX privacy_request_events_request ON public.privacy_rights_request_events(request_id,occurred_at);
+ALTER TABLE public.privacy_rights_request_events ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.privacy_rights_request_events FROM PUBLIC,anon,authenticated;
+GRANT SELECT ON public.privacy_rights_request_events TO authenticated;
+CREATE POLICY privacy_events_platform_admin_read ON public.privacy_rights_request_events FOR SELECT TO authenticated USING(
+ EXISTS(SELECT 1 FROM public.platform_admins a WHERE a.user_id=auth.uid() AND a.active)
+);
+CREATE FUNCTION public.log_privacy_request_event() RETURNS trigger
+ LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+BEGIN
+ IF TG_OP='INSERT' THEN
+  INSERT INTO public.privacy_rights_request_events(request_id,actor_id,event_type,new_status)
+  VALUES(NEW.id,auth.uid(),'submitted',NEW.status);
+ ELSIF OLD.status IS DISTINCT FROM NEW.status THEN
+  INSERT INTO public.privacy_rights_request_events(request_id,actor_id,event_type,previous_status,new_status)
+  VALUES(NEW.id,auth.uid(),'status_changed',OLD.status,NEW.status);
+ END IF;
+ RETURN NEW;
+END$$;
+REVOKE ALL ON FUNCTION public.log_privacy_request_event() FROM PUBLIC,anon,authenticated;
+CREATE TRIGGER privacy_request_event_log AFTER INSERT OR UPDATE ON public.privacy_rights_requests
+ FOR EACH ROW EXECUTE FUNCTION public.log_privacy_request_event();
 COMMIT;
