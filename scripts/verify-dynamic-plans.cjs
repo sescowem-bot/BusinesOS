@@ -21,4 +21,8 @@ assert.ok(publicCms.includes('return {plans:[],available:false}')&&publicCms.inc
 const sql054=read('supabase/migrations/054_public_pricing_read_repair.sql');
 assert.ok(sql054.includes('WHERE p.published IS TRUE')&&sql054.includes('GRANT EXECUTE ON FUNCTION public.published_subscription_plan_catalog() TO anon,authenticated'),'Public pricing RPC must expose only published plans');
 assert.ok(sql054.includes('USING (published IS TRUE)'),'Anonymous read policy must not query private administrator tables');
+const fix056=read('supabase/migrations/056_free_entitlement_trigger_42703.sql');
+assert.ok(fix056.includes("TG_TABLE_NAME='platform_plan_features' THEN")&&fix056.includes("TG_TABLE_NAME='plan_parent_links' THEN"),'SQL 056 must separate feature rows from plan-parent rows');
+assert.ok(fix056.includes("NEW.enabled IS TRUE")&&fix056.includes("NEW.plan_id='free'"),'Free plan restrictions must be preserved');
+assert.ok(fix056.includes('CREATE OR REPLACE FUNCTION public.prevent_free_entitlement_override()'),'SQL 056 must replace the existing shared trigger body');
 console.log('Dynamic plans source / permission invariants passed. Live RLS and migrations require Supabase tests.');
