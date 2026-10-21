@@ -1,13 +1,14 @@
 import {requireBusinessFeature} from '@/lib/server/authorization';
+import {notFound} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {AccountingSetup,JournalForm} from './forms';
 import {AccountingIntegrationForms} from './integration-forms';
 import Link from 'next/link';
 export const dynamic='force-dynamic';
-async function AccountingWorkspace(){
+async function AccountingWorkspace({showReports}:{showReports:boolean}){
  const {client,businessId,role}=await getWorkspace();
- if(!['owner','manager','finance'].includes(role))return <section className="tax-page"><h1>Accounting</h1><p>Only authorised finance roles can access the general ledger.</p></section>;
+ if(!['owner','manager','finance'].includes(role))notFound();
  const [accountsResult,periodsResult,trialResult,journalsResult,settingsResult,eventsResult]=await Promise.all([
   client.from('gl_accounts').select('id,code,name,class,normal_side').eq('business_id',businessId).order('code'),
   client.from('gl_periods').select('id,name,starts_on,ends_on,status').eq('business_id',businessId).order('starts_on',{ascending:false}),
@@ -33,10 +34,11 @@ async function AccountingWorkspace(){
  <section className="tax-panel"><h2>Chart of accounts & periods</h2><AccountingSetup accounts={accounts} periods={periods}/></section>
  <section className="tax-panel"><h2>Post a manual journal</h2><JournalForm accounts={accounts}/></section>
  <section className="tax-panel"><h2>Recent journals</h2><div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Description</th><th>Source</th><th>Reference</th><th>Status</th></tr></thead><tbody>{journals.map(j=><tr key={j.id}><td>{j.journal_date}</td><td>{j.description}</td><td>{j.source_type}</td><td>{j.reference||'—'}</td><td>{j.status}</td></tr>)}</tbody></table></div>{!journals.length&&<p className="muted">No journals posted yet.</p>}</section>
- <p><Link href="/reports">View financial reports →</Link></p></div>;
+ {showReports&&<p><Link href="/reports">View financial reports →</Link></p>}</div>;
 }
 export default async function Page(){
  const access=await requireBusinessFeature('accounting');
  if(!access.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{access.reason}</p><Link className="btn" href="/upgrade">View plans</Link></section>;
- return <AccountingWorkspace/>;
+ const reports=await requireBusinessFeature('financial_reports',{optional:true});
+ return <AccountingWorkspace showReports={reports.allowed}/>;
 }

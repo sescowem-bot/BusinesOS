@@ -60,6 +60,7 @@ jobs:
           npm run check:dashboard-runtime-date
           npm run check:ios-safe-errors
           npm run check:customer-ux
+          npm run check:feature-visibility
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

@@ -53,7 +53,8 @@
     "check:ios-safe-errors": "node scripts/verify-ios-safe-customer-ux.cjs",
     "check:customer-ux": "node scripts/verify-customer-facing-ux.cjs",
     "check:public-product": "node scripts/verify-phase30n-l-public-product.cjs",
-    "check:tier-billing": "node scripts/verify-phase30n-m-billing.cjs"
+    "check:tier-billing": "node scripts/verify-phase30n-m-billing.cjs",
+    "check:feature-visibility": "node scripts/verify-feature-visibility.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
