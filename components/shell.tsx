@@ -32,13 +32,19 @@ const restrictedModules:Record<string,string>={
  '/tax-centre':'tax','/tax-profile':'tax','/tax-compliance':'tax',
  '/communications':'communications','/insights':'insights','/growth':'growth'
 };
+// Management-only modules must also be hidden when the staff role does not qualify.
+const roleRestrictedModules:Record<string,readonly string[]>={
+ '/accounting':['owner','manager','finance'],
+ '/reports':['owner','manager','finance'],
+ '/retail-reports':['owner','manager','finance']
+};
 const allItems=groups.flatMap(g=>g.items);
 const selected=(path:string,href:string)=>path===href||(href!=='/admin'&&href!=='/dashboard'&&path.startsWith(href+'/'));
 
 function NavigationItems({path,isPlatformAdmin,unreadCount,onNavigate,filter,enabledFeatures,businessRole}:{path:string;isPlatformAdmin:boolean;unreadCount:number;onNavigate:()=>void;filter:string;enabledFeatures:string[];businessRole?:string}){
  const term=filter.trim().toLocaleLowerCase();
  const visibleGroups=[...(isPlatformAdmin?[{title:'Platform administration',items:ownerLinks}]:[]),...groups]
-  .map(group=>({...group,items:group.items.filter(item=>(!restrictedModules[item.href]||enabledFeatures.includes(restrictedModules[item.href]))&&(item.href!=='/receivables'||['owner','manager','finance','sales'].includes(businessRole||''))&&(!term||`${item.label} ${group.title}`.toLocaleLowerCase().includes(term)))}))
+  .map(group=>({...group,items:group.items.filter(item=>(!restrictedModules[item.href]||enabledFeatures.includes(restrictedModules[item.href]))&&(!roleRestrictedModules[item.href]||roleRestrictedModules[item.href].includes(businessRole||''))&&(item.href!=='/receivables'||['owner','manager','finance','sales'].includes(businessRole||''))&&(!term||`${item.label} ${group.title}`.toLocaleLowerCase().includes(term)))}))
   .filter(group=>group.items.length>0);
  return <>
  {visibleGroups.map(group=><section className="work-nav-group" key={group.title} aria-label={group.title}>

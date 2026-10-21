@@ -13,7 +13,7 @@ export default async function PurchasingPage(){
  const {client,businessId,role}=access;
  const canWrite=['owner','manager','inventory'].includes(role);
  const canApproveBills=['owner','manager'].includes(role);
- const stock=await requireBusinessFeature('inventory');
+ const stock=await requireBusinessFeature('inventory',{optional:true});
  const canReceive=canWrite&&stock.allowed;
  const [supResult,prodResult,poResult]=await Promise.all([
   client.from('business_suppliers').select('id,name,contact_name,phone,email,active').eq('business_id',businessId).order('name').limit(200),
