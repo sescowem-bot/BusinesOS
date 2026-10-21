@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import {notFound} from 'next/navigation';
+import {redirect} from 'next/navigation';
 import {requireBusinessFeature} from '@/lib/server/authorization';
 import {BusinessAlert,BusinessPageHeading,BusinessSection,BusinessSummary} from '@/components/business-page-ui';
 export const dynamic='force-dynamic';
@@ -13,7 +13,7 @@ export default async function RetailReports({searchParams}:{searchParams:Promise
  const access=await requireBusinessFeature('financial_reports');
  if(!access.allowed)return <div className="bo-page"><BusinessPageHeading eyebrow="OPERATIONS / RETAIL REPORTING" title="Retail performance" description="Management-only operational reports"/><BusinessAlert>{access.reason}</BusinessAlert></div>;
  const {role}=access;
- if(!['owner','manager','finance'].includes(role))notFound();
+ if(!['owner','manager','finance'].includes(role))redirect('/dashboard');
  const supplied=await searchParams;
  const today=todayLagos();
  const defaultFrom=new Date(Date.parse(today+'T00:00:00Z')-29*86400000).toISOString().slice(0,10);

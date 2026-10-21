@@ -1,5 +1,5 @@
 import {requireBusinessFeature} from '@/lib/server/authorization';
-import {notFound} from 'next/navigation';
+import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {AccountingSetup,JournalForm} from './forms';
@@ -8,7 +8,7 @@ import Link from 'next/link';
 export const dynamic='force-dynamic';
 async function AccountingWorkspace({showReports}:{showReports:boolean}){
  const {client,businessId,role}=await getWorkspace();
- if(!['owner','manager','finance'].includes(role))notFound();
+ if(!['owner','manager','finance'].includes(role))redirect('/dashboard');
  const [accountsResult,periodsResult,trialResult,journalsResult,settingsResult,eventsResult]=await Promise.all([
   client.from('gl_accounts').select('id,code,name,class,normal_side').eq('business_id',businessId).order('code'),
   client.from('gl_periods').select('id,name,starts_on,ends_on,status').eq('business_id',businessId).order('starts_on',{ascending:false}),
