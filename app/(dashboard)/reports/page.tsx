@@ -1,5 +1,5 @@
 import {requireBusinessFeature} from '@/lib/server/authorization';
-import {notFound} from 'next/navigation';
+import {redirect} from 'next/navigation';
 import Link from 'next/link';
 import {money} from '@/lib/format';
 import {financialContext,loadTrial} from '@/lib/reporting/server';
@@ -21,7 +21,7 @@ async function InternalProtectedPage({showAccounting,showTax}:{showAccounting:bo
 export default async function GuardedPage(){
  const check=await requireBusinessFeature('financial_reports');
  if(!check.allowed)return <section className="tax-page"><h1>Access restricted</h1><p role="alert">{check.reason}</p><a className="btn" href="/upgrade">View available plans</a></section>;
- if(!['owner','manager','finance'].includes(check.role))notFound();
+ if(!['owner','manager','finance'].includes(check.role))redirect('/dashboard');
  const [accounting,tax]=await Promise.all([
   requireBusinessFeature('accounting',{optional:true}),
   requireBusinessFeature('tax',{optional:true})
