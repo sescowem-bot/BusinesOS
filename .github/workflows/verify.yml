@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install website dependencies
-        run: if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+        run: npm ci --no-audit --no-fund
       - name: Route audit
         run: npm run check:routes
       - name: Regression and security checks
@@ -61,6 +61,7 @@ jobs:
           npm run check:ios-safe-errors
           npm run check:customer-ux
           npm run check:feature-visibility
+          npm run test:phase0
       - name: TypeScript
         run: npm run typecheck
       - name: Production build
@@ -75,3 +76,30 @@ jobs:
           deno-version: v2.x
       - name: Typecheck Supabase Auth Email Hook independently
         run: deno check --node-modules-dir=auto supabase/functions/send-email/index.ts
+
+  phase0-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: phase0
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d phase0"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute SQL 057 with real role permissions
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: phase0
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_057_rls_execution.sql
