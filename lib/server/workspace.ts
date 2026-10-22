@@ -30,8 +30,18 @@ export const getWorkspace=cache(async ()=>{
   const {data:admin,error:adminError}=await client.from('platform_admins').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();
   if(adminError)throw new Error('Platform role could not be verified. Contact support.');
   if(admin)redirect('/admin/my-business');
+  // RLS hides inactive memberships. Do not mistake a suspended/removed user for a new customer.
+  const {data:blocked,error:blockedError}=await client.rpc('my_blocked_membership_exists');
+  if(blockedError&&!['PGRST202','42883'].includes(blockedError.code))
+   throw new Error('Unable to verify workspace access. Contact platform support.');
+  if(blocked===true)redirect('/account/access-restricted');
   redirect('/onboarding');
  }
+ // Independently check the session's actual workspace status, not just a visible membership row.
+ const {data:accessState,error:accessError}=await client.rpc('my_business_access_state',{p_business_id:member.business_id});
+ if(accessError&&!['PGRST202','42883'].includes(accessError.code))
+  throw new Error('Unable to verify business access. Contact platform support.');
+ if(!accessError&&accessState!=='active')redirect('/account/access-restricted');
  if(perfStart!==null)console.info('[businessos-perf] workspace auth and membership ms:',Date.now()-perfStart);
  return {client,businessId:member.business_id,role:member.role,userId:user.id};
 });
