@@ -22,6 +22,12 @@ export default async function BusinessDetails({params}:{params:Promise<{id:strin
  if(error)return <main className="admin-area"><Link href="/admin/businesses">← Business directory</Link><section className="card card-pad" role="alert"><h1>Unable to load business</h1><p>Please try again. If the issue continues, contact support.</p><p className="muted">Make sure you are signed in with an authorised administrator account.</p></section></main>;
  if(!data)notFound();
  const b=data as Detail;
+ // Account lifecycle status is admin-only and deliberately read-only.
+ type Lifecycle={status:string;members:{user_id:string;status:string}[];history:{id:number;action:string;reason:string;changed_at:string}[]};
+ const {data:lifecycleData,error:lifecycleError}=await session.client.rpc('platform_business_lifecycle_snapshot',{p_business_id:id});
+ const lifecycle=(!lifecycleError&&lifecycleData&&typeof lifecycleData==='object'&&!Array.isArray(lifecycleData))
+   ?lifecycleData as Lifecycle:null;
+ const memberStatuses=new Map<string,string>((lifecycle?.members||[]).map(m=>[m.user_id,m.status] as [string,string]));
  const [grantsResult,auditResult,planFeaturesResult,parentResult,roleProfilesResult,roleAssignmentsResult,pricesResult,availablePlansResult,manualAuditResult]=await Promise.all([
   session.client.from('business_feature_grants').select('feature_key,enabled,allowed_roles,expires_at,note,updated_at').eq('business_id',id).order('feature_key'),
   session.client.from('business_feature_grant_audit').select('id,feature_key,changed_at,changed_by').eq('business_id',id).order('changed_at',{ascending:false}).limit(20),
@@ -53,7 +59,7 @@ export default async function BusinessDetails({params}:{params:Promise<{id:strin
    {availablePlansResult.error?<p role="alert">Plan choices are temporarily unavailable.</p>:<ManualPlanForm businessId={b.id} planId={b.plan_id} plans={availablePlansResult.data||[]}/>}
    {!manualAuditResult.error&&!!manualAuditResult.data?.length&&<details><summary>Recent manual subscription changes</summary><ul>{manualAuditResult.data.map(v=><li key={v.id}>{v.previous_plan_id||'Unassigned'} → {v.new_plan_id} · {new Date(v.changed_at).toLocaleDateString('en-NG')} · {v.reason}</li>)}</ul></details>}
   </section>
-  <section className="card card-pad" style={{marginTop:20}}><h2>Business team</h2><div style={{overflowX:'auto'}}><table style={{width:'100%'}}><thead><tr><th align="left">Member</th><th align="left">Role</th><th align="left">Joined</th></tr></thead><tbody>{b.members.map(m=><tr key={m.user_id}><td style={{padding:'10px 6px'}}>{m.full_name?.trim()||'Name not provided'}<div className="small muted">{m.user_id}</div></td><td>{m.role}</td><td>{new Date(m.joined_at).toLocaleDateString('en-NG')}</td></tr>)}</tbody></table></div>{!b.members.length&&<p>No members found.</p>}</section>
+  <section className="card card-pad" style={{marginTop:20}}><h2>Business team</h2><div style={{overflowX:'auto'}}><table style={{width:'100%'}}><thead><tr><th align="left">Member</th><th align="left">Role</th><th align="left">Access</th><th align="left">Joined</th></tr></thead><tbody>{b.members.map(m=><tr key={m.user_id}><td style={{padding:'10px 6px'}}>{m.full_name?.trim()||'Name not provided'}<div className="small muted">{m.user_id}</div></td><td>{m.role}</td><td>{lifecycleError?'Unavailable':memberStatuses.get(m.user_id)||'Unverified'}</td><td>{new Date(m.joined_at).toLocaleDateString('en-NG')}</td></tr>)}</tbody></table></div>{!b.members.length&&<p>No members found.</p>}</section>
   <section className="card card-pad" style={{marginTop:20}}>
    <h2>Business access status</h2>
    {lifecycleError||!lifecycle?<p role="alert">Account status cannot be verified right now. No access changes can be made here.</p>:
