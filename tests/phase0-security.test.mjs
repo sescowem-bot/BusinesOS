@@ -47,3 +47,28 @@ test('without DSN monitoring logs only redacted event and makes no external requ
   globalThis.fetch=oldFetch;console.error=oldLog;
  }
 });
+
+test('configured Sentry relay sends only redacted error envelope',async()=>{
+ const prev=process.env.BUSINESSOS_SENTRY_DSN;
+ const oldFetch=globalThis.fetch,oldLog=console.error;
+ const calls=[];
+ try{
+  process.env.BUSINESSOS_SENTRY_DSN='https://publickey@o123.ingest.sentry.io/777';
+  globalThis.fetch=async(url,options)=>{calls.push({url,body:options.body});return {ok:true,status:200}};
+  console.error=()=>{};
+  await reportRedactedServerError(
+   new Error('Private phone 08012345678; customer@example.com; password=abcd'),
+   {routePath:'/invoices/[id]',routerKind:'app'}
+  );
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].url,'https://o123.ingest.sentry.io/api/777/envelope/');
+  assert.equal(calls[0].body.includes('08012345678'),false);
+  assert.equal(calls[0].body.includes('customer@example.com'),false);
+  assert.equal(calls[0].body.includes('password=abcd'),false);
+  assert.ok(calls[0].body.includes('/invoices/[id]'));
+ }finally{
+  if(prev===undefined)delete process.env.BUSINESSOS_SENTRY_DSN;
+  else process.env.BUSINESSOS_SENTRY_DSN=prev;
+  globalThis.fetch=oldFetch;console.error=oldLog;
+ }
+});
