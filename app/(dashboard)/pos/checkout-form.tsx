@@ -44,6 +44,7 @@ export function CheckoutForm({products,customers,taxMode,productTax,locations,lo
  const vat=taxMode==='reviewed'?pricing.vat:0;
  const totalPayable=taxMode==='reviewed'?pricing.total:total;
  const invalidDiscount=taxMode==='reviewed'&&(!/^\d{1,12}(?:\.\d{1,2})?$/.test(discount)||!pricing.valid);
+ const invalidPriceIntegrity=taxMode==='reviewed'&&!pricing.integrityOk;
  const tenderSum=tenders.reduce((sum,t)=>sum+(Number(t.amount)||0),0);
  const invalidTenders=tenderMode==='split'&&(tenders.some(t=>!/^\d{1,10}(?:\.\d{1,2})?$/.test(t.amount)||Number(t.amount)<=0)||tenderSum>totalPayable+0.00001);
  const scan=()=>{
@@ -123,7 +124,8 @@ export function CheckoutForm({products,customers,taxMode,productTax,locations,lo
    {taxMode==='reviewed'&&pricing.discount>0&&<div className="bo-pos-total"><span>Pre-tax discount</span><strong>− {money(pricing.discount)}</strong></div>}
    {taxMode==='reviewed'?<><div className="bo-pos-total"><span>Approved VAT estimate</span><strong>{money(vat)}</strong></div><div className="bo-pos-total"><span>Total including VAT</span><strong>{money(totalPayable)}</strong></div>{invalidTax&&<p role="alert" className="negative">Every item needs a current approved VAT classification before checkout. Ask the owner to link the product in POS Tax Setup.</p>}{invalidDiscount&&<p role="alert" className="negative">Enter a valid discount smaller than the pre-tax basket subtotal (up to two decimal places).</p>}</>:<p className="small muted">VAT has not been reviewed for this business. No automatic tax is included in this checkout.</p>}
    <p className="small muted">Payment selection records an already received payment. BusinessOS does not charge cards or confirm bank transfers.</p>
-   <button className="btn btn-primary" type="submit" disabled={pending||!locationId||!requestId||!basket.length||total<=0||invalidTax||invalidDiscount||invalidTenders}>{pending?'Saving checkout…':'Complete checkout'}</button>
+   {invalidPriceIntegrity&&<p role="alert" className="negative">VAT-inclusive totals cannot currently be reconciled for this basket. Ask a manager to review the prices. No new payment has been recorded.</p>}
+   <button className="btn btn-primary" type="submit" disabled={pending||!locationId||!requestId||!basket.length||total<=0||invalidTax||invalidDiscount||invalidTenders||invalidPriceIntegrity}>{pending?'Saving checkout…':'Complete checkout'}</button>
    {state.message&&<p role="status" className={state.ok?'positive':'negative'}>{state.message}</p>}
    {state.ok&&state.orderId&&<div className="bo-pos-held-actions"><Link href={`/pos/receipts/${state.orderId}`} className="btn btn-primary">Print POS receipt</Link><Link href={`/orders/${state.orderId}`} className="btn">View order</Link></div>}
   </form></section>

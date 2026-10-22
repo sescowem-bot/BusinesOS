@@ -24,5 +24,10 @@ export function previewPosPricing(lines:PosPricingLine[],mode:PosPriceMode,disco
   const tax=money(taxable*line.rate/10000);vat=money(vat+tax);
   return {...line,taxable,tax,discount:portion/100};
  });
- return {valid,subtotal,discount:applied,vat,total:money(subtotal-applied+vat),breakdown};
+ // Fail closed with the pre-existing production SQL 064 integrity trigger.
+ // Do not represent this as a full VAT accounting correction.
+ const total=money(subtotal-applied+vat);
+ const enteredGross=money(calculated.reduce((s,l)=>s+money(l.quantity*l.price),0));
+ const integrityOk=mode!=='inclusive'||(applied===0&&cents(total)===cents(enteredGross));
+ return {valid,subtotal,discount:applied,vat,total,breakdown,integrityOk};
 }
