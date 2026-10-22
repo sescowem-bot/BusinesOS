@@ -10,6 +10,12 @@ async function InternalProtectedPage(){
   client.from('business_member_labels').select('user_id,display_name').eq('business_id',businessId).limit(100),
   client.rpc('business_has_feature',{p_business_id:businessId,p_feature_key:'team'})
  ]);
+ // Read-only account access: destructive staff actions remain disabled until the full RLS audit.
+ const memberAccessResult=role==='owner'?await client.rpc('business_staff_access_list',{p_business:businessId}):null;
+ const memberAccess=new Map<string,string>(
+   ((Array.isArray(memberAccessResult?.data)?memberAccessResult.data:[]) as {user_id:string;status:string}[])
+     .map(entry=>[entry.user_id,entry.status] as [string,string])
+ );
  const advanced=teamAllowed===true;
  const [{data:branches},{data:approvals}]=advanced?await Promise.all([
   client.from('business_branches').select('id,name,code,address,active').eq('business_id',businessId).order('name').limit(100),
