@@ -20,7 +20,12 @@ export default async function Onboarding(){
   if(error)return <main className="auth"><div className="auth-card"><h1>We couldn't confirm your agreement</h1><p>Please refresh this page and try again.</p></div></main>;
   if(!acceptance)return <main className="auth"><div className="auth-card"><Link href="/" className="brand">{b.name}</Link><h1>One more step</h1><TermsAcknowledgement terms={terms.document}/></div></main>;
  }
- const {data:existing}=await client.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
+ const {data:existing,error:existingError}=await client.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
+ if(existingError)return <main className="auth"><div className="auth-card"><h1>Unable to check your workspaces</h1><p>Please refresh or contact support. No new business has been created.</p></div></main>;
  if(existing?.length)redirect('/dashboard');
+ const {data:blocked,error:blockedError}=await client.rpc('my_blocked_membership_exists');
+ if(!blockedError&&blocked===true)redirect('/account/access-restricted');
+ if(blockedError&&!['PGRST202','42883'].includes(blockedError.code))
+  return <main className="auth"><div className="auth-card"><h1>Unable to verify account access</h1><p>Please try again or contact support before creating another workspace.</p></div></main>;
  return <main className="auth"><div className="auth-card"><Link href="/" className="brand">{b.name}</Link><h1>Tell us about your business</h1><p className="muted">Just a few details to get your workspace ready. You can update them anytime.</p><OnboardForm/></div></main>;
 }

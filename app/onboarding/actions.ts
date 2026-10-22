@@ -20,6 +20,10 @@ export async function createWorkspace(_s:OnboardState,form:FormData):Promise<Onb
  const {data:existing,error:lookupError}=await client.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
  if(lookupError)return {error:'Unable to verify existing workspaces. Please contact support.'};
  if(existing?.length)redirect('/dashboard');
+ const {data:blocked,error:blockedError}=await client.rpc('my_blocked_membership_exists');
+ if(!blockedError&&blocked===true)redirect('/account/access-restricted');
+ if(blockedError&&!['PGRST202','42883'].includes(blockedError.code))
+  return {error:'Unable to verify account access. Contact support before creating another workspace.'};
  const {data:businessId,error}=await client.rpc('create_my_business_workspace',{p_name:name,p_category:category});
  if(error)return {error:workspaceError(error.code,error.message)};
  if(!businessId)return {error:'We couldn’t confirm your new workspace. Check your workspaces before trying again, or contact support.'};
