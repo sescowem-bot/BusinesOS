@@ -16,8 +16,7 @@ const csp=[
  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.paystack.co https://*.paystack.co https://*.cloudinary.com https://www.google-analytics.com https://*.google-analytics.com https://*.vercel-insights.com",
  "frame-src https://checkout.paystack.com https://*.paystack.co",
  "media-src 'self' blob: https:",
- "worker-src 'self' blob:",
- "upgrade-insecure-requests"
+ "worker-src 'self' blob:"
 ].join('; ');
 
 const nextConfig:NextConfig={
