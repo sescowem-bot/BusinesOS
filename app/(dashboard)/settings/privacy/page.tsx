@@ -14,7 +14,7 @@ export default async function PrivacySettings(){
   <div className="page-head"><div><p className="small muted">BUSINESSOS / PRIVACY</p><h1>Privacy &amp; data rights</h1><p>Ask about your personal information, make a request and follow its progress.</p></div><Link className="btn" href="/settings">Back to settings</Link></div>
   <div className="grid grid-2">
    <section className="card card-pad"><h2>Make a request</h2><PrivacyRightsForm owner={role==='owner'}/></section>
-   <section className="card card-pad"><h2>Your information</h2>
+   <section className="card card-pad"><h2>Your information</h2><p><Link className="btn" href="/account/deletion-request">Account &amp; business closure requests</Link></p>
     <p>We can help with information linked to your account. If your request involves customer records held by a business, we may need to work with that business.</p>
     <p>We'll check your identity before sharing or changing information. Some records may need to be kept for legal reasons.</p>
     <p><CookieSettingsButton className="bo-privacy-open-cookies"/></p><p className="small muted">Read our <Link href="/privacy">Privacy Notice</Link>, <Link href="/terms">Terms</Link> and <Link href="/cookies">Cookie Notice</Link>.</p>
