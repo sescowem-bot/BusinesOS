@@ -1,3 +1,5 @@
+> **Current review work:** Phase 0 security and reproducible-build foundation. Production migration 057 is separate from the quarantined staging SQL 057–062. See [Phase 0 release guide](MD/PHASE_0_SECURITY_HARDENING.md). Production database updates require independent testing and approval.
+
 ## Latest public website release — Phase 030N-L
 
 The public Home, Features, Solutions, How It Works, Pricing, About, Resources and Contact pages now use detailed product-focused layouts. Prices and published entitlements remain dynamic. See `MD/PHASE_030N_L_PUBLIC_WEBSITE_OVERHAUL.md` for scope and test instructions. Run `npm run check:public-product` to verify key marketing-site invariants.
