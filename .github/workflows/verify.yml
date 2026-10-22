@@ -61,6 +61,7 @@ jobs:
           npm run check:ios-safe-errors
           npm run check:customer-ux
           npm run check:feature-visibility
+          npm run check:account-lifecycle
       - name: TypeScript
         run: npm run typecheck
       - name: Production build
