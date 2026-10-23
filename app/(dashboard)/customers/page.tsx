@@ -1,48 +1,44 @@
 import {getWorkspace} from '@/lib/server/workspace';
-import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
-import {BusinessRecordsTable,type RecordItem} from '@/components/business-records';
+import type {RecordItem} from '@/components/business-records';
+import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-directory';
+import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
-
 type CustomerLink={customer_id:string;customers:{name?:string;phone?:string|null;email?:string|null}|{name?:string;phone?:string|null;email?:string|null}[]|null};
-export default async function Customers(){
+export default async function Customers({searchParams}:{searchParams:Promise<DirectoryRaw>}){
  const {client,businessId,role}=await getWorkspace();
- const canRecordOrders=['owner','manager','finance','sales'].includes(role);
- const [linksResult,ordersResult,paymentsResult]=await Promise.all([
-  client.from('business_customers').select('customer_id,customers(name,phone,email)').eq('business_id',businessId).order('created_at',{ascending:false}).limit(250),
-  client.from('orders').select('customer_id,total,status').eq('business_id',businessId).limit(1000),
-  client.from('payments').select('customer_id,amount,status').eq('business_id',businessId).limit(1000)
- ]);
- const error=linksResult.error||ordersResult.error||paymentsResult.error;
- if(error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / CUSTOMERS" title="Customers" description="Keep your customers, orders and payments organised in one place."/><BusinessAlert>Customer and balance data could not be verified. Please try again or contact support. No figures have been estimated.</BusinessAlert></div>;
- const links=(linksResult.data||[]) as CustomerLink[];
- const orders=ordersResult.data||[],payments=paymentsResult.data||[];
- const orderTotals=new Map<string,{count:number;total:number}>();
- for(const o of orders){if(o.status==='cancelled'||!o.customer_id)continue;const v=orderTotals.get(o.customer_id)||{count:0,total:0};v.count++;v.total+=Number(o.total)||0;orderTotals.set(o.customer_id,v)}
- const paymentTotals=new Map<string,number>();
- for(const p of payments){if(p.status!=='completed'||!p.customer_id)continue;paymentTotals.set(p.customer_id,(paymentTotals.get(p.customer_id)||0)+(Number(p.amount)||0))}
+ const canCreate=['owner','manager','finance','sales'].includes(role);
+ const params=parseDirectory(await searchParams);
+ let query=client.from('business_customers')
+  .select('customer_id,customers!inner(name,phone,email)',{count:'exact'})
+  .eq('business_id',businessId);
+ if(params.q){
+  const pattern='%'+params.q+'%';
+  query=query.or(`name.ilike."${pattern}",phone.ilike."${pattern}",email.ilike."${pattern}"`,{referencedTable:'customers'});
+ }
+ const {data,error,count}=await query.order('created_at',{ascending:false}).order('customer_id',{ascending:false})
+  .range(params.offset,params.offset+DIRECTORY_SIZE-1);
+ if(error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / CUSTOMERS" title="Customers" description="Find contacts across your complete customer history."/><BusinessAlert>Customer records could not be loaded. Please try again; no data has been changed.</BusinessAlert></div>;
+ const links=(data||[]) as CustomerLink[];
  const rows:RecordItem[]=links.map(link=>{
   const c=Array.isArray(link.customers)?link.customers[0]:link.customers;
-  const sale=orderTotals.get(link.customer_id)||{count:0,total:0};const paid=paymentTotals.get(link.customer_id)||0;
-  const balance=Math.max(0,sale.total-paid);
-  const filter=balance>0?'Balance due':sale.count?'No balance due':'No orders';
   const name=c?.name||'Unnamed customer';
-  return {id:link.customer_id,filter,search:[name,c?.phone,c?.email,filter].filter(Boolean).join(' '),cells:[
-   {text:name,kind:'strong'},{text:c?.phone||'—'},{text:c?.email||'—'},{text:String(sale.count)},
-   {text:money(sale.total),kind:'amount'},{text:money(paid),kind:'amount'},
-   {text:money(balance),kind:'amount',tone:balance>0?'warning':'neutral'},
-   canRecordOrders?{text:'Create order',href:`/orders/new?customer=${encodeURIComponent(link.customer_id)}`,kind:'strong'}:{text:'View customer',kind:'muted'}
+  return {id:link.customer_id,search:[name,c?.phone,c?.email].filter(Boolean).join(' '),cells:[
+   {text:name,kind:'strong'},{text:c?.phone||'—'},{text:c?.email||'—'},
+   {text:'View orders',href:`/orders?customer=${encodeURIComponent(link.customer_id)}`,kind:'strong'},
+   canCreate?{text:'Create order',href:`/orders/new?customer=${encodeURIComponent(link.customer_id)}`,kind:'strong'}:{text:'View only',kind:'muted'}
   ]};
  });
- const limited=links.length===250||orders.length===1000||payments.length===1000;
- const withOrders=links.filter(c=>(orderTotals.get(c.customer_id)?.count||0)>0).length;
- const withBalances=rows.filter(r=>r.filter==='Balance due').length;
  return <div className="bo-page">
-  <BusinessPageHeading eyebrow="SALES / CUSTOMERS" title="Customers" description="Customer contacts and related order balances for your current business workspace." action={{href:'/customers/new',label:'Add customer'}}/>
-  <BusinessSummary items={[{label:'Customers in loaded list',value:links.length,detail:'Most recent 250 maximum'},{label:'With recorded orders',value:withOrders,detail:'Based on loaded transactions'},{label:'With outstanding balances',value:withBalances,detail:'Review individual orders for accuracy'}]}/>
-  {limited&&<BusinessAlert>Some records have reached the loading limit. The displayed balances and counts may be incomplete. Use the financial reports for reconciled totals.</BusinessAlert>}
-  <BusinessSection title="Customer directory" description="Find customers by name, phone or email. Authorised sales staff can start a new order with the customer already selected.">
-   <BusinessRecordsTable columns={['Customer','Phone','Email','Orders','Order value','Received','Balance','Next step']} rows={rows} searchLabel="Search customers by name, phone or email" emptyTitle="No customers added yet" emptyDescription="Add your first customer to begin recording orders and payments." emptyHref="/customers/new" emptyAction="Add customer" limitNote="Balances reflect loaded, non-cancelled orders and completed payments. A customer can have credits or historical transactions outside this loaded set."/>
+  <BusinessPageHeading eyebrow="SALES / CUSTOMERS" title="Customers" description="Find customers by name, phone or email, including older records." action={canCreate?{href:'/customers/new',label:'Add customer'}:undefined}/>
+  <BusinessSummary items={[{label:params.q?'Matching customers':'Customer records',value:count??'—',detail:'Search includes older records'},{label:'Showing on this page',value:rows.length,detail:`Page ${params.page} of your directory`}]}/>
+  <BusinessSection title="Customer directory" description="Search the complete customer list or open a customer's orders. Balances belong to verified orders, not an incomplete customer sample.">
+   <ServerRecordRegister route="/customers" columns={['Customer','Phone','Email','Orders','Next step']}
+    rows={rows} count={count} page={params.page} pageSize={DIRECTORY_SIZE} q={params.q}
+    searchLabel="Customer name, phone or email" emptyTitle="No customers added yet"
+    emptyDescription="Add a customer to begin recording their orders and payments."
+    emptyHref={canCreate?'/customers/new':undefined} emptyAction={canCreate?'Add customer':undefined}
+    note="Customer balances are not estimated from a restricted sample of transactions. Open an order to see its recorded payments and balance."/>
   </BusinessSection>
  </div>;
 }

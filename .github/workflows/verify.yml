@@ -62,6 +62,8 @@ jobs:
           npm run check:customer-ux
           npm run check:feature-visibility
           npm run test:phase1
+          npm run test:phase2
+          npm run check:phase2-registers
       - name: TypeScript
         run: npm run typecheck
       - name: Production build

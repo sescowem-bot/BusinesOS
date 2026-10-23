@@ -1,37 +1,55 @@
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
-import {BusinessRecordsTable,type RecordItem} from '@/components/business-records';
+import type {RecordItem} from '@/components/business-records';
+import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-directory';
+import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
-export default async function Payments(){
+const filters=[{value:'completed',label:'Completed'},{value:'pending',label:'Pending'},{value:'failed',label:'Failed'},{value:'refunded',label:'Refunded'}];
+export default async function Payments({searchParams}:{searchParams:Promise<DirectoryRaw>}){
  const {client,businessId}=await getWorkspace();
- const [paymentsResult,ordersResult]=await Promise.all([
-  client.from('payments').select('id,order_id,amount,method,status,reference,paid_at').eq('business_id',businessId).order('paid_at',{ascending:false}).limit(200),
-  client.from('orders').select('id,order_number,total,status,payments(amount,status)').eq('business_id',businessId).limit(200)
- ]);
- if(paymentsResult.error||ordersResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="FINANCE / PAYMENTS" title="Customer payments" description="Follow recorded receipts and outstanding customer balances."/><BusinessAlert>Payment and order records could not be verified. Please retry before relying on financial amounts.</BusinessAlert></div>;
- const payments=paymentsResult.data||[],orders=ordersResult.data||[];
- const names=new Map(orders.map(o=>[o.id,o.order_number]));
+ const params=parseDirectory(await searchParams);
+ const status=filters.some(f=>f.value===params.status)?params.status:'';
+ let query=client.from('payments')
+  .select('id,order_id,amount,method,status,reference,paid_at',{count:'exact'})
+  .eq('business_id',businessId);
+ if(params.q){
+  const pattern='%'+params.q+'%';
+  query=query.ilike('reference',pattern);
+ }
+ if(status)query=query.eq('status',status);
+ const {data,error,count}=await query.order('paid_at',{ascending:false}).order('id',{ascending:false})
+  .range(params.offset,params.offset+DIRECTORY_SIZE-1);
+ if(error)return <div className="bo-page"><BusinessPageHeading eyebrow="FINANCE / PAYMENTS" title="Customer payments" description="Review recorded receipts."/><BusinessAlert>Payment history could not be loaded. Please retry before relying on the figures.</BusinessAlert></div>;
+ const payments=data||[];
+ const ids=Array.from(new Set(payments.map(p=>p.order_id).filter((v):v is string=>typeof v==='string'&&!!v)));
+ const linked=ids.length?await client.from('orders').select('id,order_number').eq('business_id',businessId).in('id',ids):{data:[],error:null};
+ const names=new Map((linked.data||[]).map(o=>[o.id,o.order_number]));
  const completed=payments.filter(p=>p.status==='completed');
  const received=completed.reduce((sum,p)=>sum+(Number(p.amount)||0),0);
- const outstanding=orders.filter(o=>o.status!=='cancelled').reduce((sum,o)=>sum+Math.max(0,(Number(o.total)||0)-(o.payments||[]).filter(p=>p.status==='completed').reduce((v,p)=>v+(Number(p.amount)||0),0)),0);
  const rows:RecordItem[]=payments.map(p=>{
-  const status=p.status==='completed'?'Completed':p.status||'Unknown';
-  return {id:p.id,filter:status,search:[names.get(p.order_id),p.reference,p.method,status].filter(Boolean).join(' '),cells:[
-   {text:new Date(p.paid_at).toLocaleDateString('en-NG'),kind:'muted'},
-   {text:names.get(p.order_id)||'Open order',href:`/orders/${p.order_id}`,kind:'strong'},
+  const state=p.status==='completed'?'Completed':p.status||'Unknown';
+  const date=p.paid_at?new Date(p.paid_at).toLocaleDateString('en-NG'):'Not dated';
+  return {id:p.id,filter:state,search:[names.get(p.order_id),p.reference,p.method,state].filter(Boolean).join(' '),cells:[
+   {text:date,kind:'muted'},
+   {text:names.get(p.order_id)||'Open order',href:p.order_id?`/orders/${p.order_id}`:undefined,kind:'strong'},
    {text:money(Number(p.amount)||0),kind:'amount'},{text:p.method||'—'},
-   {text:status,kind:'status',tone:status==='Completed'?'success':status==='failed'?'danger':'warning'},
+   {text:state,kind:'status',tone:state==='Completed'?'success':state==='failed'?'danger':'warning'},
    {text:p.reference||'—',kind:'muted'},
-   p.status==='completed'?{text:'Print acknowledgement',href:`/payments/${p.id}`}:{text:'—',kind:'muted'}
+   p.status==='completed'?{text:'Print acknowledgement',href:`/payments/${p.id}`,kind:'strong'}:{text:'—',kind:'muted'}
   ]};
  });
  return <div className="bo-page">
-  <BusinessPageHeading eyebrow="FINANCE / PAYMENTS" title="Customer payments" description="Monitor manually recorded payments and open their linked orders. No online gateway is connected." action={{href:'/orders',label:'Find an order'}}/>
-  <BusinessSummary items={[{label:'Completed receipts in loaded list',value:money(received),detail:`${completed.length} payments`},{label:'Outstanding on loaded orders',value:money(outstanding),detail:'Excludes cancelled orders',warning:outstanding>0},{label:'Payment entries',value:payments.length,detail:'Latest 200 maximum'}]}/>
-  {(payments.length===200||orders.length===200)&&<BusinessAlert>The payment or order list has reached its 200-record limit. The summary may be incomplete; use reconciled financial reports for complete figures.</BusinessAlert>}
-  <BusinessSection title="Payment history" description="Search by order number, reference or payment method, then open completed payment acknowledgements.">
-   <BusinessRecordsTable columns={['Paid on','Order','Amount','Method','Status','Reference','Document']} rows={rows} searchLabel="Search payments or references" emptyTitle="No payments recorded yet" emptyDescription="Create an order, then open it to record a payment." emptyHref="/orders" emptyAction="View orders" limitNote="Only completed payments count as received. Payment acknowledgement documents confirm recorded entries, not independent bank settlement."/>
+  <BusinessPageHeading eyebrow="FINANCE / PAYMENTS" title="Customer payments" description="Search all recorded payment references, including older entries. This register displays recorded payments, not bank settlement." action={{href:'/orders',label:'Find an order'}}/>
+  <BusinessSummary items={[{label:status||params.q?'Matching payments':'Payment records',value:count??'—',detail:'Across your complete payment history'},{label:'Completed payments on this page',value:completed.length},{label:'Received on this page',value:money(received),detail:'Completed entries only'}]}/>
+  {linked.error&&<BusinessAlert>Order numbers are temporarily unavailable. Payment entries and amounts shown remain from the selected business.</BusinessAlert>}
+  <BusinessSection title="Payment history" description="Find a payment by reference and filter by recorded status.">
+   <ServerRecordRegister route="/payments" columns={['Paid on','Order','Amount','Method','Status','Reference','Document']}
+    rows={rows} count={count} page={params.page} pageSize={DIRECTORY_SIZE} q={params.q}
+    status={status} filterOptions={filters} searchLabel="Search payment reference"
+    emptyTitle="No payments recorded yet" emptyDescription="Record a payment from an existing customer order."
+    emptyHref="/orders" emptyAction="View orders"
+    note="Figures cover the current page only. A payment acknowledgement confirms a recorded entry, not bank settlement."/>
   </BusinessSection>
  </div>;
 }

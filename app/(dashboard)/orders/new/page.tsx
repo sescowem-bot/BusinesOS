@@ -20,6 +20,18 @@ export default async function NewOrder({searchParams}:{searchParams:Promise<{cus
  const title=<BusinessPageHeading eyebrow="SALES / CREATE ORDER" title="Create a customer order" description="Select the customer, enter what you are selling and record any payment received. You'll see the balance after saving."/>;
  if(customersResult.error||taxProfile.error)return <div className="bo-page bo-form-page">{title}<BusinessAlert>Customer or tax information could not be verified. To protect your records, order creation is unavailable until the data loads. Please refresh or <Link href="/support">contact support</Link>.</BusinessAlert></div>;
  const customers=(customersResult.data||[]).map(v=>({id:v.customer_id,name:customerNameFromRelation(v.customers,'')})).filter(c=>c.name);
+ // A customer found on page 401 of the directory must still be preselected,
+ // even when the normal order form loads only the 500 newest customer choices.
+ const knownId=typeof requestedCustomer==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedCustomer);
+ if(knownId&&!customers.some(c=>c.id===requestedCustomer)){
+  const linked=await client.from('business_customers').select('customer_id,customers(name)')
+   .eq('business_id',businessId).eq('customer_id',requestedCustomer).maybeSingle();
+  if(linked.error)return <div className="bo-page bo-form-page">{title}<BusinessAlert>Selected customer could not be verified. Please open the customer directory again before creating an order.</BusinessAlert></div>;
+  if(linked.data){
+   const name=customerNameFromRelation(linked.data.customers,'');
+   if(name)customers.unshift({id:linked.data.customer_id,name});
+  }
+ }
  const initialCustomerId=customers.some(c=>c.id===requestedCustomer)?requestedCustomer:'';
  const registered=taxProfile.data?.vat_registration_status==='registered';
  const reviewed=taxProfile.data?.classification_status==='reviewed';
@@ -64,7 +76,7 @@ export default async function NewOrder({searchParams}:{searchParams:Promise<{cus
    </section>:
    <section className="bo-form-panel"><div className="bo-form-head"><p className="bo-eyebrow">CUSTOMER ORDER</p><h2>Order details and payment</h2><p>Enter the agreed price, then select Not paid, Part payment or Paid in full. This form does not collect money online.</p></div><OrderForm customers={customers} requestKey={randomUUID()} canRecordCost={canRecordCost} initialCustomerId={initialCustomerId}/></section>
   }
-  {customers.length===500&&<BusinessAlert>The customer dropdown is limited to 500 records. If your customer is missing, open Customers to review the directory before saving.</BusinessAlert>}
+  {customersResult.data?.length===500&&<BusinessAlert>For faster loading, the customer dropdown starts with 500 recent contacts. To use an older customer, search the Customers directory and select Create order on that record.</BusinessAlert>}
   <div className="bo-order-help"><strong>What happens after saving?</strong><p>BusinessOS creates the order and records any confirmed initial payment together. You can view the amount paid, outstanding balance and payment history from the order details page.</p></div>
  </div>;
 }

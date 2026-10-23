@@ -11,7 +11,7 @@ const css=read('app/globals.css');
 let count=0;const verify=(test,description)=>{assert.ok(test,description);count++};
 verify(page.includes("import {Suspense} from 'react'"),'Must stream expense UI');
 verify(page.includes('<Suspense fallback={<WorkspaceLoading/>}>'),'Must stream workspace auth verification');
-verify(page.includes('<Suspense key={`expense-register-${page}`} fallback={<RegisterLoading/>}>'),'Must stream register independently');
+verify(page.includes('<Suspense key={`expense-register-${page}-${q}`} fallback={<RegisterLoading/>}>'),'Must stream register independently');
 verify(page.includes('getWorkspace()'),'Must verify authenticated business membership');
 verify(page.includes(".eq('business_id',businessId)"),'Expense read must be tenant scoped');
 verify(!page.includes('unstable_cache')&&!page.includes('revalidate:')&&!page.includes('cache('),'Must not cache private expenses across users');

@@ -2,42 +2,64 @@ import {customerNameFromRelation} from '@/lib/customer-relations';
 import {getWorkspace} from '@/lib/server/workspace';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
-import {BusinessRecordsTable,type RecordItem} from '@/components/business-records';
+import type {RecordItem} from '@/components/business-records';
+import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-directory';
+import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
-export default async function Orders(){
+export default async function Orders({searchParams}:{searchParams:Promise<DirectoryRaw>}){
  const {client,businessId,role}=await getWorkspace();
- const canRecordPayment=['owner','manager','finance','sales'].includes(role);
- const [ordersResult,customersResult]=await Promise.all([
-  client.from('orders').select('id,order_number,total,status,created_at,due_date,customer_id,payments(amount,status)').eq('business_id',businessId).order('created_at',{ascending:false}).limit(200),
-  client.from('business_customers').select('customer_id,customers(name)').eq('business_id',businessId).limit(500)
- ]);
- if(ordersResult.error||customersResult.error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / ORDERS" title="Orders & sales" description="Review customer orders and their recorded payments."/><BusinessAlert>Order data could not be loaded or verified. Please retry; no financial totals are shown.</BusinessAlert></div>;
- const orders=ordersResult.data||[];
- const names=new Map<string,string>((customersResult.data||[]).map(v=>[v.customer_id,customerNameFromRelation(v.customers, 'Customer')]));
- let total=0,received=0,balance=0,open=0;
+ const canRecord=['owner','manager','finance','sales'].includes(role);
+ const params=parseDirectory(await searchParams);
+ let query=client.from('orders')
+  .select('id,order_number,total,status,created_at,due_date,customer_id,payments(amount,status)',{count:'exact'})
+  .eq('business_id',businessId);
+ if(params.q)query=query.ilike('order_number','%'+params.q+'%');
+ if(params.customer)query=query.eq('customer_id',params.customer);
+ const {data,error,count}=await query.order('created_at',{ascending:false}).order('id',{ascending:false})
+  .range(params.offset,params.offset+DIRECTORY_SIZE-1);
+ if(error)return <div className="bo-page"><BusinessPageHeading eyebrow="SALES / ORDERS" title="Orders & sales" description="Find customer orders and payment history."/><BusinessAlert>Order records could not be verified. Please retry; no financial totals are shown.</BusinessAlert></div>;
+ const orders=data||[];
+ const ids=Array.from(new Set(orders.map(o=>o.customer_id).filter((v):v is string=>typeof v==='string'&&!!v)));
+ const customers=ids.length?await client.from('business_customers').select('customer_id,customers(name)')
+  .eq('business_id',businessId).in('customer_id',ids):{data:[],error:null};
+ const names=new Map<string,string>((customers.data||[]).map(v=>[v.customer_id,customerNameFromRelation(v.customers,'Customer')]));
  const rows:RecordItem[]=orders.map(o=>{
   const amount=Number(o.total)||0;
   const paid=(o.payments||[]).filter(p=>p.status==='completed').reduce((s,p)=>s+(Number(p.amount)||0),0);
-  const due=Math.max(0,amount-paid);
-  if(o.status!=='cancelled'){total+=amount;received+=paid;balance+=due;if(due>0)open++}
-  const status=o.status==='cancelled'?'Cancelled':amount<=0?'No charge':due<=0?'Paid':paid>0?'Part paid':'Unpaid';
-  const actionLabel=o.status==='cancelled'?'View order':due>0?(canRecordPayment?'Review / receive payment':'Review balance'):'View order';
-  return {id:o.id,filter:status,search:[o.order_number,names.get(o.customer_id),status,o.created_at].filter(Boolean).join(' '),cells:[
+  const cancelled=o.status==='cancelled';
+  const due=cancelled?0:Math.max(0,amount-paid);
+  const state=cancelled?'Cancelled':amount<=0?'No charge':due<=0?'Paid':paid>0?'Part paid':'Unpaid';
+  return {id:o.id,filter:state,search:[o.order_number,names.get(o.customer_id),state].filter(Boolean).join(' '),cells:[
    {text:o.order_number||'View order',href:`/orders/${o.id}`,kind:'strong'},
    {text:names.get(o.customer_id)||'Walk-in'},{text:money(amount),kind:'amount'},
    {text:money(paid),kind:'amount'},{text:money(due),kind:'amount'},
-   {text:status,kind:'status',tone:status==='Paid'?'success':status==='Cancelled'?'danger':'warning'},
+   {text:state,kind:'status',tone:state==='Paid'?'success':cancelled?'danger':'warning'},
    {text:new Date(o.created_at).toLocaleDateString('en-NG'),kind:'muted'},
-   {text:actionLabel,href:`/orders/${o.id}${due>0&&o.status!=='cancelled'?'#payment-history':''}`,kind:'strong'}
+   {text:cancelled?'View order':due>0&&canRecord?'Review / receive payment':'Open order',
+    href:`/orders/${o.id}${due>0&&!cancelled?'#payment-history':''}`,kind:'strong'}
   ]};
  });
+ const active=orders.filter(o=>o.status!=='cancelled');
+ const value=active.reduce((n,o)=>n+(Number(o.total)||0),0);
+ const received=active.reduce((n,o)=>n+(o.payments||[]).filter(p=>p.status==='completed').reduce((sum,p)=>sum+(Number(p.amount)||0),0),0);
+ const outstanding=active.reduce((n,o)=>{
+  const paid=(o.payments||[]).filter(p=>p.status==='completed').reduce((sum,p)=>sum+(Number(p.amount)||0),0);
+  return n+Math.max(0,(Number(o.total)||0)-paid);
+ },0);
  return <div className="bo-page">
-  <BusinessPageHeading eyebrow="SALES / ORDERS" title="Orders & sales" description="Track order status, recorded payments and outstanding balances. Open any order to collect payments or issue a commercial invoice." action={canRecordPayment?{href:'/orders/new',label:'New order'}:undefined}/>
-  <BusinessSummary items={[{label:'Order value in loaded list',value:money(total),detail:'Excludes cancelled orders'},{label:'Completed payments',value:money(received),detail:'On listed orders'},{label:'Outstanding balances',value:money(balance),detail:`${open} open orders`,warning:balance>0},{label:'Orders in loaded list',value:orders.length,detail:'Latest 200 maximum'}]}/>
-  {orders.length===200&&<BusinessAlert>Only the newest 200 orders are loaded. Financial totals above are not complete-period figures; use your reconciled reports.</BusinessAlert>}
-  <section className="bo-guide-strip" aria-label="Understanding order payment status"><strong>Understanding payment status</strong><p><span><b>Unpaid</b> No payment recorded</span><span><b>Part paid</b> Some money received</span><span><b>Paid</b> Fully settled</span></p></section>
-  <BusinessSection title="Order register" description="Search by order number or customer, filter by payment status, or select Review / receive payment to see what is outstanding.">
-   <BusinessRecordsTable columns={['Order','Customer','Value','Received','Outstanding','Status','Created','Next step']} rows={rows} searchLabel="Search orders or customers" emptyTitle="No orders recorded yet" emptyDescription="Create a sales order and link it to a customer to start tracking payments." emptyHref="/orders/new" emptyAction="Create order" limitNote="Payments reflect completed entries linked to each loaded order; cancellation and refund workflows require separate review."/>
+  <BusinessPageHeading eyebrow="SALES / ORDERS" title="Orders & sales"
+   description={params.customer?'Orders for your selected customer. Search order numbers or return to all orders.':'Search any order number, including older transactions. Open an order to review individual payments.'}
+   action={canRecord?{href:'/orders/new',label:'New order'}:undefined}/>
+  <BusinessSummary items={[{label:params.q||params.customer?'Matching orders':'All recorded orders',value:count??'—',detail:'Complete matching register'},{label:'Order value on this page',value:money(value),detail:'Excludes cancelled orders'},{label:'Received on this page',value:money(received)},{label:'Outstanding on this page',value:money(outstanding),warning:outstanding>0}]}/>
+  {customers.error&&<BusinessAlert>Customer names are temporarily unavailable. Order amounts remain linked to the individual records shown.</BusinessAlert>}
+  <section className="bo-guide-strip" aria-label="Understanding payment status"><strong>Understanding payment status</strong><p><span><b>Unpaid</b> No completed payment recorded</span><span><b>Part paid</b> Some money received</span><span><b>Paid</b> Fully settled</span></p></section>
+  <BusinessSection title="Order register" description="Use the search box for order numbers. Payment totals are calculated from the payments linked to each listed order.">
+   <ServerRecordRegister route="/orders" columns={['Order','Customer','Value','Received','Outstanding','Status','Created','Next step']}
+    rows={rows} count={count} page={params.page} pageSize={DIRECTORY_SIZE} q={params.q} customer={params.customer}
+    searchLabel="Search by order number" emptyTitle="No orders recorded yet"
+    emptyDescription="Create an order to begin tracking amounts received and remaining balances."
+    emptyHref={canRecord?'/orders/new':undefined} emptyAction={canRecord?'Create order':undefined}
+    note="Summary amounts relate only to the current page. Review reports for complete-period totals. Cancelled orders do not contribute to outstanding balances."/>
   </BusinessSection>
  </div>;
 }

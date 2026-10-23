@@ -55,7 +55,9 @@
     "check:public-product": "node scripts/verify-phase30n-l-public-product.cjs",
     "check:tier-billing": "node scripts/verify-phase30n-m-billing.cjs",
     "check:feature-visibility": "node scripts/verify-feature-visibility.cjs",
-    "test:phase1": "node --experimental-strip-types --test tests/phase1/financial.test.mjs"
+    "test:phase1": "node --experimental-strip-types --test tests/phase1/financial.test.mjs",
+    "test:phase2": "node --experimental-strip-types --test tests/phase2/record-directory.test.mjs",
+    "check:phase2-registers": "node scripts/verify-phase2-registers.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

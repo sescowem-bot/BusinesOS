@@ -3,12 +3,13 @@ import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
 import {ExpenseForm} from './expense-form';
 import {WorkspaceLoadingBrand} from '@/components/workspace-loading-brand';
+import {parseDirectory,directoryHref,type DirectoryRaw} from '@/lib/record-directory';
 
 export const dynamic='force-dynamic';
 const PAGE_SIZE=25;
-type PageSearch={page?:string|string[]};
+type PageSearch=DirectoryRaw;
 
-/** Expense amount presentation is exact to the kobo; ordinary money() rounds to naira. */
+/** Expenses are always displayed to two decimal places. */
 const naira=(amount:number)=>new Intl.NumberFormat('en-NG',{
  style:'currency',currency:'NGN',minimumFractionDigits:2,maximumFractionDigits:2
 }).format(amount);
@@ -27,13 +28,14 @@ function WorkspaceLoading(){
 }
 
 /** Paginated, tenant-scoped financial records. Do not fetch or cache all expenses in memory. */
-async function ExpenseRegister({page}:{page:number}){
+async function ExpenseRegister({page,q}:{page:number;q:string}){
  const {client,businessId}=await getWorkspace();
  const start=(page-1)*PAGE_SIZE;
- const {data,error}=await client.from('expenses')
+ let query=client.from('expenses')
   .select('id,description,amount,paid_at,expense_categories(name)')
-  .eq('business_id',businessId)
-  .order('paid_at',{ascending:false})
+  .eq('business_id',businessId);
+ if(q)query=query.ilike('description','%'+q+'%');
+ const {data,error}=await query.order('paid_at',{ascending:false})
   .order('id',{ascending:false})
   .range(start,start+PAGE_SIZE);
  if(error)return <section className="tax-panel bo-expense-register" role="alert">
@@ -43,7 +45,14 @@ async function ExpenseRegister({page}:{page:number}){
  </section>;
  const rows=(data||[]).slice(0,PAGE_SIZE),hasNext=(data||[]).length>PAGE_SIZE;
  const pageTotal=rows.reduce((v,e)=>v+Number(e.amount),0);
- return <section className="tax-panel bo-expense-register" aria-label="Recent expenses">
+ return <section className="tax-panel bo-expense-register" aria-label="Expense register">
+  <form action="/expenses" method="get" role="search" aria-label="Search expenses" className="bo-table-tools">
+   <label className="bo-table-search"><span>Find expenses by description</span>
+    <input type="search" name="q" defaultValue={q} maxLength={80} placeholder="e.g. transport or supplies"/>
+   </label>
+   <button type="submit" className="btn btn-primary">Search</button>
+   {q&&<Link className="btn" href="/expenses" prefetch={false}>Clear</Link>}
+  </form>
   <div className="bo-expense-registry-head">
    <div><h2>Expense register</h2><p className="small muted">Showing up to {PAGE_SIZE} records per page, newest first. Amounts shown below are paid expenses only.</p></div>
    <div className="bo-expense-page-total"><span>Total on this page</span><strong>{naira(pageTotal)}</strong></div>
@@ -59,20 +68,18 @@ async function ExpenseRegister({page}:{page:number}){
   {!rows.length&&<div className="bo-expense-empty"><strong>{page===1?'No paid expenses recorded yet.':'There are no expenses on this page.'}</strong><p className="small muted">{page===1?'When you save an expense, it will appear here.':'Return to the previous page to review earlier records.'}</p></div>}
   <nav className="bo-expense-pagination" aria-label="Expense pages">
    <span className="small muted">Page {page} · Only displayed records are totalled</span>
-   <div>{page>1&&<Link className="btn" href={page===2?'/expenses':`/expenses?page=${page-1}`} prefetch={false}>← Previous</Link>}{hasNext&&<Link className="btn" href={`/expenses?page=${page+1}`} prefetch={false}>Next page →</Link>}</div>
+   <div>{page>1&&<Link className="btn" href={directoryHref('/expenses',{page:page-1,q})} prefetch={false}>← Previous</Link>}{hasNext&&<Link className="btn" href={directoryHref('/expenses',{page:page+1,q})} prefetch={false}>Next page →</Link>}</div>
   </nav>
  </section>;
 }
 
 async function ExpenseWorkspace({searchParams}:{searchParams:Promise<PageSearch>}){
  const [{role},search]=await Promise.all([getWorkspace(),searchParams]);
- const raw=Array.isArray(search.page)?search.page[0]:search.page;
- const parsed=raw&&/^\d{1,4}$/.test(raw)?Number(raw):1;
- const page=Number.isSafeInteger(parsed)&&parsed>0?Math.min(parsed,1000):1;
+ const {page,q}=parseDirectory(search);
  const mayCreate=['owner','manager','finance'].includes(role);
  return <>
   {mayCreate&&<ExpenseForm/>}
-  <Suspense key={`expense-register-${page}`} fallback={<RegisterLoading/>}><ExpenseRegister page={page}/></Suspense>
+  <Suspense key={`expense-register-${page}-${q}`} fallback={<RegisterLoading/>}><ExpenseRegister page={page} q={q}/></Suspense>
  </>;
 }
 
