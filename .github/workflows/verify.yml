@@ -15,58 +15,17 @@ jobs:
         with:
           node-version: '22'
       - name: Install website dependencies
+        id: install
         run: npm ci --no-audit --no-fund
       - name: Route audit
         run: npm run check:routes
       - name: Regression and security checks
-        run: |
-          npm run check:phase21
-          npm run check:phase22
-          npm run check:phase23
-          npm run check:phase24
-          npm run check:website
-          npm run check:plans
-          npm run test:accounting
-          npm run check:admin-ui
-          npm run check:phase26
-          npm run check:branding-assets
-          npm run check:phase27
-          npm run check:phase28
-          npm run check:phase28b
-          npm run check:phase29
-          npm run check:phase30
-          npm run check:phase30b
-          npm run check:phase30c
-          npm run check:phase30d
-          npm run check:phase30e
-          npm run check:phase30f
-          npm run check:phase30g
-          npm run check:phase30h
-          npm run check:phase30i
-          npm run check:order-payment
-          npm run check:phase30j
-          npm run check:phase30k
-          npm run check:branch-stock
-          npm run check:phase30l
-          npm run check:auth-ux
-          npm run check:performance
-          npm run check:phase30m
-          npm run check:dashboard-support
-          npm run check:phase30n-ux
-          npm run check:free-pwa
-          npm run check:expenses-speed
-          npm run check:global-loading
-          npm run check:structured-plans
-          npm run check:dashboard-runtime-date
-          npm run check:ios-safe-errors
-          npm run check:customer-ux
-          npm run check:feature-visibility
-          npm run test:phase1
-          npm run test:phase2
-          npm run check:phase2-registers
+        run: npm run verify:regressions
       - name: TypeScript
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run typecheck
       - name: Production build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run build
   deno-auth-hook:
     runs-on: ubuntu-latest

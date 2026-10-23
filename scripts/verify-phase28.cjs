@@ -2,6 +2,7 @@ const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const shell=fs.readFileSync('components/shell.tsx','utf8');
 const home=fs.readFileSync('app/(dashboard)/dashboard/page.tsx','utf8');
+const actions=fs.readFileSync('lib/dashboard-workflow.ts','utf8');
 const css=fs.readFileSync('app/globals.css','utf8');
 const checks=[
  ['Role-separated platform navigation',shell.includes('isPlatformAdmin?[{title:')&&shell.includes("href:'/admin'")],
@@ -11,7 +12,7 @@ const checks=[
  ['Navigation current-page indication',shell.includes('aria-current')],
  ['Notifications and logout retained',shell.includes('unreadCount')&&shell.includes('href="/logout"')],
  ['Business dashboard reads real business data',home.includes("client.rpc('business_dashboard_command'")&&home.includes('recent_orders')],
- ['Business dashboard actions use real routes',home.includes('href="/orders/new"')&&home.includes('href="/customers/new"')],
+ ['Business dashboard actions use real routes',home.includes('dashboardQuickActions(role,features)')&&actions.includes("href:'/orders/new'")&&actions.includes("href:'/customers/new'")],
  ['Period trends use real current/prior amounts',home.includes('previous_sales')&&home.includes('previous_received')&&home.includes('change(gross')],
  ['No fabricated KPI metrics',!home.includes('1000000')&&!home.includes('₦250')],
  ['Responsive and reduced-motion styles',css.includes('@media(max-width:900px)')&&css.includes('@media(prefers-reduced-motion:reduce)')],

@@ -11,7 +11,8 @@ export async function GET(request:NextRequest){
  try{
   const {businessId,role}=await getWorkspace();
   if(role!=='owner')return status('owner');
-  const {data:row}=await billingAdmin().from('business_subscription_payments').select('business_id,status').eq('reference',reference).maybeSingle();
+  const {data:row,error:lookupError}=await billingAdmin().from('business_subscription_payments').select('business_id,status').eq('reference',reference).maybeSingle();
+  if(lookupError)return status('pending');
   if(!row||row.business_id!==businessId)return status('invalid');
   if(row.status==='paid')return status('success');
   const verified=await verifyPaystackPayment(reference);

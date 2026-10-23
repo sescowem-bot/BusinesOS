@@ -19,7 +19,7 @@ check(newOrder.includes('if(customersResult.error||taxProfile.error)'),'tax prof
 check(newOrder.includes('if(registered&&reviewed)'),'ordinary businesses skip expensive VAT rule loading');
 check(newOrder.includes('mustUseTaxForm?')&&newOrder.includes('<OrderForm customers={customers}'),'show one relevant order form');
 check(newOrder.includes('!reviewed?'),'registered VAT without review cannot create an ordinary unverified order');
-check(newOrder.includes('initialCustomerId=customers.some'),'customer ID preselection must verify business membership');
+check(newOrder.includes(".eq('business_id',businessId).eq('customer_id',requestedCustomer)")&&newOrder.includes('if(linked.error)')&&newOrder.includes('initialCustomerId=customers.some'),'customer ID preselection verifies older customers belong to this business');
 check(form.includes('initialCustomerId')&&reviewed.includes('initialCustomerId'),'both order modes preselect customer');
 check(customers.includes('encodeURIComponent(link.customer_id)'),'customer register links to prepared order');
 check(customers.includes('Next step'),'customer register has action');
