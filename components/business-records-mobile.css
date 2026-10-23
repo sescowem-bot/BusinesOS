@@ -1,0 +1,12 @@
+/* Readable native table semantics on narrow displays. */
+.bo-table-search input:focus-visible,.bo-filter select:focus-visible,.bo-page-buttons button:focus-visible{outline:3px solid #397cb5;outline-offset:2px}
+.bo-table .bo-cell-amount{font-variant-numeric:tabular-nums}
+@media(max-width:640px){
+.bo-table-scroll{overflow:visible}.bo-table{display:block;min-width:0;width:100%}
+.bo-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bo-table tbody{display:grid;gap:10px}.bo-table tr{display:block;border:1px solid #e2e8ef;border-radius:12px;padding:10px 13px;background:#fff}
+.bo-table td{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-width:0;border-bottom:1px solid #eff2f5;white-space:normal;text-align:right;padding:9px 0;overflow-wrap:anywhere}
+.bo-table td:last-child{border-bottom:0}.bo-table td::before{content:attr(data-label);color:#65798d;font-size:11px;font-weight:700;text-align:left;flex:0 0 38%;overflow-wrap:anywhere}
+.bo-table td span,.bo-table td a{min-width:0;overflow-wrap:anywhere}.bo-record-footer{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}.bo-page-buttons button{min-height:42px}
+}
+@media(prefers-reduced-motion:reduce){.bo-table *, .bo-table *::before{scroll-behavior:auto}}

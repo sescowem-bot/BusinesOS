@@ -1,0 +1,18 @@
+/* Guided forms: labeled fields, focus rings and mobile touch targets. */
+.bo-guided-form{display:grid;gap:16px;max-width:650px;width:100%}.bo-guided-form .bo-field{display:grid;gap:6px;min-width:0}
+.bo-guided-form .bo-field>label{font-size:13px;font-weight:700;color:#234157}
+.bo-guided-form .bo-field>input,.bo-guided-form .bo-field>select,.bo-guided-form .bo-field>textarea{min-height:44px;width:100%;min-width:0;padding:10px 12px;border:1px solid #b8c6d1;border-radius:9px;background:#fff;color:#123048;font-size:16px}
+.bo-guided-form .bo-field>textarea{min-height:94px;resize:vertical}
+.bo-guided-form .bo-field>input:focus-visible,.bo-guided-form .bo-field>select:focus-visible,.bo-guided-form .bo-field>textarea:focus-visible{outline:3px solid #80b9e4;outline-offset:2px}
+.bo-guided-form .bo-field>[aria-invalid="true"]{border-color:#b42318}
+.bo-guided-form .bo-field-hint{margin:0;font-size:12px;line-height:1.55;color:#587084}
+.bo-guided-form .bo-field-hint.bo-field-error{color:#a51e19;font-weight:700}
+.bo-guided-form .bo-form-choice{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid #e2e9ef;border-radius:10px;background:#f7fafc}
+.bo-guided-form .bo-form-choice input{height:18px;width:18px;margin:2px 0 0;flex:0 0 auto}
+.bo-guided-form .bo-form-choice span{font-size:13px;line-height:1.5;color:#294a60}
+.bo-guided-form .bo-form-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.bo-guided-form .bo-form-actions button{min-height:44px}
+.bo-guided-form .bo-form-alert{margin:0;padding:12px 14px;border-radius:9px;background:#fff0ee;color:#922722;line-height:1.5;font-size:13px}
+.bo-guided-form .bo-form-success{margin:0;padding:12px 14px;border-radius:9px;background:#edf9f2;color:#126640;line-height:1.5;font-size:13px}
+@media(max-width:480px){.bo-guided-form .bo-form-actions button{width:100%}}
+@media(prefers-reduced-motion:reduce){.bo-guided-form *{scroll-behavior:auto}}

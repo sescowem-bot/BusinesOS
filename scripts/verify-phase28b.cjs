@@ -15,11 +15,17 @@ assert.match(helpers,/BusinessPageHeading/);
 assert.match(helpers,/BusinessAlert/);
 for(const p of ['customers','orders','products','payments','invoices']){
  const source=read(`app/(dashboard)/${p}/page.tsx`);
- assert.match(source,/BusinessRecordsTable/);
+ if(/ServerRecordRegister/.test(source)){
+  assert.match(source,/\.range\(/,'Server register must have a page bound: '+p);
+  assert.match(source,/count:'exact'/,'Server register must report exact count: '+p);
+ }else{
+  assert.match(source,/BusinessRecordsTable/,'Legacy pages use bounded client-side tables: '+p);
+  assert.match(source,/\.limit\(/,'Legacy pages must be bounded: '+p);
+ }
  assert.match(source,/\.eq\('business_id',businessId\)/,'Records must be scoped to active business: '+p);
  assert.match(source,/BusinessPageHeading/);
  assert.match(source,/BusinessSection/);
- assert.match(source,/\.limit\(/,'Large datasets must have explicit bounded list queries: '+p);
+
  assert.doesNotMatch(source,/Demo Business|sample customer|fake customer/i);
 }
 const detail=read('app/(dashboard)/orders/[id]/page.tsx');
