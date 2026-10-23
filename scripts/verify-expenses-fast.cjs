@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {ciRuns}=require('./ci-contract.cjs');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const read=file=>fs.readFileSync(file,'utf8');
@@ -32,5 +33,5 @@ verify(!page.includes(".limit(200)"),'Avoid loading 200 expenses per navigation'
 verify(expenseAction.includes("client.rpc('gl_record_paid_expense'"),'Existing guarded finance RPC must remain');
 verify(shell.includes('getWorkspace()'),'Business shell remains authenticated');
 verify(read('package.json').includes('check:expenses-speed'),'Dedicated regression command included');
-verify(read('.github/workflows/verify.yml').includes('check:expenses-speed'),'CI must cover the fix');
+verify(ciRuns('check:expenses-speed'),'CI must cover the fix');
 console.log(`Expenses loading/performance guards passed (${count} assertions).`);

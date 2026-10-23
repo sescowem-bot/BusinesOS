@@ -1,3 +1,4 @@
+const {ciRuns}=require('./ci-contract.cjs');
 const fs=require('fs'),assert=require('node:assert/strict');const read=p=>fs.readFileSync(p,'utf8');
 const sql=read('supabase/migrations/044_structured_plan_entitlements_custom_company_roles.sql');
 const form=read('app/admin/cms-form.tsx'),action=read('app/admin/cms-actions.ts'),plans=read('app/admin/plans/page.tsx');
@@ -38,7 +39,7 @@ check(read('app/admin/plan-access/permission-editor.tsx').includes("disabled={pl
 check(read('lib/feature-directory.ts').includes('moduleWorkflows'),'Workflow catalogue missing');
 check(read('app/pricing/page.tsx').includes('price_monthly_ngn'),'Public page should show numeric prices');
 check(read('app/(dashboard)/upgrade/page.tsx').includes('price_yearly_ngn'),'Customer page should show annual pricing');
-check(read('.github/workflows/verify.yml').includes('check:structured-plans'),'CI gate missing');
+check(ciRuns('check:structured-plans'),'CI gate missing');
 const ts=require('./load-typescript.cjs');
 for(const p of ['app/admin/businesses/[id]/company-access-actions.ts','app/admin/businesses/[id]/company-access-forms.tsx','app/admin/businesses/[id]/page.tsx','app/admin/plans/page.tsx','app/admin/cms-actions.ts','app/admin/cms-form.tsx']){
  const parsed=ts.createSourceFile(p,read(p),ts.ScriptTarget.Latest,true,p.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);

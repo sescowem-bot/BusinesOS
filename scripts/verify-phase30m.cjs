@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {ciRuns}=require('./ci-contract.cjs');
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');
 const sql=read('supabase/migrations/041_wholesale_pricing_pos_reporting.sql');
@@ -33,7 +34,7 @@ check(wholesale.includes('Reference prices only'),'wholesale policy disclosure a
 check(actions.includes("requireBusinessFeature('pos')")&&actions.includes("['owner','manager']"),'wholesale Server Action authorization missing');
 check(actions.includes('business_set_wholesale_price_tier')&&actions.includes('business_delete_wholesale_price_tier'),'controlled edit RPC calls missing');
 check(read('components/shell.tsx').includes('/retail-reports')&&read('components/shell.tsx').includes('/wholesale'),'menu links missing');
-check(read('.github/workflows/verify.yml').includes('check:phase30m'),'CI regression missing');
+check(ciRuns('check:phase30m'),'CI regression missing');
 const ts=require('./load-typescript.cjs')
 for(const file of ['app/(dashboard)/retail-reports/page.tsx','app/(dashboard)/wholesale/page.tsx','app/(dashboard)/wholesale/forms.tsx','app/(dashboard)/wholesale/actions.ts']){
  const f=ts.createSourceFile(file,read(file),ts.ScriptTarget.Latest,true,file.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);

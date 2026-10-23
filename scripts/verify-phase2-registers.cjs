@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {ciRuns}=require('./ci-contract.cjs');
 /* Phase 2 guard: no capped local-only record search or cross-business listing. */
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
@@ -39,5 +40,5 @@ const expense=read('app/(dashboard)/expenses/page.tsx');
 ok(expense.includes('directoryHref')&&expense.includes('q={q}')&&expense.includes("eq('business_id',businessId)"),'Expense search must preserve page, query and business');
 const helper=read('lib/record-directory.ts');
 ok(helper.includes('Number.isSafeInteger')&&helper.includes('DIRECTORY_SIZE=25'), 'Bounded query parsing required');
-ok(read('.github/workflows/verify.yml').includes('npm run test:phase2'),'Phase2 tests must run in CI');
+ok(ciRuns('test:phase2'),'Phase2 tests must run in CI');
 console.log('Phase 2 register source review passed: '+checks+' assertions');

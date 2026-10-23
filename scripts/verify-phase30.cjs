@@ -1,5 +1,7 @@
 /** Verify Phase 030 release invariants without claiming integration testing. */
 'use strict';
+const {ciRuns}=require('./ci-contract.cjs');
+
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
@@ -18,9 +20,10 @@ const checks=[
  ['app/admin/page.tsx',"href:'/admin/pilot'",'System Owner dashboard must link to pilot'],
  ['scripts/pilot-smoke.cjs',"redirect:'manual'",'Anonymous route test must not accidentally follow redirects'],
  ['scripts/pilot-smoke.cjs','https:', 'Public smoke test must require HTTPS'],
- ['.github/workflows/verify.yml','check:phase30','CI must run Phase 030 invariants']
+ ['scripts/regression-checks.json','"check:phase30"','CI must run Phase 030 invariants']
 ];
 for(const [file,text,explanation] of checks)assert(read(file).includes(text),explanation);
+assert(ciRuns('check:phase30'),'Phase 030 must actually be scheduled in CI');
 const pkg=JSON.parse(read('package.json'));
 assert.equal(pkg.scripts['check:phase30'],'node scripts/verify-phase30.cjs');
 assert.equal(pkg.scripts['smoke:pilot'],'node scripts/pilot-smoke.cjs');

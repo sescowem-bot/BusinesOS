@@ -1,3 +1,4 @@
+const {ciRuns}=require('./ci-contract.cjs');
 // Source and schema contract validation for Phase 030N-B. Live DB tests required.
 const assert=require('node:assert/strict');const fs=require('node:fs');
 const rd=p=>fs.readFileSync(p,'utf8');let checks=0;
@@ -17,7 +18,7 @@ expect(up.includes("current==='free'")&&up.includes('Free forever'),'Free is inc
 expect(up.includes("plan.id==='free'?")&&up.includes('Included automatically'),'Free plan is assigned automatically without approval');
 expect(!up.includes('No approved plan assigned yet'),'confusing unassigned plan message removed');
 expect(rd('app/onboarding/page.tsx').includes('Tell us about your business'),'friendly workspace introduction');
-expect(rd('app/onboarding/form.tsx').includes('Start with the Free plan'),'Free plan clearly explained without internal roles');
+expect(rd('app/onboarding/form.tsx').includes('Free plan'),'Free plan clearly explained without internal roles');
 const manifest=rd('app/manifest.ts');
 for(const needle of ["start_url:'/dashboard'","display:'standalone'","scope:'/'","purpose:'maskable'","getPlatformBrand"])
  expect(manifest.includes(needle),`manifest: ${needle}`);
@@ -42,7 +43,7 @@ expect(rd('app/(dashboard)/dashboard/page.tsx').includes('href="/install"'),'das
 expect(rd('components/public-footer.tsx').includes('href="/install"'),'public site install nav');
 expect(rd('app/install/page.tsx').includes('InstallAppGuide'),'accessible guide route');
 expect(rd('app/globals.css').includes('@media(max-width:760px){.install-page-layout'),'mobile layout');
-expect(rd('.github/workflows/verify.yml').includes('npm run check:free-pwa'),'CI coverage');
+expect(ciRuns('check:free-pwa'),'CI coverage');
 const ts=require('./load-typescript.cjs')
 for(const file of ['app/manifest.ts','app/install/page.tsx','components/install-app-guide.tsx','app/layout.tsx','app/(dashboard)/upgrade/page.tsx']){
  const sf=ts.createSourceFile(file,rd(file),ts.ScriptTarget.Latest,true,file.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);

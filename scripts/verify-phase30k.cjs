@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {ciRuns}=require('./ci-contract.cjs');
 const fs=require('node:fs');const assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');const sql=read('supabase/migrations/038_partial_purchase_receipts_supplier_bills.sql');
 const actions=read('app/(dashboard)/purchasing/actions.ts'),forms=read('app/(dashboard)/purchasing/purchase-form.tsx');
@@ -28,7 +29,7 @@ ok(purchasing.includes('partially_received')&&purchasing.includes('received_quan
 ok(purchasing.includes('financialDataReady')&&purchasing.includes('Supplier bill'),'bill load and fallback missing');
 ok(inventory.includes('Restock planning'),'restock recommendation panel missing');
 ok(read('package.json').includes('check:phase30k'),'package test missing');
-ok(read('.github/workflows/verify.yml').includes('check:phase30k'),'CI test missing');
+ok(ciRuns('check:phase30k'),'CI test missing');
 ok(read('MD/PHASE_030K_PARTIAL_RECEIPTS_SUPPLIER_BILLS.md').includes('branch'),'limitations documentation missing');
 const ts=require('./load-typescript.cjs')
 for(const f of ['app/(dashboard)/purchasing/actions.ts','app/(dashboard)/purchasing/page.tsx','app/(dashboard)/purchasing/purchase-form.tsx','app/(dashboard)/inventory/page.tsx']){

@@ -1,3 +1,4 @@
+const {ciRuns}=require('./ci-contract.cjs');
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');let checks=0;
 function check(v,m){assert.ok(v,m);checks++;}
@@ -36,7 +37,7 @@ check(read('components/shell.tsx').includes("href:'/getting-started'"),'guide in
 check(read('app/(dashboard)/dashboard/page.tsx').includes('href="/getting-started"'),'guide on dashboard');
 check(!newOrder.includes('taxDataUnavailable ? true : false'),'no silent tax fallback');
 check(read('package.json').includes('check:phase30n-ux'),'check in npm scripts');
-check(read('.github/workflows/verify.yml').includes('check:phase30n-ux'),'CI step included');
+check(ciRuns('check:phase30n-ux'),'CI step included');
 const ts=require('./load-typescript.cjs')
 for(const f of ['app/(dashboard)/getting-started/page.tsx','app/(dashboard)/orders/new/page.tsx','app/(dashboard)/orders/page.tsx','app/(dashboard)/customers/page.tsx','app/(dashboard)/orders/[id]/page.tsx','app/(dashboard)/orders/new/reviewed-tax-form.tsx','app/(dashboard)/sales/forms.tsx','components/business-records.tsx']){
  const source=ts.createSourceFile(f,read(f),ts.ScriptTarget.Latest,true,f.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
