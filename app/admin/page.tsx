@@ -11,6 +11,7 @@ const tools=[
  {name:'Subscriptions & renewals',detail:'Review expiry dates and send renewal reminders to account owners.',href:'/admin/renewals',icon:CreditCard},
  {name:'Billing ledger',detail:'Read-only review of subscription payments and pending confirmations.',href:'/admin/billing',icon:CreditCard},
  {name:'Feature permissions',detail:'Control module and team-role entitlements.',href:'/admin/plan-access',icon:ShieldCheck},
+ {name:'Action permission matrix',detail:'Manage audited view, create, edit, delete, approve and export preferences for each role.',href:'/admin/plan-actions',icon:ShieldCheck},
  {name:'Usage limits',detail:'Review safe subscription capacity and its deployment status.',href:'/admin/usage-limits',icon:ShieldCheck},
  {name:'Email templates',detail:'Review branded notifications and delivery settings.',href:'/admin/email',icon:Mail},
  {name:'System health',detail:'Check data services and administration readiness.',href:'/admin/health',icon:MonitorCog},

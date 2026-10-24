@@ -824,3 +824,15 @@
 .bo-plan-audit-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .bo-plan-audit-steps p{font-size:13px;line-height:1.6;margin:0}
 @media(max-width:700px){.bo-plan-audit-card{padding:17px}.bo-plan-audit-cardhead .btn{font-size:12px;padding:9px 10px}.bo-plan-audit-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* System Owner's plan/role/action permission matrix */
+.bo-action-picker{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.bo-action-picker label{display:flex;flex-direction:column;gap:6px;min-width:160px;font-weight:700}
+.bo-action-picker select,.bo-matrix-label select{min-height:42px;max-width:100%;border:1px solid #cbd9e4;border-radius:8px;background:#fff;color:#123b63;padding:8px 10px}
+.bo-action-module{margin:8px 0;border:1px solid #dce6ed;border-radius:10px;overflow:hidden}
+.bo-action-module>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px;cursor:pointer;flex-wrap:wrap}
+.bo-action-module[open]>summary{background:#f5f9fc}
+.bo-action-module>.table-wrap{padding:8px 14px 12px}
+.bo-matrix-label{display:inline-flex;min-width:230px}
+.bo-matrix-label select{width:100%}
+@media(max-width:640px){.bo-action-picker label{width:100%}.bo-action-picker button{width:100%}.bo-matrix-label{min-width:180px}}

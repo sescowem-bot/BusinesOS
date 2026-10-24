@@ -37,7 +37,7 @@ export default async function PlanAudit(){
  const nice=(key:string)=>paidCapabilities.find(x=>x.key===key)?.name||key;
  return <main className="admin-area bo-plan-audit"><header className="admin-header">
   <div><span className="badge badge-brand">SYSTEM OWNER / PERMISSIONS</span><h1>Plans, modules and staff permissions</h1><p>Review what each subscription includes and the configured staff roles. These are different controls.</p></div>
-  <div className="bo-plan-audit-actions"><Link className="btn btn-primary" href="/admin/plan-access">Edit plan access</Link><Link className="btn" href="/admin/usage-limits">Review usage limits</Link></div>
+  <div className="bo-plan-audit-actions"><Link className="btn btn-primary" href="/admin/plan-access">Edit plan access</Link><Link className="btn" href="/admin/usage-limits">Review usage limits</Link><Link className="btn" href="/admin/plan-actions">Action permissions</Link></div>
  </header>
  <section className="card card-pad bo-plan-audit-intro"><h2>How access works</h2>
   <div className="bo-plan-audit-steps"><p><strong>1. Subscription</strong> decides which additional modules the business can use.</p><p><strong>2. Staff role</strong> decides who can use a module within the business.</p><p><strong>3. Business-specific settings</strong> may further restrict staff or grant an audited exception.</p></div>
