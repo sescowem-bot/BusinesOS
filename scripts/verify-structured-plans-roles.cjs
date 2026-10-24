@@ -35,7 +35,8 @@ check(plans.includes('moduleWorkflowCount')&&plans.includes('moduleWorkflows'),'
 check(company.includes('What this company can actually use'),'Per-company entitlement breakdown missing');
 check(company.includes('CompanyPriceForm')&&company.includes('CompanyRoleForm')&&company.includes('CompanyRoleAssignmentForm'),'Business admin edit panels missing');
 check(companyForms.includes('Create new named role')&&companyForms.includes('Maximum additional modules'),'Custom role permissions UI missing');
-check(read('app/admin/plan-access/permission-editor.tsx').includes("disabled={planId==='free'}"),'Free plan should never be enabled directly');
+check(read('app/admin/plan-access/page.tsx').includes('CorePlanAccessEditor'),'System Owner must configure core features on every plan');
+check(!read('app/admin/plan-access/permission-editor.tsx').includes("disabled={planId==='free'}"),'Free premium module controls must remain editable');
 check(read('lib/feature-directory.ts').includes('moduleWorkflows'),'Workflow catalogue missing');
 check(read('app/pricing/page.tsx').includes('price_monthly_ngn'),'Public page should show numeric prices');
 check(read('app/(dashboard)/upgrade/page.tsx').includes('price_yearly_ngn'),'Customer page should show annual pricing');
