@@ -17,7 +17,9 @@ test('registering cannot grant paid entitlements',()=>{
 test('loading fallback has no frightening timeout actions',()=>{
  const source=read('components/workspace-loading-brand.tsx');
  assert.doesNotMatch(source,/window\.location\.reload|setTimeout|Back to website|Retry page/);
- assert.match(source,/bo-quiet-loader/);
+ assert.match(source,/bo-premium-loader__ring/);
+ assert.match(source,/bo-premium-loader__name/);
+ assert.match(source,/bo-premium-loader__label/);
 });
 test('Free is documented as eight core business essentials',()=>{
  const source=read('app/admin/plan-access/audit/page.tsx');
