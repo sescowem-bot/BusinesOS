@@ -12,5 +12,5 @@ test('workspace cookie settings stay mounted and first visit notice is not hidde
  assert.doesNotMatch(s,/if\(!ready\|\|!publicArea\)return null/);
  assert.match(s,/decision===null&&<aside/);
  assert.match(s,/decision!==null&&publicArea&&<button/);
- assert.match(f('app\\/\\(dashboard\\)\\/settings\\/privacy\\/page.tsx'),/CookieSettingsButton/);
+ assert.match(f('app/(dashboard)/settings/privacy/page.tsx'),/CookieSettingsButton/);
 });
