@@ -1,0 +1,17 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+const read=p=>readFileSync(p,'utf8');
+const page=read('app/(dashboard)/upgrade/page.tsx');
+const settings=read('app/(dashboard)/settings/page.tsx');
+const checkout=read('app/(dashboard)/upgrade/checkout-form.tsx');
+const admin=read('app/admin/businesses/[id]/manual-plan-actions.ts');
+test('Paid plan is self-service via Paystack, no request form',()=>{assert.match(page,/PlanCheckoutForm/);assert.match(page,/billingReady/);assert.doesNotMatch(page,/UpgradeRequestForm|business_upgrade_requests|Your upgrade requests|Request this plan/);});
+test('No customer upgrade action survives',()=>{assert.equal(existsSync('app/(dashboard)/upgrade/request-form.tsx'),false);assert.equal(existsSync('app/(dashboard)/upgrade/actions.ts'),false)});
+test('Subscription settings no longer offer admin requests',()=>{assert.doesNotMatch(settings,/pendingRequest|request an upgrade|business_upgrade_requests/);assert.match(settings,/pay securely with Paystack/)});
+test('Only business owners can initiate paid subscriptions',()=>{assert.match(page,/!owner/);assert.match(read('app/api/billing/checkout/route.ts'),/role!=='owner'/);});
+test('Gateway amount comes from DB, never client supplied',()=>{const api=read('app/api/billing/checkout/route.ts');assert.match(api,/public_site_plans/);assert.match(api,/priceToKobo/);assert.match(api,/transaction\/initialize/);});
+test('Callback and webhook re-verify provider before plan activation',()=>{const verify=read('app/api/billing/verify/route.ts'),webhook=read('app/api/webhooks/paystack/route.ts');assert.match(verify,/verifyPaystackPayment/);assert.match(webhook,/verifyPaystackPayment/);});
+test('System owner manual changes remain independent',()=>{assert.match(admin,/requirePlatformAdmin/);assert.match(admin,/admin_assign_business_subscription/);});
+test('Premium tools shown as previews, but are not unlocked by navigation',()=>{assert.match(page,/premiumPreviews/);assert.match(page,/business_workspace_features/);assert.match(page,/Staff cannot initiate charges/);assert.doesNotMatch(read('components/shell.tsx'),/\bUpgradeRequestForm\b/)});
+test('Checkout requires explicit payment via Paystack',()=>{assert.match(checkout,/action="\/api\/billing\/checkout"/);assert.match(checkout,/Continue to Paystack payment/);});

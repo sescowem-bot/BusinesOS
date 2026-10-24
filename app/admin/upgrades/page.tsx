@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
-import {ReviewUpgradeForm} from './review-form';
 export const dynamic='force-dynamic';
 type Directory={business_id:string;business_name:string};
 export default async function AdminUpgrades(){
@@ -13,8 +12,8 @@ export default async function AdminUpgrades(){
  ]);
  const names=new Map(((directory.data||[]) as Directory[]).map(b=>[b.business_id,b.business_name]));
  const planNames=new Map((plans.data||[]).map(p=>[p.id,p.name]));
- return <main className="admin-area"><Link href="/admin">← Administration</Link><h1>Plan upgrade requests</h1><p className="muted">Review plan enquiries sent by business owners. Accepting a request is not payment confirmation and does not immediately change a subscription. For complimentary access, use the audited controls under Registered businesses.</p>
+ return <main className="admin-area"><Link href="/admin">← Administration</Link><h1>Historical upgrade enquiries</h1><p className="muted">Customers now pay directly through verified Paystack checkout—no upgrade request or manual approval. This page retains previous enquiries for audit only. For a complimentary or manual subscription change, use the audited controls in <Link href="/admin/businesses">Registered businesses</Link>.</p>
  {(directory.error||requests.error||plans.error)&&<section className="card card-pad" role="alert"><strong>One or more administration services are unavailable.</strong><p>Please check database readiness under <Link href="/admin/health">System diagnostics</Link>. Review controls are disabled until request records are available.</p></section>}
- <div className="grid grid-2">{!requests.error&&(requests.data||[]).map(r=><section className="card card-pad" key={r.id}><p className="badge">{r.status==='pending'?'Under review':r.status==='approved'?'Accepted':r.status==='rejected'?'Declined':r.status}</p><h2>{planNames.get(r.plan_id)||r.plan_id}</h2><p className="small muted">Business: {names.get(r.business_id)||r.business_id}</p><p className="small muted">Requested: {new Date(r.requested_at).toLocaleString('en-NG')}</p><p>{r.justification||'No reason provided'}</p>{r.status==='pending'&&!directory.error&&!plans.error?<ReviewUpgradeForm requestId={r.id}/>:r.status==='pending'?<p role="alert" className="muted small">Review is paused while plan or company details are unavailable.</p>:<p className="muted small">Decision: {r.review_note||'No note'}</p>}</section>)}
- {!requests.error&&!requests.data?.length&&<p>No requests yet. New business-owner requests will appear here.</p>}</div></main>;
+ <div className="grid grid-2">{!requests.error&&(requests.data||[]).map(r=><section className="card card-pad" key={r.id}><p className="badge">{r.status==='pending'?'Under review':r.status==='approved'?'Accepted':r.status==='rejected'?'Declined':r.status}</p><h2>{planNames.get(r.plan_id)||r.plan_id}</h2><p className="small muted">Business: {names.get(r.business_id)||r.business_id}</p><p className="small muted">Requested: {new Date(r.requested_at).toLocaleString('en-NG')}</p><p>{r.justification||'No reason provided'}</p><p className="muted small">{r.status==='pending'?'Archived enquiry. The business owner can subscribe through Paystack.':'Decision: '+(r.review_note||'No note')}</p></section>)}
+ {!requests.error&&!requests.data?.length&&<p>No historical upgrade enquiries.</p>}</div></main>;
 }

@@ -4,18 +4,18 @@ import {saveBusinessProfile,saveBusinessLogo} from './actions';
 export const dynamic='force-dynamic';
 export default async function Settings(){
  const {client,businessId,role}=await getWorkspace();
- const [{data:assignment},{data:latestRequest}] = await Promise.all([client.from('business_plan_assignments').select('plan_id,expires_at').eq('business_id',businessId).maybeSingle(),client.from('business_upgrade_requests').select('plan_id,status,requested_at').eq('business_id',businessId).order('requested_at',{ascending:false}).limit(1)]);
+ const {data:assignment}=await client.from('business_plan_assignments').select('plan_id,expires_at').eq('business_id',businessId).maybeSingle();
  const currentPlan=assignment?.plan_id||'free';
- const pendingRequest=latestRequest?.[0]?.status==='pending';
+
  const {data:business,error}=await client.from('businesses').select('name,category,phone,whatsapp,email,description,address,city,state,currency,logo_url,verified,published,directory_email,directory_phone,directory_whatsapp').eq('id',businessId).maybeSingle();
  const owner=role==='owner';
  return <div className="tax-page bo-settings"><div className="page-head"><div><h1>Business settings</h1><p>Keep your business name, logo and contact details up to date.</p></div></div>
  {error&&<section className="notice" role="alert">We couldn't load your business details. Please refresh the page.</section>}
  {owner&&<section className="card card-pad bo-subscription-settings" style={{marginBottom:20}}>
    <div className="page-head"><div><h2>Plan &amp; subscription</h2><p className="small muted">Your current plan: <strong>{currentPlan==='free'?'Free':currentPlan.replace(/-/g,' ')}</strong></p>
-   {pendingRequest&&<p className="small muted">Your upgrade request is awaiting review.</p>}</div>
+</div>
    <Link className="btn btn-primary" href="/upgrade">Manage subscription →</Link></div>
-   <p className="small muted">Compare plans, request an upgrade, or pay securely when online checkout is available.</p>
+   <p className="small muted">Compare plans and pay securely with Paystack. Plans activate only after verified payment; separate audited manual changes are managed by the System Owner.</p>
   </section>}
  <section className="card card-pad" style={{marginBottom:20}}><h2>Privacy & data rights</h2><p>Review your data rights, ask for corrections or exports and track privacy requests. Requests are reviewed securely; deletion is not automatic.</p><Link className="btn" href="/settings/privacy">Manage privacy requests →</Link></section>
  <div className="grid grid-2"><section className="card card-pad"><h2>Business identity</h2><p className="small muted">Your logo appears alongside your business details in supported areas.</p><div className="bo-logo-preview">{business?.logo_url&&/^https:\/\//.test(business.logo_url)?<img src={business.logo_url} alt={`${business.name} logo`} className="bo-business-logo"/>:<span className="bo-business-logo bo-business-logo-fallback">{business?.name?.slice(0,1)||'B'}</span>}<div><strong>{business?.name||'Your business'}</strong><p className="small muted">PNG, JPG or WebP · Maximum 2 MB</p></div></div>{owner&&<form action={saveBusinessLogo} className="comms-form" encType="multipart/form-data"><input type="hidden" name="business_id" value={businessId}/><label>Upload business logo<input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required/></label><button className="btn" type="submit">Upload logo</button></form>}</section><section className="card card-pad"><h2>Public business profile</h2><p className="small muted">Choose whether customers can discover your business in the public directory. Your details stay private until your business is verified and you enable the listing.</p><p><strong>Verification:</strong> {business?.verified?'Verified':'Not yet verified'}</p>{business?.verified?<p className="small muted">{business?.published?'Your business is visible in the public directory.':'Your business is verified. You can choose to appear publicly.'}</p>:<p className="small muted">Public listing becomes available after BusinessOS verifies your business.</p>}{business?.published&&business?.verified&&<Link href="/directory" className="btn">View directory</Link>}</section></div>

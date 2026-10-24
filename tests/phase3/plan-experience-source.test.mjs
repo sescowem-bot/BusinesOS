@@ -11,7 +11,8 @@ test('public pricing keeps selected plan through registration',()=>{
 test('registering cannot grant paid entitlements',()=>{
  assert.doesNotMatch(read('app/(auth)/signup/actions.ts'),/activate_paid_business_plan|business_plan_assignments/);
  assert.doesNotMatch(read('app/onboarding/actions.ts'),/activate_paid_business_plan|business_plan_assignments/);
- assert.match(read('app/(dashboard)/upgrade/checkout-form.tsx'),/Pay securely & activate/);
+ assert.match(read('app/(dashboard)/upgrade/checkout-form.tsx'),/Continue to Paystack payment/);
+ assert.doesNotMatch(read('app/(dashboard)/upgrade/page.tsx'),/Request this plan|UpgradeRequestForm/);
 });
 test('loading fallback has no frightening timeout actions',()=>{
  const source=read('components/workspace-loading-brand.tsx');
