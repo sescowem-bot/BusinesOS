@@ -19,7 +19,7 @@ export function explainAuthError(error:AuthErrorLike,flow:'signup'|'login'|'reco
   return {message:text,retryAfterSeconds:seconds,reason:'rate_limit'};
  }
  if(code==='email_not_confirmed')return {message:'Your email is not confirmed yet. Open your verification email, including Spam/Junk, then sign in.',retryAfterSeconds:0,reason:'unconfirmed'};
- if(code==='invalid_credentials'||code==='invalid_grant')return {message:'The email or password could not be verified. Check your details or reset your password.',retryAfterSeconds:0,reason:'credentials'};
+ if(code==='invalid_credentials'||code==='invalid_grant')return {message:'Incorrect email or password. Check your details or reset your password.',retryAfterSeconds:0,reason:'credentials'};
  if(code==='email_address_not_authorized')return {message:'Email confirmation is not available for this address yet. Please contact support.',retryAfterSeconds:0,reason:'configuration'};
  return {message:flow==='signup'?'We could not complete registration. Please try again or contact support.':flow==='login'?'Sign in is temporarily unavailable. Please try again.':'Password reset could not be requested. Please try again later.',retryAfterSeconds:0,reason:'general'};
 }

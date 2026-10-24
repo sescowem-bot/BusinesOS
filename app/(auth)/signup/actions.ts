@@ -12,8 +12,8 @@ export async function signUp(_state:SignupState,data:FormData):Promise<SignupSta
  const password=String(data.get('password')||'');
  const confirm=String(data.get('confirm_password')||'');
  const desiredPlan=requestedPaidPlan(data.get('selected_plan'));
- if(name.length<2||name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<12||password.length>128)
-  return failed('Enter your full name, a valid email and a password of 12–128 characters.');
+ if(name.length<2||name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<8||password.length>128)
+  return failed('Enter your full name, a valid email and a password of 8–128 characters.');
  if(password!==confirm)return failed('The two passwords do not match. Please check and try again.');
  const terms=await getActiveTerms();
  if(!terms.available)return failed('Registration is temporarily unavailable while legal document availability is checked.');

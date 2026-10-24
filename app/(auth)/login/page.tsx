@@ -26,8 +26,8 @@ export default async function Login({searchParams}:{searchParams:Promise<{error?
    </section></main>;
   }
  }
- return <main className="auth"><div className="auth-card auth-card-accessible"><Link href="/" className="brand"><span className="brand-mark">{brand.logo_url?<img src={brand.logo_url} alt="" width={35} height={35} style={{objectFit:'contain'}}/>:brand.short_name[0]?.toUpperCase()}</span><span>{brand.name}</span></Link><h1>Welcome back</h1><p className="muted">Sign in to pick up where you left off.</p>
+ return <main className="auth"><div className="auth-card auth-card-accessible"><Link href="/" className="brand"><span className="brand-mark">{brand.logo_url?<img src={brand.logo_url} alt="" width={35} height={35} style={{objectFit:'contain'}}/>:brand.short_name[0]?.toUpperCase()}</span><span>{brand.name}</span></Link><h1>Welcome back</h1><p className="muted">Sign in securely to manage your business.</p>
  {loginError==='callback'&&<div className="auth-feedback auth-feedback-error" role="alert"><strong>Your verification link has expired or was already used.</strong><p>Request a fresh link to continue.</p><Link href="/forgot-password">Get a new link →</Link></div>}
  {loginError==='config'&&<div className="auth-feedback auth-feedback-error" role="alert">Sign-in is temporarily unavailable. Please contact support.</div>}
- <LoginForm/><p className="small muted" style={{marginTop:18}}>{brand.support_email?<a href={`mailto:${brand.support_email}`}>Need help? Contact support</a>:<Link href="/contact">Need help? Contact us</Link>}</p><Link className="small" href="/">Return to website</Link></div></main>;
+ <LoginForm/><p className="small muted" style={{marginTop:18}}>{brand.support_email?<a href={`mailto:${brand.support_email}`}>Need help? Contact support</a>:<Link href="/contact">Need help? Contact us</Link>}</p></div></main>;
 }
