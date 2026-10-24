@@ -32,6 +32,18 @@ export function parseActionMatrix(data:unknown,role:unknown):PermissionEntry[]|n
  }
  return parsed;
 }
+/** A staged preference must never widen Free beyond the core workspace. */
+export function safeMatrixForPlan(plan:string,entries:readonly PermissionEntry[]):boolean{
+ if(!validPlanId(plan))return false;
+ return plan!=='free'||entries.every(row=>essentialModuleKeys.has(row.module_key)||row.decision!=='allow');
+}
+/** Explain the exact number of changes before the administrator saves them. */
+export function changedMatrixCells(before:Readonly<Record<string,ActionDecision>>,after:Readonly<Record<string,ActionDecision>>):number{
+ return actionModules.reduce((count,mod)=>count+roleActions.filter(action=>before[actionKey(mod.key,action)]!==after[actionKey(mod.key,action)]).length,0);
+}
+export function validChangeReason(input:unknown):input is string{
+ return typeof input==='string'&&input.trim().length>=12&&input.trim().length<=300;
+}
 export function matrixFromSaved(saved:readonly StoredDecision[],role:ActionRole):Record<string,ActionDecision>{
  const map:Record<string,ActionDecision>={};
  for(const mod of actionModules)for(const action of roleActions)map[actionKey(mod.key,action)]='inherit';
