@@ -1,5 +1,6 @@
 'use server';
 import {friendlyServiceError} from '@/lib/user-feedback';
+import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {revalidatePath} from 'next/cache';
 import {getWorkspace} from '@/lib/server/workspace';
 import {requireBusinessFeature} from '@/lib/server/authorization';
@@ -12,7 +13,7 @@ export async function addCatalogItem(_:CatalogState,fd:FormData):Promise<Catalog
  if(!name||name.length>160||sku.length>100||description.length>2000||!['product','service','package'].includes(type)||![price,cost,stock,minimum].every(v=>Number.isFinite(v)&&v>=0)||(!track&&stock!==0))return fail('Check the item, amounts, and inventory tracking settings.');
  if(track||minimum>0){const access=await requireBusinessFeature('inventory');if(!access.allowed)return fail(access.reason);}
  const {error}=await client.rpc('catalog_create_item',{p_business:businessId,p_name:name,p_type:type,p_sku:sku||null,p_description:description||null,p_price:price,p_cost:cost,p_track:track,p_initial_stock:stock,p_minimum:minimum});
- if(error)return fail('Item could not be saved. Review the details and try again.');
+ if(error)return fail(usageLimitFeedback(error)||'Item could not be saved. Review the details and try again.');
  revalidatePath('/products');revalidatePath('/inventory');return {error:'',success:'Item created successfully.'};
  }catch{return fail('Unable to create item.');}
 }

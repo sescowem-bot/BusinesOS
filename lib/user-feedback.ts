@@ -3,10 +3,12 @@
  * Server-side logs/monitoring may retain diagnostics; NEVER return database messages,
  * stack traces, SQL migration names, table names or infrastructure details to a customer.
  */
+import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 export type ServiceFailure={code?:string|null;message?:string|null;status?:number|null};
 export function friendlyServiceError(action:string,error?:ServiceFailure|null):string{
  const verb=action.replace(/[^a-zA-Z\s-]/g,'').trim().toLowerCase()||'complete this request';
  const code=error?.code||'';
+ const usage=usageLimitFeedback(error);if(usage)return usage;
  if(['42501','PGRST301','PGRST302'].includes(code)||error?.status===403)return `You don't have access to ${verb}. Ask your business owner for permission if you think this is a mistake.`;
  if(code==='23505')return `This record may already exist. Review your saved records before trying to ${verb} again.`;
  if(code==='23503')return `One of the selected records is no longer available. Refresh the page and try again.`;

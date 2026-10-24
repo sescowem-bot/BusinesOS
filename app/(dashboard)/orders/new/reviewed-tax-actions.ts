@@ -1,5 +1,6 @@
 'use server';
 import {revalidatePath} from 'next/cache';
+import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 export type ReviewedTaxState={error:string;success:string};
@@ -37,9 +38,9 @@ export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):P
    p_payment_state:paymentState,p_payment_amount:paymentAmount,
    p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
-  if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
+  if(error)return {error:usageLimitFeedback(error)||(error.code==='42883'||error.code==='PGRST202'?
    'Orders are temporarily unavailable. Please try again or contact support.':
-   'Order not saved. Verify the VAT profile, approved classification, payment details and total.',success:''};
+   'Order not saved. Verify the VAT profile, approved classification, payment details and total.'),success:''};
   if(!data)return {error:'Order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);
   revalidatePath('/orders');revalidatePath('/payments');revalidatePath('/invoices');revalidatePath('/dashboard');

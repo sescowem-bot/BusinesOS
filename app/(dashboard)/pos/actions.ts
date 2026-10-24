@@ -1,5 +1,6 @@
 'use server';
 import {friendlyServiceError} from '@/lib/user-feedback';
+import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {checkoutPriceIntegrityMessage} from '@/lib/pos-integrity-error';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
@@ -58,7 +59,7 @@ export async function submitCheckout(_:CheckoutState,fd:FormData):Promise<Checko
    p_tenders:tenders,p_price_mode:priceMode,p_discount:vatRegistered?discount:0,p_location:location
   }:options;
   const {data,error}=await access.client.rpc(operation,rpcOptions);
-  if(error){const integrity=checkoutPriceIntegrityMessage(error);if(integrity)return failed(integrity);}
+  if(error){const integrity=checkoutPriceIntegrityMessage(error);if(integrity)return failed(integrity);const quota=usageLimitFeedback(error);if(quota)return failed(quota);}
   if(error)return failed(error.code==='42501'?'POS access is not enabled for this business and role.':error.code==='42883'||error.code==='PGRST202'?'Checkout is temporarily unavailable. Please contact support before retrying.':friendlyServiceError('complete checkout', error));
   revalidatePath('/pos');revalidatePath('/orders');revalidatePath('/payments');revalidatePath('/products');revalidatePath('/inventory');
   return {ok:true,message:split?'Sale and split recorded tenders saved in one transaction. No bank or card was charged.':paid?'Sale and recorded payment saved. This does not charge a bank card.':'Sale saved as unpaid. Stock has been deducted for tracked items.',orderId:String(data)};

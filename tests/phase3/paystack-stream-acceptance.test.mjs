@@ -1,0 +1,6 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {createHmac} from 'node:crypto';
+import {limitedWebhookBody,signedPaystackPayload} from '../../lib/phase3/paystack-webhook-policy.ts';
+test('authentic raw signed payload is accepted',()=>{let raw=new TextEncoder().encode('{"event":"charge.success"}');let sig=createHmac('sha512','secret').update(raw).digest('hex');assert.equal(signedPaystackPayload(raw,sig,'secret'),true);raw[0]=97;assert.equal(signedPaystackPayload(raw,sig,'secret'),false)});
+test('malformed signatures are rejected',()=>{let raw=new TextEncoder().encode('{}');assert.equal(signedPaystackPayload(raw,'123','secret'),false);assert.equal(signedPaystackPayload(raw,null,'secret'),false)});
+test('bounded request reader rejects oversized data',async()=>{const stream=new ReadableStream({start(c){c.enqueue(new Uint8Array(5));c.enqueue(new Uint8Array(6));c.close()}});assert.equal(await limitedWebhookBody(stream,10),null)});
+test('bounded request reader preserves exact bytes',async()=>{const stream=new ReadableStream({start(c){c.enqueue(new Uint8Array([1,2]));c.enqueue(new Uint8Array([3]));c.close()}});assert.deepEqual(Array.from((await limitedWebhookBody(stream,5))||[]),[1,2,3])});

@@ -1,0 +1,13 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {calculateVatLines,exactKobo,allocateDiscount} from '../../lib/phase3/vat-line-reconciliation.ts';
+const item=(unitPrice,quantity='1',rateBasisPoints=750,id='a')=>({id,unitPrice,quantity,rateBasisPoints});
+test('inclusive seven kobo stays seven kobo',()=>{let x=calculateVatLines([item('0.07')],'inclusive');assert.equal(x.payableCents,7n);assert.equal(x.vatCents,0n);assert.equal(x.conserved,true)});
+test('inclusive 31.17 splits 29.00 and 2.17',()=>{let x=calculateVatLines([item('31.17')],'inclusive');assert.equal(x.netCents,2900n);assert.equal(x.vatCents,217n)});
+test('inclusive 1075.00 splits 1000 and 75',()=>{let x=calculateVatLines([item('1075.00')],'inclusive');assert.equal(x.netCents,100000n);assert.equal(x.vatCents,7500n)});
+test('exclusive 1000 plus 7.5 percent VAT',()=>assert.equal(calculateVatLines([item('1000.00')],'exclusive').payableCents,107500n));
+test('line extension fractional quantities',()=>assert.equal(calculateVatLines([item('31.17','0.333')],'inclusive').enteredGrossCents,1038n));
+test('discount distributes without losing cents',()=>assert.deepEqual(allocateDiscount([1n,1n,1n],2n),[1n,1n,0n]));
+test('mixed tax treatment conserves gross',()=>{let x=calculateVatLines([item('0.07','1',750,'a'),item('31.17','2',0,'b')],'inclusive');assert.equal(x.payableCents,6241n)});
+test('invalid fractions and zero line refused',()=>{assert.throws(()=>exactKobo('0.001'));assert.throws(()=>calculateVatLines([item('0.07','0.001')],'inclusive'))});
+test('duplicate IDs and oversized discount refused',()=>{assert.throws(()=>calculateVatLines([item('1.00'),item('2.00')],'inclusive'));assert.throws(()=>calculateVatLines([item('1.00')],'inclusive','1.00'))});

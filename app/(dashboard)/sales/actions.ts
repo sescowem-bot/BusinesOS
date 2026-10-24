@@ -1,5 +1,6 @@
 'use server';
 import {revalidatePath} from 'next/cache';
+import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
 export type ActionState={error:string;success:string};
@@ -9,7 +10,7 @@ export async function createCustomer(_:ActionState,form:FormData):Promise<Action
  const {client,businessId}=await getWorkspace();const name=String(form.get('name')||'').trim(),phone=String(form.get('phone')||'').trim(),email=String(form.get('email')||'').trim();
  if(name.length<2||name.length>150||phone.length>40||email.length>254||Boolean(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))return {error:'Check the name, phone and email fields.',success:''};
  const {error}=await client.rpc('crm_create_customer',{p_business:businessId,p_name:name,p_phone:phone||null,p_email:email||null});
- if(error)return {error:'We couldn’t add this customer. Check their details and try again.',success:''};
+ if(error)return {error:usageLimitFeedback(error)||'We couldn’t add this customer. Check their details and try again.',success:''};
  revalidatePath('/customers');return {error:'',success:'Customer created successfully.'};
  }catch(e){return {error:initialError(e),success:''}}
 }
@@ -47,9 +48,9 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
    p_payment_state:paymentState,p_payment_amount:paymentAmount,
    p_payment_method:paymentMethod,p_payment_reference:paymentReference||null,p_unit_cost:unitCost
   });
-  if(error)return {error:error.code==='42883'||error.code==='PGRST202'?
+  if(error)return {error:usageLimitFeedback(error)||(error.code==='42883'||error.code==='PGRST202'?
    'This order cannot be completed right now. Please try again or contact support.':
-   'Order was not created. Check payment amount, customer, business access or reviewed VAT requirements.',success:''};
+   'Order was not created. Check payment amount, customer, business access or reviewed VAT requirements.'),success:''};
   if(!data)return {error:'The saved order could not be confirmed. Check Orders before retrying.',success:''};
   savedOrderId=String(data);
   revalidatePath('/orders');revalidatePath('/payments');revalidatePath('/customers');revalidatePath('/dashboard');
