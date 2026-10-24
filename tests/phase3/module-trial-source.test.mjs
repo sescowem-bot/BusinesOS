@@ -1,0 +1,6 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';const f=p=>readFileSync(p,'utf8');
+test('trial issue requires an authorized System Owner',()=>{const s=f('app/admin/usage-limits/trial-actions.ts');assert.match(s,/requirePlatformAdmin/);assert.match(s,/admin_issue_business_trial/);assert.match(s,/admin_set_trial_module/);});
+test('trial offer is selected as a plan + module pair',()=>{const s=f('app/admin/usage-limits/trial-editor.tsx');assert.match(s,/name="offer"/);assert.match(s,/o.plan\+'::'\+o.feature/);assert.doesNotMatch(s,/name="selected"/);});
+test('trial does not grant payments or plan assignment directly',()=>{const s=f('app/admin/usage-limits/trial-actions.ts');assert.doesNotMatch(s,/activateVerifiedPayment|admin_assign_business_subscription|business_subscription_payments/);});
+test('trial module is listed with actual plan configuration',()=>{const s=f('app/admin/usage-limits/page.tsx');assert.match(s,/platform_plan_trial_modules/);assert.match(s,/TrialModuleSettings/);assert.match(s,/IssueModuleTrial/);});
+test('applied migration is recorded, not a suggestion to rerun',()=>{const s=f('review/sql/businessos_selectable_module_trials_APPLIED.sql');assert.match(s,/DO NOT RUN AGAIN/);assert.match(s,/expires_at/);assert.match(s,/admin_issue_business_trial/);});
