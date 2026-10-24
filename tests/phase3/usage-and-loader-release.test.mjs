@@ -9,15 +9,16 @@ test('brand loader restored with ring logo and name',()=>{
 });
 test('usage limits never exposes engineering staging instructions',()=>{
  const src=load('app/admin/usage-limits/page.tsx');
- for(const token of ['System Owner','Numerical plan limits','platform_plan_usage_limits']) assert.ok(src.includes(token));
+ for(const token of ['System Owner','Usage limits','platform_plan_usage_limits','LimitEditor','TrialEditor']) assert.ok(src.includes(token));
  assert.doesNotMatch(src,/staging-only|disposable staging|Run it in|Run SQL|execute SQL|migration\.sql/i);
  assert.match(src,/requirePlatformAdmin/);
 });
 test('usage screen does not imply caps are active when backend missing',()=>{
  const src=load('app/admin/usage-limits/page.tsx');
- assert.match(src,/!limitsLoaded/);
- assert.match(src,/Numerical plan limits are not yet configured/);
+ assert.match(src,/!ready/);
+ assert.match(src,/Usage settings are being configured/);
  assert.match(src,/flag\.data\?\.enabled===true/);
+ assert.match(src,/Numerical enforcement is not yet active/);
 });
 test('authentication stays useful and safe',()=>{
  const src=load('lib/auth-feedback.ts');
