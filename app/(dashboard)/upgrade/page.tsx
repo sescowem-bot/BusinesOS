@@ -4,10 +4,11 @@ import {essentialCapabilities,releasedPaidCapabilities} from '@/lib/plan-catalog
 import {billingReady} from '@/lib/server/billing';
 import {PlanCheckoutForm} from './checkout-form';
 import {UpgradeRequestForm} from './request-form';
+import {requestedPaidPlan} from '@/lib/plan-selection';
 export const dynamic='force-dynamic';
 type Plan={id:string;name:string;price_monthly_ngn:number|null;price_yearly_ngn:number|null;description:string|null};
 type PublishedPlanFeature={plan_id:string;feature_key:string};
-export default async function UpgradePage({searchParams}:{searchParams:Promise<{checkout?:string}>}){
+export default async function UpgradePage({searchParams}:{searchParams:Promise<{checkout?:string;plan?:string}>}){
  const {client,businessId,role}=await getWorkspace();
  const [{data:plans,error:plansError},{data:assignment,error:assignmentError},{data:access,error:accessError},{data:payments,error:paymentsError},{data:requests,error:requestsError}]=await Promise.all([
   client.from('public_site_plans').select('id,name,description,price_monthly_ngn,price_yearly_ngn').eq('published',true).order('sort_order'),
@@ -20,11 +21,15 @@ export default async function UpgradePage({searchParams}:{searchParams:Promise<{
  const permissions=(Array.isArray(access)?access:[]) as PublishedPlanFeature[];
  const current=assignment?.plan_id;
  const expired=!!assignment?.expires_at && new Date(assignment.expires_at)<=new Date();
- const message=(await searchParams).checkout;
+ const params=await searchParams;
+ const message=params.checkout;
+ const requestedPlan=requestedPaidPlan(params.plan);
+ const selected=brandPlans.find(p=>p.id===requestedPlan);
  const gateway=billingReady();
  const owner=role==='owner';
  const pending=(requests||[]).some(x=>x.status==='pending');
  return <main className="tax-page"><div className="page-head"><div><h1>Plan &amp; billing</h1><p>Compare plans, make an upgrade request, or pay securely where available.</p></div><div style={{display:'flex',gap:8,flexWrap:'wrap'}}><Link href="/settings" className="btn">Business settings</Link><Link href="/pricing" className="btn">Compare plans</Link></div></div>
+ {selected&&role==='owner'&&<div className="notice" role="status">You selected <strong>{selected.name}</strong>. Review the subscription below, choose monthly or annual billing, then select <strong>Pay securely &amp; activate</strong>. No charge is made just by registering.</div>}
  {message==='success'&&<div className="notice" role="status">Your payment was verified and your plan is active. You can start using its features now.</div>}
  {message&&message!=='success'&&<div className="notice" role="status">{message==='pending'?'Payment is still being confirmed. Your current plan has not changed.':message==='owner'?'Only the business owner can pay for a subscription.':message==='switch'?'Your existing paid plan is still active. Changing to another plan will be available when that billing period ends.':message==='unavailable'?'Online plan payments are temporarily unavailable. Please try again later.':'We could not start or confirm that payment. Your current plan has not changed.'}</div>}
  <section className="card card-pad" style={{margin:'20px 0'}}><h2>Current subscription</h2>{assignmentError?<p role="alert">We could not confirm your subscription. Please try again.</p>:<><p className="plan-current-status">{brandPlans.find(p=>p.id===current)?.name|| (current==='free'?'Free':'Your plan')} {expired?' · Renewal due':' · Active'}</p>{assignment?.expires_at&&<p className="small muted">{expired?'Previous access ended':'Current period ends'} {new Date(assignment.expires_at).toLocaleDateString('en-NG')}</p>}{current==='free'&&<p className="small muted">You can use the business essentials included with Free without contacting an administrator.</p>}</>}</section>
@@ -33,8 +38,8 @@ export default async function UpgradePage({searchParams}:{searchParams:Promise<{
   const monthly=plan.price_monthly_ngn==null?null:Number(plan.price_monthly_ngn);
   const yearly=plan.price_yearly_ngn==null?null:Number(plan.price_yearly_ngn);
   const price=(n:number)=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN'}).format(n);
-  return <section className="card card-pad" key={plan.id}><h2>{plan.name}</h2><p className="bo-plan-price">{plan.id==='free'?'Free forever':monthly!=null&&monthly>0?`${price(monthly)}/month`:yearly!=null&&yearly>0?`${price(yearly)}/year`:'Contact us for pricing'}</p><p className="small muted">{plan.description}</p><h3>Business essentials</h3><ul>{essentialCapabilities.map(x=><li key={x.key}>{x.name}</li>)}</ul>{permissions.some(p=>p.plan_id===plan.id)&&<><h3>Included with this plan</h3><ul>{releasedPaidCapabilities.filter(x=>permissions.some(p=>p.plan_id===plan.id&&p.feature_key===x.key)).map(x=><li key={x.key}>{x.name}</li>)}</ul></>}
- {active?<strong className="positive">Your current plan</strong>:plan.id==='free'?<p className="small muted">Included automatically when you create your business.</p>:role!=='owner'?<p className="small muted">Your business account administrator manages subscriptions.</p>:<div className="bo-upgrade-options">{gateway&&(monthly!=null&&monthly>0||yearly!=null&&yearly>0)&&<PlanCheckoutForm planId={plan.id} monthly={monthly} yearly={yearly} disabled={!!plansError||!!assignmentError||!!accessError||!!paymentsError}/>}<div style={{marginTop:16,paddingTop:14,borderTop:'1px solid #e0e8ed'}}><h4>Request this plan</h4><p className="small muted">Send a request for our team to review. No payment is taken when you submit it.</p><UpgradeRequestForm planId={plan.id} disabled={pending||!!requestsError||!!plansError||!!assignmentError}/>{pending&&<p className="small muted">You already have a request under review.</p>}</div></div>}</section>})}</div>
+  return <section className="card card-pad" key={plan.id} id={'plan-'+plan.id} style={selected?.id===plan.id?{border:'2px solid #158367',scrollMarginTop:90}:{}}><h2>{plan.name}</h2><p className="bo-plan-price">{plan.id==='free'?'Free forever':monthly!=null&&monthly>0?`${price(monthly)}/month`:yearly!=null&&yearly>0?`${price(yearly)}/year`:'Contact us for pricing'}</p><p className="small muted">{plan.description}</p><h3>Business essentials</h3><ul>{essentialCapabilities.map(x=><li key={x.key}>{x.name}</li>)}</ul>{permissions.some(p=>p.plan_id===plan.id)&&<><h3>Included with this plan</h3><ul>{releasedPaidCapabilities.filter(x=>permissions.some(p=>p.plan_id===plan.id&&p.feature_key===x.key)).map(x=><li key={x.key}>{x.name}</li>)}</ul></>}
+ {active?<strong className="positive">Your current plan</strong>:plan.id==='free'?<p className="small muted">Included automatically when you create your business.</p>:role!=='owner'?<p className="small muted">Your business account administrator manages subscriptions.</p>:<div className="bo-upgrade-options">{gateway&&(monthly!=null&&monthly>0||yearly!=null&&yearly>0)&&<PlanCheckoutForm planId={plan.id} monthly={monthly} yearly={yearly} disabled={!!plansError||!!assignmentError||!!accessError||!!paymentsError}/>}{!gateway&&<p role="status" className="small muted">Online checkout is not configured yet. No subscription payment will be taken here.</p>}<div style={{marginTop:16,paddingTop:14,borderTop:'1px solid #e0e8ed'}}><h4>Request this plan</h4><p className="small muted">Send a request for our team to review. No payment is taken when you submit it.</p><UpgradeRequestForm planId={plan.id} disabled={pending||!!requestsError||!!plansError||!!assignmentError}/>{pending&&<p className="small muted">You already have a request under review.</p>}</div></div>}</section>})}</div>
  {accessError&&<div className="notice" role="alert">Plan features could not be verified. Online checkout is paused until your plan information is available. Your current subscription has not changed.</div>}
  {owner&&paymentsError&&<div className="notice" role="alert">Payment history is temporarily unavailable. Please check it again before attempting another payment.</div>}
  {plansError&&<div className="notice" role="alert">Plans are temporarily unavailable. Please try again shortly.</div>}

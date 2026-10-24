@@ -1,33 +1,16 @@
 'use client';
-import {createContext,useContext,useEffect,useState} from 'react';
-import Link from 'next/link';
-
+import {createContext,useContext} from 'react';
 type Branding={logoUrl?:string;businessName?:string;platformName?:string};
 const BrandContext=createContext<Branding>({});
-/** Branding is provided by the existing authenticated shell query; no new network request. */
 export function WorkspaceLoadingBrandProvider({branding,children}:{branding:Branding;children:React.ReactNode}){
  return <BrandContext.Provider value={branding}>{children}</BrandContext.Provider>;
 }
-/** Both initial route transitions and nested workspace pages use the same low-cost loader. */
+/** Quiet, nonblocking route placeholder. No timer, alarming timeout text or navigation reset. */
 export function WorkspaceLoadingBrand({label='Loading page',mode='page'}:{label?:string;mode?:'page'|'workspace'|'section'}){
- const {logoUrl,businessName,platformName}=useContext(BrandContext);
- const [waiting,setWaiting]=useState(false);
- useEffect(()=>{
-  const id=window.setTimeout(()=>setWaiting(true),8000);
-  return()=>window.clearTimeout(id);
- },[label]);
+ const {logoUrl}=useContext(BrandContext);
  const safeLogo=logoUrl&&/^https:\/\//i.test(logoUrl)?logoUrl:null;
- const title=businessName||platformName||'BusinessOS';
- return <section className={`bo-premium-loader bo-premium-loader--${mode}`} role="status" aria-live="polite" aria-busy="true" aria-label={label}>
-  <div className="bo-premium-loader__animation" aria-hidden="true">
-   <span className="bo-premium-loader__ring"/>
-   <span className="bo-premium-loader__symbol">{safeLogo?<img src={safeLogo} alt="" width={54} height={54} loading="eager" referrerPolicy="no-referrer"/>:<img src="/app-icon-192.png" alt="" width={54} height={54} loading="eager"/>}</span>
-  </div>
-  <strong className="bo-premium-loader__name">{title}</strong>
-  <p className="bo-premium-loader__label">{label}…</p>
-  {waiting&&<div className="bo-premium-loader__slow" role="status">
-   <p>This page is taking a little longer to open. You can retry or return to the website.</p>
-   <div className="bo-premium-loader__actions"><button type="button" onClick={()=>window.location.reload()}>Retry page</button><Link href="/" prefetch={false}>Back to website</Link></div>
-  </div>}
- </section>;
+ return <div className={`bo-premium-loader bo-premium-loader--${mode} bo-quiet-loader`} role="status" aria-live="polite" aria-busy="true" aria-label={label}>
+  <span className="bo-premium-loader__symbol bo-quiet-loader__symbol" aria-hidden="true"><img src={safeLogo||'/app-icon-192.png'} alt="" width={26} height={26}/></span>
+  <span className="bo-quiet-loader__track" aria-hidden="true"><span/></span>
+ </div>;
 }

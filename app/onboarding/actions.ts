@@ -1,6 +1,7 @@
 'use server';
 import {redirect} from 'next/navigation';
 import {getServerSupabase} from '@/lib/server/supabase';
+import {requestedPaidPlan} from '@/lib/plan-selection';
 export type OnboardState={error:string};
 function workspaceError(code?:string,message?:string){
  const hint=(message||'').toLowerCase();
@@ -19,9 +20,10 @@ export async function createWorkspace(_s:OnboardState,form:FormData):Promise<Onb
  if(authError||!user)return {error:'Please sign in again before creating a business.'};
  const {data:existing,error:lookupError}=await client.from('business_members').select('business_id').eq('user_id',user.id).limit(1);
  if(lookupError)return {error:'Unable to verify existing workspaces. Please contact support.'};
- if(existing?.length)redirect('/dashboard');
+ const desiredPlan=requestedPaidPlan(form.get('selected_plan'))||requestedPaidPlan(user.user_metadata?.desired_plan);
+ if(existing?.length)redirect(desiredPlan?'/upgrade?plan='+encodeURIComponent(desiredPlan):'/dashboard');
  const {data:businessId,error}=await client.rpc('create_my_business_workspace',{p_name:name,p_category:category});
  if(error)return {error:workspaceError(error.code,error.message)};
  if(!businessId)return {error:'We couldn’t confirm your new workspace. Check your workspaces before trying again, or contact support.'};
- redirect('/dashboard');
+ redirect(desiredPlan?'/upgrade?plan='+encodeURIComponent(desiredPlan):'/dashboard');
 }

@@ -3,6 +3,7 @@ import {redirect} from 'next/navigation';
 import {getServerSupabase} from '@/lib/server/supabase';
 import {getActiveTerms} from '@/lib/server/legal-documents';
 import {explainAuthError} from '@/lib/auth-feedback';
+import {requestedPaidPlan} from '@/lib/plan-selection';
 export type SignupState={error:string;success:string;retryAfterSeconds:number;reason:string};
 const failed=(error:string):SignupState=>({error,success:'',retryAfterSeconds:0,reason:'general'});
 export async function signUp(_state:SignupState,data:FormData):Promise<SignupState>{
@@ -10,6 +11,7 @@ export async function signUp(_state:SignupState,data:FormData):Promise<SignupSta
  const email=String(data.get('email')||'').trim().toLowerCase();
  const password=String(data.get('password')||'');
  const confirm=String(data.get('confirm_password')||'');
+ const desiredPlan=requestedPaidPlan(data.get('selected_plan'));
  if(name.length<2||name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<12||password.length>128)
   return failed('Enter your full name, a valid email and a password of 12–128 characters.');
  if(password!==confirm)return failed('The two passwords do not match. Please check and try again.');
@@ -22,6 +24,7 @@ export async function signUp(_state:SignupState,data:FormData):Promise<SignupSta
  const site=process.env.NEXT_PUBLIC_SITE_URL||process.env.NEXT_PUBLIC_APP_URL;
  const redirectUrl=site&&/^https:\/\/[^/]+/.test(site)?`${site.replace(/\/$/,'')}/auth/callback?next=/onboarding`:undefined;
  const metadata:Record<string,string|boolean>={full_name:name};
+ if(desiredPlan)metadata.desired_plan=desiredPlan;
  // Unapproved notices acknowledgement is NOT recorded as binding legal consent.
  if(terms.document){metadata.businessos_terms_accepted=true;metadata.businessos_terms_document_id=terms.document.id;}
  let result;

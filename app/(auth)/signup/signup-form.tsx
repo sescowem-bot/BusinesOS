@@ -8,7 +8,7 @@ import type {ActiveTerms} from '@/lib/server/legal-documents';
 
 const initial:SignupState={error:'',success:'',retryAfterSeconds:0,reason:''};
 
-export default function SignupForm({terms,available}:{terms:ActiveTerms|null;available:boolean}){
+export default function SignupForm({terms,available,selectedPlan=null}:{terms:ActiveTerms|null;available:boolean;selectedPlan?:string|null}){
  const [state,action,pending]=useActionState(signUp,initial);
  const [showPassword,setShowPassword]=useState(false);
  const [showConfirm,setShowConfirm]=useState(false);
@@ -17,7 +17,7 @@ export default function SignupForm({terms,available}:{terms:ActiveTerms|null;ava
  const [accepted,setAccepted]=useState(false);
  useEffect(()=>{if(state.retryAfterSeconds>0)setCountdown(state.retryAfterSeconds)},[state]);
  useEffect(()=>{if(countdown<=0)return;const t=setTimeout(()=>setCountdown(x=>Math.max(0,x-1)),1000);return ()=>clearTimeout(t)},[countdown]);
- return <form action={action} className="auth-friendly-form">
+ return <form action={action} className="auth-friendly-form"><input type="hidden" name="selected_plan" value={selectedPlan||''}/>
   <div className="field"><label htmlFor="name">Full name</label><input id="name" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Your full name"/></div>
   <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" required maxLength={254} placeholder="you@example.com"/></div>
   <div className="field"><label htmlFor="password">Create password</label><div className="auth-password-wrap"><input id="password" name="password" type={showPassword?'text':'password'} required minLength={12} maxLength={128} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} aria-describedby="password-guidance"/><button type="button" className="auth-password-toggle" onClick={()=>setShowPassword(x=>!x)} aria-label={showPassword?'Hide password':'Show password'} aria-pressed={showPassword}>{showPassword?'Hide':'Show'}</button></div><p className="auth-field-help" id="password-guidance">Choose a password with at least 12 characters. A unique phrase that's easy to remember works well.</p><div className="bo-password-progress" aria-label="Password length progress"><span style={{width:`${Math.min(100,password.length/12*100)}%`}}/></div><p className="auth-field-help" aria-live="polite">{password.length>=12?'Good length. Choose a password you have not used elsewhere.':`${12-password.length} more characters needed.`}</p></div>

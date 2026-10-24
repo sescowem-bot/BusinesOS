@@ -1,6 +1,6 @@
 'use client';
 import {useActionState,useState} from 'react';
-import {paidCapabilities,planRoles,defaultFeatureRoleAccess,type PaidFeature,type PlanRole} from '@/lib/plan-catalog';
+import {essentialCapabilities,paidCapabilities,planRoles,defaultFeatureRoleAccess,type PaidFeature,type PlanRole} from '@/lib/plan-catalog';
 import {savePlanPermissions,type PermissionState} from './actions';
 const initial:PermissionState={ok:false,message:''};
 type RoleMap=Record<PaidFeature,PlanRole[]>;
@@ -11,6 +11,7 @@ export function PlanPermissionEditor({planId,initialFeatures,initialRoles}:{plan
  const [roles,setRoles]=useState<RoleMap>(()=>Object.fromEntries(paidCapabilities.map(f=>[f.key,planRoles.filter(r=>r.key!=='owner'&&(initialRoles[f.key]?.[r.key]??defaultFeatureRoleAccess[f.key].includes(r.key))).map(r=>r.key)])) as RoleMap);
  function updateRole(feature:PaidFeature,role:PlanRole,checked:boolean){setRoles(prev=>({...prev,[feature]:checked?[...prev[feature],role]:prev[feature].filter(r=>r!==role)}))}
  return <form action={action} className="plan-permissions-form"><input type="hidden" name="plan_id" value={planId}/><input type="hidden" name="features" value={JSON.stringify(features)}/><input type="hidden" name="roles" value={JSON.stringify(roles)}/>
+  <section className="card card-pad" style={{marginBottom:16}}><h3>Included in every plan — business essentials</h3><p className="small muted">Free and paid plans include the core business workspace. The checkboxes below configure additional modules and their staff-role grants, not detailed create/edit/delete permissions.</p><ul className="bo-plan-audit-core">{essentialCapabilities.map(item=><li key={item.key}>{item.name}</li>)}</ul></section>
   {planId==='free'&&<p className="company-free-extras-note">Free is reserved for core modules. To make a special exception, open that company's profile and add an audited business-specific extra, optionally with an expiry date.</p>}<div className="plan-role-key"><strong>Business staff roles:</strong> {planRoles.map(r=><span key={r.key} title={r.detail}>{r.name}</span>)}</div>
   <div className="plan-permissions-list">{paidCapabilities.map(f=><section className="plan-feature-row" key={f.key}>
    <div className="plan-feature-description"><span className="small muted">{f.group}</span><h3>{f.name}</h3><p className="small muted">{f.detail}</p></div>
