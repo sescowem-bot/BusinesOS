@@ -5,3 +5,12 @@ test('analytics and marketing are declared inactive, not enabled by false consen
 test('cookie settings can reopen after saving, even from the bottom left or footer',()=>{const s=f('components/cookie-preferences.tsx');assert.match(s,/bo-cookie-floating-trigger/);assert.match(s,/OPEN_COOKIE_SETTINGS_EVENT/);assert.match(f('components/public-footer.tsx'),/CookieSettingsButton/);});
 test('hero has real keyboard tabs, reduced motion support, no heavy 3d runtime',()=>{const s=f('components/public-hero-experience.tsx');assert.match(s,/useState/);assert.match(s,/aria-pressed/);assert.match(s,/onPointerMove/);assert.match(s,/pointerType!=='mouse'/);assert.match(s,/prefers-reduced-motion/);assert.match(f('app/page.tsx'),/PublicHeroExperience/);assert.doesNotMatch(f('package.json'),/@react-three\/fiber|@react-three\/drei|three":/);});
 test('hero and cookie CSS honor users who choose reduced motion',()=>{const s=f('app/globals.css');assert.match(s,/html\[data-bo-motion='reduce'\] \.bo-showcase-light/);assert.match(s,/\.bo-cookie-dialog-v3/);assert.match(s,/\.bo-cookie-switch input:focus-visible/);});
+
+test('workspace cookie settings stay mounted and first visit notice is not hidden behind route gating',()=>{
+ const s=f('components/cookie-preferences.tsx');
+ assert.match(s,/if\(!ready\)return null/);
+ assert.doesNotMatch(s,/if\(!ready\|\|!publicArea\)return null/);
+ assert.match(s,/decision===null&&<aside/);
+ assert.match(s,/decision!==null&&publicArea&&<button/);
+ assert.match(f('app\\/\\(dashboard\\)\\/settings\\/privacy\\/page.tsx'),/CookieSettingsButton/);
+});

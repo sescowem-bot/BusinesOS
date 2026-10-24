@@ -70,7 +70,7 @@ export function CookiePreferences(){
   setFeedback('Your cookie preferences were saved.');
   setOpen(false);
  }
- if(!ready||!publicArea)return null;
+ if(!ready)return null;
  return <>
   {decision===null&&<aside className="bo-cookie-banner bo-cookie-banner-v3" aria-label="Cookie choices" role="region">
    <div className="bo-cookie-icon" aria-hidden="true"><Cookie size={23}/></div>
@@ -85,7 +85,7 @@ export function CookiePreferences(){
     <Link href="/cookies" className="bo-cookie-banner-link">Read our Cookie Notice</Link>
    </div>
   </aside>}
-  {decision!==null&&<button className="bo-cookie-floating-trigger" type="button" onClick={()=>setOpen(true)} aria-label="Review cookie preferences"><Cookie size={16} aria-hidden="true"/> Privacy choices</button>}
+  {decision!==null&&publicArea&&<button className="bo-cookie-floating-trigger" type="button" onClick={()=>{setReduceMotion(getCookie(MOTION_COOKIE)==='reduce');setOpen(true);}} aria-label="Review cookie preferences"><Cookie size={16} aria-hidden="true"/> Privacy choices</button>}
   <dialog ref={modal} className="bo-cookie-dialog bo-cookie-dialog-v3" aria-labelledby="bo-cookie-heading" aria-describedby="bo-cookie-description" onClose={()=>setOpen(false)} onCancel={()=>setOpen(false)}>
    <div className="bo-cookie-dialog-top">
     <span className="bo-cookie-dialog-icon" aria-hidden="true"><ShieldCheck size={23}/></span>
