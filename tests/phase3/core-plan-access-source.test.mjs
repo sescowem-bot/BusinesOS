@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';const read=p=>readFileSync(p,'utf8');
+test('Free and paid plans can configure all eight core modules',()=>{let s=read('app/admin/plan-access/page.tsx');assert.match(s,/CorePlanAccessEditor/);assert.match(s,/platform_plan_core_features/);});
+test('Free no longer forcibly disables premium modules',()=>{let s=read('app/admin/plan-access/permission-editor.tsx');assert.doesNotMatch(s,/disabled=\{planId==='free'\}/);assert.doesNotMatch(read('app/admin/plan-access/actions.ts'),/Free is core-only/);});
+test('System Owner changes core rules through authenticated audited RPC',()=>{let s=read('app/admin/plan-access/core-actions.ts');assert.match(s,/requirePlatformAdmin/);assert.match(s,/admin_set_plan_core_feature/);});
+test('core module controls do not mutate financial tables',()=>assert.doesNotMatch(read('app/admin/plan-access/core-actions.ts'),/business_pos_sales|business_subscription_payments|business_orders/));

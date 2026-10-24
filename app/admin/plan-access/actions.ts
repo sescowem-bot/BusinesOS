@@ -13,7 +13,6 @@ export async function savePlanPermissions(_previous:PermissionState,form:FormDat
  try {flags=JSON.parse(String(form.get('features')||'')); roles=JSON.parse(String(form.get('roles')||''));} catch{return {ok:false,message:'Malformed permission configuration'};}
  if(!flags||Array.isArray(flags)||typeof flags!=='object'||!roles||Array.isArray(roles)||typeof roles!=='object')return {ok:false,message:'Invalid permission configuration'};
  const featureMap=flags as Record<string,unknown>, roleMap=roles as Record<string,unknown>;
- if(planId==='free'&&Object.values(featureMap).some(v=>v===true))return {ok:false,message:'Free is core-only. Add separately approved business extras instead.'};
  if(Object.keys(featureMap).some(x=>!isPaidFeature(x))||Object.keys(roleMap).some(x=>!isPaidFeature(x)))return {ok:false,message:'Unknown module in configuration'};
  for(const feature of paidCapabilities){
   if(typeof featureMap[feature.key]!=='boolean')return {ok:false,message:'Please configure all module permissions'};

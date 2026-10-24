@@ -2,22 +2,24 @@ import Link from 'next/link';
 import {requirePlatformAdmin} from '@/lib/server/supabase';
 import {paidCapabilities,type PaidFeature,type PlanRole} from '@/lib/plan-catalog';
 import {PlanPermissionEditor} from './permission-editor';
+import {CorePlanAccessEditor} from './core-editor';
 export const dynamic='force-dynamic';
 export default async function PlanAccessPage(){
  const session=await requirePlatformAdmin();
  if(!session)return <main className="admin-access"><h1>Administrator access required</h1><Link href="/login">Sign in</Link></main>;
- const [plansResult,accessResult,rolesResult]=await Promise.all([
+ const [plansResult,accessResult,rolesResult,coresResult]=await Promise.all([
   session.client.from('public_site_plans').select('id,name,published,description,price_label').order('sort_order'),
   session.client.from('platform_plan_features').select('plan_id,feature_key,enabled'),
-  session.client.from('platform_plan_role_features').select('plan_id,feature_key,role,enabled')
+  session.client.from('platform_plan_role_features').select('plan_id,feature_key,role,enabled'),
+  session.client.from('platform_plan_core_features').select('plan_id,feature_key,enabled')
  ]);
  return <main className="admin-area plan-admin-area"><header className="admin-header"><div><span className="badge badge-brand">SYSTEM OWNER / SUBSCRIPTIONS</span><h1>Plan access and staff roles</h1><p>Give each plan the modules it should unlock and control which business staff roles can use them.</p></div><Link href="/admin/plans" className="btn btn-primary">Manage pricing & create plan →</Link><Link href="/admin/plan-access/audit" className="btn">Review plan setup</Link><Link href="/admin/plan-actions" className="btn">Action-level permissions</Link><Link href="/admin/usage-limits" className="btn">Usage limits</Link></header>
- {(plansResult.error||accessResult.error||rolesResult.error)&&<section className="card card-pad" role="alert"><h2>Plan permissions are unavailable</h2><p>Please try again. If the problem continues, contact support.</p><p>Your existing settings have not been confirmed as changed.</p></section>}
- {!plansResult.error&&!accessResult.error&&!rolesResult.error&&<>{(plansResult.data||[]).map(plan=>{
+ {(plansResult.error||accessResult.error||rolesResult.error||coresResult.error)&&<section className="card card-pad" role="alert"><h2>Plan permissions are unavailable</h2><p>Please try again. If the problem continues, contact support.</p><p>Your existing settings have not been confirmed as changed.</p></section>}
+ {!plansResult.error&&!accessResult.error&&!rolesResult.error&&!coresResult.error&&<>{(plansResult.data||[]).map(plan=>{
   const features=Object.fromEntries((accessResult.data||[]).filter(x=>x.plan_id===plan.id).map(x=>[x.feature_key,x.enabled])) as Partial<Record<PaidFeature,boolean>>;
   const roles:Partial<Record<PaidFeature,Partial<Record<PlanRole,boolean>>>>={};
   for(const row of rolesResult.data||[]){if(row.plan_id!==plan.id)continue;const feature=row.feature_key as PaidFeature;roles[feature]={...roles[feature],[row.role]:row.enabled};}
-  return <details key={plan.id} className="card card-pad cms-panel plan-access-panel"><summary><strong>{plan.name}</strong><span className="small muted">{plan.published?'Published':'Draft'} · {plan.price_label} · {paidCapabilities.filter(x=>features[x.key]===true).length} additional modules enabled</span></summary><div className="plan-access-intro"><p className="small muted">{plan.description}</p><p>All core workspace features are included. Permissions enabled on a lower inherited plan also remain available. This editor controls additional access granted directly by this plan.</p></div><PlanPermissionEditor planId={plan.id} initialFeatures={features} initialRoles={roles}/></details>})}
+  return <details key={plan.id} className="card card-pad cms-panel plan-access-panel"><summary><strong>{plan.name}</strong><span className="small muted">{plan.published?'Published':'Draft'} · {plan.price_label} · {paidCapabilities.filter(x=>features[x.key]===true).length} additional modules enabled</span></summary><div className="plan-access-intro"><p className="small muted">{plan.description}</p><p>Choose core features and additional modules for each plan. Staff action permissions are configured separately under Action-level permissions.</p></div><CorePlanAccessEditor plan={plan.id} values={Object.fromEntries((coresResult.data||[]).filter(row=>row.plan_id===plan.id).map(row=>[row.feature_key,row.enabled]))}/><PlanPermissionEditor planId={plan.id} initialFeatures={features} initialRoles={roles}/></details>})}
   {!(plansResult.data||[]).length&&<section className="card card-pad"><p>No plans yet. <Link href="/admin/plans">Create a plan</Link> first.</p></section>}
  </>}
  </main>;
