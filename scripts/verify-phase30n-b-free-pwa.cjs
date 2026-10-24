@@ -15,7 +15,7 @@ expect(sql.includes('REVOKE ALL ON FUNCTION public.assign_default_free_plan()'),
 expect(sql.includes('BEGIN;')&&sql.includes('COMMIT;'),'atomic migration transaction');
 const up=rd('app/(dashboard)/upgrade/page.tsx');
 expect(up.includes("current==='free'")&&up.includes('Free forever'),'Free is included at no cost');
-expect(up.includes("plan.id==='free'?")&&up.includes('Included automatically'),'Free plan is assigned automatically without approval');
+expect(up.includes("item.id==='free'?")&&up.includes('Free is included automatically'),'Free plan is assigned automatically without approval');
 expect(!up.includes('No approved plan assigned yet'),'confusing unassigned plan message removed');
 expect(rd('app/onboarding/page.tsx').includes('Tell us about your business'),'friendly workspace introduction');
 expect(rd('app/onboarding/form.tsx').includes('Free plan'),'Free plan clearly explained without internal roles');
