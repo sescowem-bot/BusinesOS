@@ -1,3 +1,6 @@
+-- SUPERSEDED REVIEW PROPOSAL: NEVER EXECUTE THIS FILE.
+-- The 20261025 Phase 1/1D migrations supersede these proposed definitions and policies.
+-- Use review/PHASE1_RELEASE_LEDGER_20261025.md and the already-applied migration history instead.
 -- BusinessOS Phase 1B: targeted core RPC and direct-table write hardening.
 -- REVIEW ONLY: NOT APPLIED. Require operator verification and recoverable backup first.
 -- Atomic migration; does not update business records or turn on the global switches.

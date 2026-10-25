@@ -1,3 +1,5 @@
+> **Superseded audit snapshot.** See [Phase 1 release ledger](PHASE1_RELEASE_LEDGER_20261025.md) for all 10 migrations applied on 25 October 2026. The earlier three-migration snapshot below is historical, not the current deployment state.
+
 # Phase 1 — Production database hardening, 25 October 2026
 
 ## Verified production work (applied)
