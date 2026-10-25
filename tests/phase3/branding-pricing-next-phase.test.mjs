@@ -32,5 +32,5 @@ test('pricing explorer is interactive, grounded, and read only',()=>{
  assert.match(page,/PublicPlanNavigator/);
  assert.match(page,/PublicPlanComparisonControls/);
  assert.match(page,/planStartUrl\(plan\.id,access\)/);
- assert.doesNotMatch(app,/upgrade\?|checkout|paystack/i);
+ assert.doesNotMatch(app,/<form|startCheckout|initializePayment|fetch\(/i);
 });
