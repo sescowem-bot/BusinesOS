@@ -2,6 +2,7 @@
 import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
+import {premiumActionAllowed,coreActionAllowed} from '@/lib/server/core-action-permissions';
 export type ReturnActionState={ok:boolean;message:string;returnId?:string;creditNoteId?:string};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const fail=(message:string):ReturnActionState=>({ok:false,message});
@@ -16,6 +17,7 @@ export async function requestPosReturn(_:ReturnActionState,fd:FormData):Promise<
   if(![order,item,request].every(x=>UUID.test(x))||reason.length<10||reason.length>500||
    !/^\d{1,7}(?:\.\d{1,3})?$/.test(quantityText)||!Number.isFinite(qty)||qty<=0||qty>1000000)
    return fail('Choose a valid sale item, quantity and reason (10–500 characters).');
+  if(!(await premiumActionAllowed(access,'pos','create')))return fail('Return requests are not permitted for this plan or staff role.');
   const {data,error}=await access.client.rpc('business_request_pos_return',{
    p_business:access.businessId,p_order:order,p_item:item,p_quantity:qty,p_reason:reason,p_request:request
   });
@@ -30,6 +32,7 @@ export async function reviewPosReturn(_:ReturnActionState,fd:FormData):Promise<R
   const id=String(fd.get('return_id')||''),decision=String(fd.get('decision')||''),note=String(fd.get('note')||'').trim();
   if(!UUID.test(id)||!['approve','reject'].includes(decision)||note.length>500)return fail('Review details are invalid.');
   if(fd.get('review_confirm')!=='yes')return fail('Confirm that you have reviewed the original sale and return evidence.');
+  if(!(await premiumActionAllowed(access,'pos','approve')))return fail('Return approval is not permitted for this plan or staff role.');
   const {error}=await access.client.rpc('business_review_pos_return',{
    p_business:access.businessId,p_return:id,p_approve:decision==='approve',p_note:note
   });
@@ -46,6 +49,7 @@ export async function completePosReturn(_:ReturnActionState,fd:FormData):Promise
   if(!UUID.test(id)||!['cash','transfer','external_pos','external_card','other'].includes(method)||
      !['yes','no'].includes(stock)||reference.length<3||reference.length>150||fd.get('confirmed')!=='yes')
    return fail('Confirm the actual refund, method, reference and returned-stock condition.');
+  if(!(await premiumActionAllowed(access,'pos','approve'))||!(await coreActionAllowed(access,'payments','edit')))return fail('Refund completion is not permitted for this plan or staff role.');
   const {data,error}=await access.client.rpc('business_complete_pos_return',{
    p_business:access.businessId,p_return:id,p_method:method,p_reference:reference,p_restock:stock==='yes'
   });

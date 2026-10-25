@@ -1,4 +1,5 @@
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
 import type {RecordItem} from '@/components/business-records';
@@ -6,8 +7,8 @@ import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-dire
 import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
 export default async function Products({searchParams}:{searchParams:Promise<DirectoryRaw>}){
- const {client,businessId,role}=await getWorkspace();
- const canEdit=['owner','manager','inventory'].includes(role);
+ const access=await getWorkspace();const {client,businessId,role}=access;
+ const canEdit=['owner','manager','inventory'].includes(role)&&await coreActionAllowed(access,'products','create');
  const params=parseDirectory(await searchParams);
  const status=['active','inactive'].includes(params.status)?params.status:'';
  let query=client.from('products')

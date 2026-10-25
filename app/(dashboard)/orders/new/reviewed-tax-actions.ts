@@ -3,6 +3,7 @@ import {revalidatePath} from 'next/cache';
 import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 export type ReviewedTaxState={error:string;success:string};
 export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):Promise<ReviewedTaxState>{
  let savedOrderId:string;
@@ -29,8 +30,10 @@ export async function createReviewedTaxOrder(_:ReviewedTaxState,form:FormData):P
    (paymentState!=='unpaid'&&!['cash','transfer','pos','card','other'].includes(paymentMethod||''))||
    paymentReference.length>150||Boolean(dueDate&&!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)))
    return {error:'Select an approved supply and check the order and initial payment details.',success:''};
-  const {client,businessId,role}=await getWorkspace();
+  const access=await getWorkspace();const {client,businessId,role}=access;
   if(!['owner','manager','finance','sales'].includes(role))return {error:'Not authorised to create orders.',success:''};
+  const [canCreate,canRecordPayment]=await Promise.all([coreActionAllowed(access,'orders','create'),paymentState==='partial'?coreActionAllowed(access,'payments','create'):Promise.resolve(true)]);
+  if(!canCreate||!canRecordPayment)return {error:'This plan or staff role cannot create the reviewed order or its initial payment.',success:''};
   const {data,error}=await client.rpc('crm_create_order_with_cost',{
    p_business:businessId,p_customer:customer,p_request_key:requestKey,p_mode:'reviewed',
    p_description:null,p_supply:supply,p_quantity:quantity,p_unit_price:price,

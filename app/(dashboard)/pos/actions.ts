@@ -4,6 +4,7 @@ import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {checkoutPriceIntegrityMessage} from '@/lib/pos-integrity-error';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
+import {premiumActionAllowed,coreActionAllowed} from '@/lib/server/core-action-permissions';
 export type CheckoutState={ok:boolean;message:string;orderId?:string};
 const failed=(message:string):CheckoutState=>({ok:false,message});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -58,6 +59,8 @@ export async function submitCheckout(_:CheckoutState,fd:FormData):Promise<Checko
    p_business:access.businessId,p_request:request,p_customer:customer||null,p_items:lines,
    p_tenders:tenders,p_price_mode:priceMode,p_discount:vatRegistered?discount:0,p_location:location
   }:options;
+  if(!(await premiumActionAllowed(access,'pos','create')))return failed('This plan or staff role cannot complete POS checkouts.');
+  if((paid||split)&&!(await coreActionAllowed(access,'payments','create')))return failed('Payment recording is not included for this plan or staff role.');
   const {data,error}=await access.client.rpc(operation,rpcOptions);
   if(error){const integrity=checkoutPriceIntegrityMessage(error);if(integrity)return failed(integrity);const quota=usageLimitFeedback(error);if(quota)return failed(quota);}
   if(error)return failed(error.code==='42501'?'POS access is not enabled for this business and role.':error.code==='42883'||error.code==='PGRST202'?'Checkout is temporarily unavailable. Please contact support before retrying.':friendlyServiceError('complete checkout', error));

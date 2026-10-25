@@ -2,6 +2,7 @@
 import {friendlyServiceError} from '@/lib/user-feedback';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
+import {premiumActionAllowed} from '@/lib/server/core-action-permissions';
 export type LocationActionState={error:string;success:string};
 const fail=(error:string):LocationActionState=>({error,success:''});
 const ok=(success:string):LocationActionState=>({error:'',success});
@@ -12,6 +13,7 @@ export async function enableBranchLocation(_:LocationActionState,fd:FormData):Pr
  try{const a=await requireBusinessFeature('inventory');if(!a.allowed)return fail(a.reason);
  if(!['owner','manager'].includes(a.role))return fail('Only owners and managers can enable branch stock.');
  const branch=String(fd.get('branch')||'');if(!UUID.test(branch))return fail('Select a valid branch.');
+ if(!(await premiumActionAllowed(a,'inventory','edit')))return fail('This business operation is not permitted for the plan or staff role.');
  const {error}=await a.client.rpc('business_enable_branch_stock',{p_business:a.businessId,p_branch:branch});
  if(error)return fail(friendlyServiceError('enable this branch', error));
  reload();return ok('Branch stock location enabled. Allocate quantities from Unallocated using a transfer.');
@@ -24,6 +26,7 @@ export async function transferBranchStock(_:LocationActionState,fd:FormData):Pro
  const qty=Number(fd.get('quantity')),reason=String(fd.get('reason')||'').trim();
  if(![request,item,source,target].every(x=>UUID.test(x))||source===target||!validQty(qty)||reason.length<5||reason.length>500)
   return fail('Choose two different locations, a tracked product, a valid quantity and a reason.');
+ if(!(await premiumActionAllowed(a,'inventory','edit')))return fail('This business operation is not permitted for the plan or staff role.');
  const {error}=await a.client.rpc('business_transfer_location_stock',{p_business:a.businessId,p_request:request,p_product:item,p_from:source,p_to:target,p_quantity:qty,p_reason:reason});
  if(error)return fail(friendlyServiceError('transfer stock', error));
  reload();return ok('Stock transferred between locations. The company-wide stock total was not changed.');
@@ -36,6 +39,7 @@ export async function countBranchStock(_:LocationActionState,fd:FormData):Promis
  const expected=Number(fd.get('expected')),counted=Number(fd.get('counted')),reason=String(fd.get('reason')||'').trim();
  if(![request,location,item].every(x=>UUID.test(x))||![expected,counted].every(x=>Number.isFinite(x)&&x>=0&&x<=99999999999&&Math.abs(x*1000-Math.round(x*1000))<1e-6)||reason.length<5||reason.length>500)
   return fail('Select a location and product, enter both valid quantities and a reason.');
+ if(!(await premiumActionAllowed(a,'inventory','edit')))return fail('This business operation is not permitted for the plan or staff role.');
  const {error}=await a.client.rpc('business_count_location_stock',{p_business:a.businessId,p_request:request,p_location:location,p_product:item,p_expected:expected,p_counted:counted,p_reason:reason});
  if(error)return fail(error.code==='40001'?'Stock changed since you opened the page. Reload before counting again.':friendlyServiceError('save this stock count', error));
  reload();return ok('Location stock count recorded with its variance and audit history.');

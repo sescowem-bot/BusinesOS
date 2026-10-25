@@ -1,6 +1,7 @@
 'use server';
 import {revalidatePath} from 'next/cache';
 import {requireBusinessFeature} from '@/lib/server/authorization';
+import {premiumActionAllowed,coreActionAllowed} from '@/lib/server/core-action-permissions';
 export type MappingState={error:string;success:string};
 export async function savePosTaxMapping(_:MappingState,form:FormData):Promise<MappingState>{
  const product=String(form.get('product')||''),supply=String(form.get('supply')||'');
@@ -9,6 +10,7 @@ export async function savePosTaxMapping(_:MappingState,form:FormData):Promise<Ma
  try{
   const access=await requireBusinessFeature('pos');
   if(!access.allowed||!['owner','manager'].includes(access.role))return {error:'Only an authorised POS owner or manager can maintain these mappings.',success:''};
+  if(!(await premiumActionAllowed(access,'pos','edit')))return {error:'Product tax mappings cannot be edited by this plan or staff role.',success:''};
   const {error}=await access.client.rpc('business_set_product_tax_mapping',{p_business:access.businessId,p_product:product,p_supply:supply});
   if(error)return {error:error.code==='42883'||error.code==='PGRST202'?'Tax settings are temporarily unavailable. Please try again later.':'The product mapping could not be saved. Check the product, category and your permissions.',success:''};
   revalidatePath('/pos');revalidatePath('/pos/tax-mapping');
