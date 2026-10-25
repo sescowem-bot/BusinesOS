@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Platform fallback mark">
 <rect width="64" height="64" rx="16" fill="#123B63"/>
-<path d="M20 16h19c10 0 15 14 5 19 13 6 8 18-4 18H20V16zm10 9v8h8c6 0 6-8 0-8h-8zm0 16v5h9c6 0 6-5 0-5h-9z" fill="#FFFFFF"/>
-<path d="M50 13h5v19h-5z" fill="#16845B"/>
+<path d="M17 42V22h10v20zm14 0V15h10v27zm14 0V29h6v13z" fill="#FFFFFF"/>
+<path d="M14 48h39" stroke="#16845B" stroke-width="5" stroke-linecap="round"/>
 </svg>

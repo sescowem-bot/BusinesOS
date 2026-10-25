@@ -1,0 +1,32 @@
+/* Lightweight, accessible pricing exploration; no animation or 3D dependency. */
+.bo-plan-navigator{margin:0 0 36px;padding:clamp(20px,3vw,32px);background:linear-gradient(128deg,#f1f8fb,#f5fbf8);border:1px solid #d0e4e5;border-radius:22px;color:#183a50;box-shadow:0 12px 35px rgba(13,60,80,.055)}
+.bo-plan-navigator-intro{display:flex;align-items:start;justify-content:space-between;gap:16px}
+.bo-plan-navigator-intro>svg{color:#157e6a;flex:none}
+.bo-plan-navigator h3{font-size:clamp(22px,2.65vw,29px);line-height:1.15;letter-spacing:-.04em;margin:10px 0}
+.bo-plan-navigator-intro p{font-size:13px;color:#637b89;max-width:650px;line-height:1.7;margin:0 0 20px}
+.bo-plan-navigator-controls{display:flex;flex-wrap:wrap;gap:16px;align-items:end}
+.bo-plan-navigator-controls>label{display:grid;gap:8px;flex:1;min-width:min(100%,230px);font-size:12px;font-weight:800;color:#28475b}
+.bo-plan-navigator select{font:inherit;font-size:13px;min-height:46px;padding:10px 13px;background:#fff;color:#153a54;border:1px solid #cbdde0;border-radius:11px;width:100%}
+.bo-plan-period{display:grid;gap:8px}.bo-plan-period>span{font-size:12px;font-weight:800;color:#28475b}
+.bo-plan-period>div{display:flex;padding:4px;gap:3px;background:#e6f1ef;border-radius:11px}
+.bo-plan-period button{border:0;background:transparent;border-radius:8px;color:#54727e;font-size:12px;font-weight:850;cursor:pointer;min-height:38px;padding:7px 16px}
+.bo-plan-period button.is-active{background:#fff;color:#176c5e;box-shadow:0 3px 10px rgba(20,60,75,.1)}
+.bo-plan-navigator-need{display:flex;align-items:center;gap:9px;margin:17px 0!important;font-weight:750;font-size:12px!important;color:#276b58!important}
+.bo-plan-navigator-need svg{flex:none}
+.bo-plan-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));gap:12px}
+.bo-plan-results article{background:#fff;border:1px solid #dce9ec;border-radius:15px;padding:18px;min-width:0}
+.bo-plan-results article>div{display:grid;gap:6px}.bo-plan-results strong{font-size:15px;color:#214b60}
+.bo-plan-results article>div>span{font-size:10px;color:#687e8b}
+.bo-plan-results article p{font-size:18px;font-weight:900;color:#1a4056;margin:18px 0}
+.bo-plan-results article small{font-size:10px;font-weight:600;color:#70868e}
+.bo-plan-results article a{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;color:#167866}
+.bo-plan-disclaimer{font-size:11px!important;line-height:1.7!important;color:#708591!important;margin:20px 0 0!important}
+.bo-plan-empty{padding:15px;border-radius:12px;border:1px solid #dce8eb;background:#fff;font-size:13px;color:#4c6a77}
+.bo-compare-control{display:flex;gap:15px;align-items:center;justify-content:space-between;margin:0 0 14px;background:#f0f8f6;border:1px solid #dcece7;border-radius:12px;padding:16px}
+.bo-compare-control>div{display:grid;gap:5px}.bo-compare-control strong{font-size:13px;color:#1b4c51}.bo-compare-control span{font-size:11px;color:#64818a}
+.bo-compare-control label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:12px;font-weight:800;color:#17695f}
+.bo-compare-control input{width:16px;height:16px;accent-color:#176f60}
+.bo-compare-differences .bo-compare-core,.bo-compare-differences .bo-compare-same{display:none}
+.bo-plan-navigator select:focus-visible,.bo-plan-period button:focus-visible,.bo-compare-control input:focus-visible{outline:3px solid #219b88;outline-offset:3px}
+@media(max-width:600px){.bo-plan-navigator{margin-bottom:25px}.bo-plan-navigator-controls>label,.bo-plan-period{width:100%}.bo-plan-period>div{width:100%}.bo-plan-period button{flex:1}.bo-compare-control{align-items:start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.bo-plan-period button{transition:none}}
