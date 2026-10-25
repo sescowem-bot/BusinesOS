@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 import {PaymentForm} from '../../sales/forms';
 import {OrderCostForm} from './cost-form';
 import {IssueInvoiceForm} from '../../invoices/issue-form';
@@ -11,7 +12,7 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
  const {id}=await params;
  const {created}=await searchParams;
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))notFound();
- const {client,businessId,role}=await getWorkspace();
+ const access=await getWorkspace();const {client,businessId,role}=access;
  const [orderResult,invoiceResult,costResult,posResult]=await Promise.all([
   client.from('orders').select('id,order_number,status,subtotal,discount,tax,delivery_fee,total,due_date,order_items(name_snapshot,quantity,unit_price,line_total),payments(id,amount,method,status,paid_at)').eq('id',id).eq('business_id',businessId).maybeSingle(),
   client.from('business_invoices').select('id,invoice_number').eq('business_id',businessId).eq('order_id',id).maybeSingle(),
@@ -23,6 +24,7 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
  const paid=pays.filter(p=>p.status==='completed').reduce((sum,p)=>sum+(Number(p.amount)||0),0);
  const total=Number(order.total)||0,balance=Math.max(0,total-paid);
  const canManage=['owner','manager','finance','sales'].includes(role);
+ const [canTakePayment,canIssueInvoice,canEditCost]=canManage?await Promise.all([coreActionAllowed(access,'payments','create'),coreActionAllowed(access,'documents','create'),coreActionAllowed(access,'orders','edit')]):[false,false,false];
  const cancelled=order.status==='cancelled';
  const paymentLabel=total<=0?'No payment due':paid<=0?'Unpaid':balance<=0?'Paid in full':'Part payment';
  return <div className="bo-page">
@@ -41,17 +43,17 @@ export default async function OrderDetail({params,searchParams}:{params:Promise<
    <div className="bo-detail-row bo-detail-total"><span>Total</span><strong>{money(total)}</strong></div>
    </div>
   </BusinessSection>
-  {['owner','manager','finance'].includes(role)&&<BusinessSection title="Estimated profit cost evidence" description="Internal item costs are not invoice prices. Missing cost evidence is never treated as zero."><div className="bo-detail-section-body">{costResult.error||posResult.error?<p role="alert">Item cost information is temporarily unavailable. Estimated profit is hidden until verified.</p>:posResult.data?<p className="small muted">POS item costs were recorded with the original checkout; see <Link href="/retail-reports">Retail performance</Link>.</p>:costResult.data?<p>Recorded unit cost: <strong>{money(Number(costResult.data.unit_cost))}</strong>. Saved {new Date(costResult.data.recorded_at).toLocaleDateString('en-NG')}. This is an estimated cost input and not an audited expense.</p>:cancelled?<p>Cancelled orders are excluded from new cost recording.</p>:<><p className="small muted">This manual order has no cost evidence yet, so it is excluded from the estimated gross profit calculation. Use a supplier invoice or cost record to supply the true unit cost.</p><OrderCostForm order={id}/></>}</div></BusinessSection>}
+  {['owner','manager','finance'].includes(role)&&canEditCost&&<BusinessSection title="Estimated profit cost evidence" description="Internal item costs are not invoice prices. Missing cost evidence is never treated as zero."><div className="bo-detail-section-body">{costResult.error||posResult.error?<p role="alert">Item cost information is temporarily unavailable. Estimated profit is hidden until verified.</p>:posResult.data?<p className="small muted">POS item costs were recorded with the original checkout; see <Link href="/retail-reports">Retail performance</Link>.</p>:costResult.data?<p>Recorded unit cost: <strong>{money(Number(costResult.data.unit_cost))}</strong>. Saved {new Date(costResult.data.recorded_at).toLocaleDateString('en-NG')}. This is an estimated cost input and not an audited expense.</p>:cancelled?<p>Cancelled orders are excluded from new cost recording.</p>:<><p className="small muted">This manual order has no cost evidence yet, so it is excluded from the estimated gross profit calculation. Use a supplier invoice or cost record to supply the true unit cost.</p><OrderCostForm order={id}/></>}</div></BusinessSection>}
   <BusinessSection title="Commercial invoice" description="A numbered invoice can be issued once and preserves the details recorded at issuance.">
    <div className="bo-detail-section-body">{invoiceResult.error?<p role="alert">Invoice information is temporarily unavailable. Please try again later.</p>:
     invoiceResult.data?<p>Invoice <Link href={`/invoices/issued/${invoiceResult.data.id}`}>{invoiceResult.data.invoice_number} — View or print</Link></p>:
-    !canManage?<p className="muted">Your role is not authorised to issue invoices.</p>:
+    !canManage||!canIssueInvoice?<p className="muted">Invoice issuance is not available for this plan or staff role.</p>:
     cancelled?<p className="muted">Cancelled orders cannot be invoiced.</p>:<IssueInvoiceForm orderId={order.id}/>}</div>
   </BusinessSection>
   <div id="payment-history" className="bo-order-payment-anchor"><BusinessSection title="Payment history" description="Only completed payment entries reduce the outstanding balance.">
    <div className="bo-detail-section-body">{pays.length?pays.map(p=><div key={p.id} className="bo-detail-row"><span>{new Date(p.paid_at).toLocaleDateString('en-NG')} · {p.method} · {p.status}</span><strong>{money(Number(p.amount))}</strong>{p.status==='completed'&&<Link href={`/payments/${p.id}`}>Print acknowledgement</Link>}</div>):<p className="muted">No payments recorded.</p>}
-   {balance>0&&!cancelled&&canManage?<div className="bo-order-payment-form"><h3>Record a payment</h3><p className="muted small">Record only payments you have verified. This does not initiate a bank transfer.</p><PaymentForm order={order.id} balance={balance}/></div>:
-    balance>0&&!cancelled&&!canManage?<p className="muted small">Only authorised sales or finance roles can record payments.</p>:null}</div>
+   {balance>0&&!cancelled&&canTakePayment?<div className="bo-order-payment-form"><h3>Record a payment</h3><p className="muted small">Record only payments you have verified. This does not initiate a bank transfer.</p><PaymentForm order={order.id} balance={balance}/></div>:
+    balance>0&&!cancelled&&!canTakePayment?<p className="muted small">Only authorised sales or finance roles can record payments.</p>:null}</div>
   </BusinessSection></div>
  </div>;
 }

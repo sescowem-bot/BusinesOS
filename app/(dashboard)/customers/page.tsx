@@ -1,4 +1,5 @@
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
 import type {RecordItem} from '@/components/business-records';
 import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-directory';
@@ -6,8 +7,8 @@ import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
 type CustomerLink={customer_id:string;customers:{name?:string;phone?:string|null;email?:string|null}|{name?:string;phone?:string|null;email?:string|null}[]|null};
 export default async function Customers({searchParams}:{searchParams:Promise<DirectoryRaw>}){
- const {client,businessId,role}=await getWorkspace();
- const canCreate=['owner','manager','finance','sales'].includes(role);
+ const access=await getWorkspace();const {client,businessId,role}=access;
+ const canCreate=['owner','manager','finance','sales'].includes(role)&&await coreActionAllowed(access,'customers','create');
  const params=parseDirectory(await searchParams);
  let query=client.from('business_customers')
   .select('customer_id,customers!inner(name,phone,email)',{count:'exact'})

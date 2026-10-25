@@ -1,14 +1,16 @@
 'use server';
 import {revalidatePath} from 'next/cache';
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 
 export type IssueInvoiceState={error:string;invoiceId:string};
 export async function issueInvoice(_:IssueInvoiceState,form:FormData):Promise<IssueInvoiceState>{
   const orderId=String(form.get('order_id')||'');
   if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(orderId)) return {error:'Invalid order reference.',invoiceId:''};
   try {
-    const {client,businessId,role}=await getWorkspace();
+    const access=await getWorkspace();const {client,businessId,role}=access;
     if(!['owner','manager','finance','sales'].includes(role)) return {error:'You do not have permission to issue invoices.',invoiceId:''};
+    if(!(await coreActionAllowed(access,'documents','create')))return {error:'Invoice issuance is unavailable for this plan or staff role.',invoiceId:''};
     const {data,error}=await client.rpc('issue_business_invoice',{p_business:businessId,p_order:orderId});
     if(error){
       // Keep internal database details private. Expose only safe, actionable feedback.

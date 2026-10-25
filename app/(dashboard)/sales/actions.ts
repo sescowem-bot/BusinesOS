@@ -3,12 +3,14 @@ import {revalidatePath} from 'next/cache';
 import {usageLimitFeedback} from '@/lib/phase3/usage-limit-feedback';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 export type ActionState={error:string;success:string};
 const initialError=(_e:unknown)=>'We couldn’t complete that request. Please try again or contact support.';
 export async function createCustomer(_:ActionState,form:FormData):Promise<ActionState>{
  try{
- const {client,businessId}=await getWorkspace();const name=String(form.get('name')||'').trim(),phone=String(form.get('phone')||'').trim(),email=String(form.get('email')||'').trim();
+ const access=await getWorkspace();const {client,businessId}=access;const name=String(form.get('name')||'').trim(),phone=String(form.get('phone')||'').trim(),email=String(form.get('email')||'').trim();
  if(name.length<2||name.length>150||phone.length>40||email.length>254||Boolean(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))return {error:'Check the name, phone and email fields.',success:''};
+ if(!['owner','manager','finance','sales'].includes(access.role)||!(await coreActionAllowed(access,'customers','create')))return {error:'Customer creation is unavailable for this plan or staff role.',success:''};
  const {error}=await client.rpc('crm_create_customer',{p_business:businessId,p_name:name,p_phone:phone||null,p_email:email||null});
  if(error)return {error:usageLimitFeedback(error)||'We couldn’t add this customer. Check their details and try again.',success:''};
  revalidatePath('/customers');return {error:'',success:'Customer created successfully.'};
@@ -17,7 +19,7 @@ export async function createCustomer(_:ActionState,form:FormData):Promise<Action
 export async function createOrder(_:ActionState,form:FormData):Promise<ActionState>{
  let savedOrderId:string;
  try{
-  const {client,businessId,role}=await getWorkspace();
+  const access=await getWorkspace();const {client,businessId,role}=access;
   if(!['owner','manager','finance','sales'].includes(role))return {error:'You do not have permission to create orders.',success:''};
   const customer=String(form.get('customer')||''),desc=String(form.get('description')||'').trim();
   const quantity=Number(form.get('quantity')),unitPrice=Number(form.get('unit_price'));
@@ -41,6 +43,8 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
     (paymentState!=='unpaid'&&!['transfer','cash','pos','card','other'].includes(paymentMethod||''))||
     paymentReference.length>150||Boolean(date&&!/^\d{4}-\d{2}-\d{2}$/.test(date)))
    return {error:'Check your order details and the payment amount before saving.',success:''};
+  const [orderAllowed,paymentAllowed]=await Promise.all([coreActionAllowed(access,'orders','create'),paymentState==='partial'?coreActionAllowed(access,'payments','create'):Promise.resolve(true)]);
+  if(!orderAllowed||!paymentAllowed)return {error:'This plan or staff role cannot create this order or its initial payment.',success:''};
   const {data,error}=await client.rpc('crm_create_order_with_cost',{
    p_business:businessId,p_customer:customer,p_request_key:requestKey,p_mode:'manual',
    p_description:desc,p_supply:null,p_quantity:quantity,p_unit_price:unitPrice,
@@ -59,8 +63,9 @@ export async function createOrder(_:ActionState,form:FormData):Promise<ActionSta
 }
 export async function recordPayment(_:ActionState,form:FormData):Promise<ActionState>{
  try{
- const {client,businessId}=await getWorkspace();const order=String(form.get('order')||''),amount=Number(form.get('amount')),method=String(form.get('method')||''),reference=String(form.get('reference')||'').trim();
+ const access=await getWorkspace();const {client,businessId}=access;const order=String(form.get('order')||''),amount=Number(form.get('amount')),method=String(form.get('method')||''),reference=String(form.get('reference')||'').trim();
  if(!order||!Number.isFinite(amount)||amount<=0||!['cash','transfer','pos','card','other'].includes(method)||reference.length>150)return {error:'Enter a valid amount and payment method.',success:''};
+ if(!['owner','manager','finance','sales'].includes(access.role)||!(await coreActionAllowed(access,'payments','create')))return {error:'Payment recording is unavailable for this plan or staff role.',success:''};
  const {error}=await client.rpc('crm_record_payment',{p_business:businessId,p_order:order,p_amount:amount,p_method:method,p_reference:reference||null});
  if(error)return {error:'Payment could not be saved. Check the outstanding balance and try again.',success:''};
  revalidatePath('/orders');revalidatePath('/customers');revalidatePath(`/orders/${order}`);return {error:'',success:'Payment recorded successfully.'};

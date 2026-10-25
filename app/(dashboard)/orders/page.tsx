@@ -1,5 +1,6 @@
 import {customerNameFromRelation} from '@/lib/customer-relations';
 import {getWorkspace} from '@/lib/server/workspace';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 import {money} from '@/lib/format';
 import {BusinessPageHeading,BusinessSection,BusinessSummary,BusinessAlert} from '@/components/business-page-ui';
 import type {RecordItem} from '@/components/business-records';
@@ -7,8 +8,8 @@ import {parseDirectory,DIRECTORY_SIZE,type DirectoryRaw} from '@/lib/record-dire
 import {ServerRecordRegister} from '@/components/server-record-register';
 export const dynamic='force-dynamic';
 export default async function Orders({searchParams}:{searchParams:Promise<DirectoryRaw>}){
- const {client,businessId,role}=await getWorkspace();
- const canRecord=['owner','manager','finance','sales'].includes(role);
+ const access=await getWorkspace();const {client,businessId,role}=access;
+ const canRecord=['owner','manager','finance','sales'].includes(role)&&await coreActionAllowed(access,'orders','create');
  const params=parseDirectory(await searchParams);
  let query=client.from('orders')
   .select('id,order_number,total,status,created_at,due_date,customer_id,payments(amount,status)',{count:'exact'})

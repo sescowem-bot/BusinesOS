@@ -2,6 +2,8 @@ import {randomUUID} from 'node:crypto';
 import {customerNameFromRelation} from '@/lib/customer-relations';
 import Link from 'next/link';
 import {getWorkspace} from '@/lib/server/workspace';
+import {redirect} from 'next/navigation';
+import {coreActionAllowed} from '@/lib/server/core-action-permissions';
 import {OrderForm} from '../../sales/forms';
 import {ReviewedTaxForm} from './reviewed-tax-form';
 import {BusinessPageHeading,BusinessAlert} from '@/components/business-page-ui';
@@ -9,7 +11,8 @@ export const dynamic='force-dynamic';
 type Rule={treatment:string;rate_basis_points:number;status:string;tax_kind:string;effective_from:string;effective_to:string|null};
 export default async function NewOrder({searchParams}:{searchParams:Promise<{customer?:string}>}){
  const {customer:requestedCustomer}=await searchParams;
- const {client,businessId,role}=await getWorkspace();
+ const access=await getWorkspace();const {client,businessId,role}=access;
+ if(!['owner','manager','finance','sales'].includes(role)||!(await coreActionAllowed(access,'orders','create')))redirect('/orders');
  const canRecordCost=['owner','manager','finance'].includes(role);
  // The tax profile determines the ONLY permitted form; ordinary workspaces do not
  // load the more expensive tax supply/classification joins.
