@@ -28,6 +28,10 @@ const ownerLinks:NavigationItem[]=[
  {label:'Switch my business',href:'/admin/my-business',icon:BriefcaseBusiness}
 ];
 const restrictedModules:Record<string,string>={
+ '/customers':'customers','/orders':'orders','/products':'products',
+ '/payments':'payments','/receivables':'payments','/expenses':'expenses',
+ '/invoices':'documents','/exports':'documents','/settings':'settings',
+ '/tasks':'team','/team/updates':'team',
  '/pos':'pos','/pos/shifts':'pos','/returns':'pos','/wholesale':'pos',
  '/inventory':'inventory','/inventory/locations':'inventory','/purchasing':'purchasing',
  '/accounting':'accounting','/reports':'financial_reports','/retail-reports':'financial_reports',
@@ -85,7 +89,7 @@ export function Shell({children,brand,businessRole,businessName,businessLogo,unr
  const active=allItems.find(item=>selected(path,item.href));
  const pageTitle=active?.label||'Business workspace';
  const role=businessRole==='owner'?'Business owner':businessRole?businessRole.charAt(0).toUpperCase()+businessRole.slice(1):'Team member';
- const mobileLinks=mobileWorkspacePaths(businessRole,isPlatformAdmin);
+ const mobileLinks=mobileWorkspacePaths(businessRole,isPlatformAdmin).filter(href=>!restrictedModules[href]||enabledFeatures.includes(restrictedModules[href]));
  const brandName=brand?.name||'BusinessOS';
  return <div className="app-shell business-workspace"><a className="work-skip-link" href="#business-main">Skip to main content</a>
   <header className="topbar work-topbar">

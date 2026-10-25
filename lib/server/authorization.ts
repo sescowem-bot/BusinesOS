@@ -2,6 +2,7 @@ import 'server-only';
 import {redirect} from 'next/navigation';
 import {getWorkspace} from './workspace';
 import type {PaidFeature} from '@/lib/plan-catalog';
+import {getWorkspaceVisibleModules} from './visible-modules';
 
 export type Feature = PaidFeature;
 /** Access must be verified in SQL, not only in navigation or browser code. */
@@ -15,7 +16,8 @@ export async function requireBusinessFeature(feature:Feature,options:{optional?:
   if(!options.optional)redirect('/dashboard');
   return {...workspace,allowed:false,reason:'Unable to verify your subscription and role permissions. Contact platform support.'};
  }
- const allowed=data===true;
+ const visibility=await getWorkspaceVisibleModules();
+ const allowed=data===true&&!visibility.error&&visibility.modules.includes(feature);
  if(!allowed&&!options.optional)redirect('/dashboard');
  return {...workspace,allowed,reason:'This feature is not available to your business account.'};
 }
