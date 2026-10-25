@@ -25,7 +25,7 @@ for(const needle of ["start_url:'/dashboard'","display:'standalone'","scope:'/'"
 const layout=rd('app/layout.tsx');
 expect(layout.includes("manifest:'/manifest.webmanifest'"),'manifest linked in metadata');
 expect(layout.includes('appleWebApp:{capable:true'),'Apple web-app metadata');
-expect(layout.includes("apple:'/app-icon-180.png'"),'Apple touch icon');
+expect(layout.includes("apple:'/app-icon-180.png'")||(layout.includes('brandIconPath(b,180)')&&fs.existsSync('app/api/branding/icon/[size]/route.tsx')),'Apple touch icon (static or brand-generated)');
 for(const [file,min,max] of [['app-icon-180.png',180,180],['app-icon-192.png',192,192],['app-icon-512.png',512,512],['app-icon-maskable-512.png',512,512]]){
  const bin=fs.readFileSync('public/'+file);
  expect(bin.slice(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])),`${file} PNG signature`);
