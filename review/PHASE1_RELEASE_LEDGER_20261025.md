@@ -1,3 +1,5 @@
+> **Later status (25 October 2026):** Phase 1G activated the global action matrix after rollback-only parity checks. The OFF state described below is historical. See [Phase 1G activation and acceptance](PHASE1G_ACTIVATION_ACCEPTANCE_20261025.md) for current production status and remaining real-browser QA.
+
 # BusinessOS Phase 1 — Production permission hardening (25 October 2026)
 
 ## Status — substantial database work installed; final activation/acceptance NOT complete

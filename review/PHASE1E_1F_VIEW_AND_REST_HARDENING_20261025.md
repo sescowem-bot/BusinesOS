@@ -1,3 +1,5 @@
+> **Later status (25 October 2026):** Phase 1G activated the global action switch with zero preset overrides after SQL acceptance. The OFF-state notes below are historical. See [Phase 1G activation and acceptance](PHASE1G_ACTIVATION_ACCEPTANCE_20261025.md).
+
 # BusinessOS Phase 1E–1F: Direct-API hardening and View permission coverage
 
 **25 October 2026 — implementation deployed to production database; final role-matrix activation still pending.**
