@@ -33,7 +33,7 @@ for(const p of ['customers','orders','products','payments','invoices']){
 const detail=read('app/(dashboard)/orders/[id]/page.tsx');
 assert.match(detail,/eq\('business_id',businessId\)/);
 assert.match(detail,/canManage/);
-assert.match(detail,/!cancelled&&canManage/);
+assert.match(detail,/!cancelled&&(canTakePayment|canManage)/,'Payment UI requires plan-aware access');
 for(const p of ['customers/new','orders/new']) assert.match(read(`app/(dashboard)/${p}/page.tsx`),/bo-form-panel/);
 const css=read('app/globals.css');
 assert.match(css,/\.bo-table-tools/);
