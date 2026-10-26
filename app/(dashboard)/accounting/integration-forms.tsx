@@ -1,9 +1,10 @@
 'use client';
 import {useActionState} from 'react';
-import {configureAccounting,discoverAccountingSources,processAccountingSources,type IntegrationResult} from './integration-actions';
+import {configureAccounting,configureInventoryCostAccounts,discoverAccountingSources,processAccountingSources,type IntegrationResult} from './integration-actions';
 const initial:IntegrationResult={error:'',success:''};
 type Account={id:string;code:string;name:string;class:string};
 type Mapping={enabled:boolean;cash_account_id:string;receivable_account_id:string;advance_account_id:string;income_account_id:string;delivery_account_id:string;tax_account_id:string;expense_account_id:string};
+type InventoryCostMapping={inventory_account_id:string;cogs_account_id:string};
 function Feedback({value}:{value:IntegrationResult}){return <p aria-live="polite" role={value.error?'alert':'status'} className={value.error?'negative':'small muted'}>{value.error||value.success}</p>}
 const mapping=[
  {key:'cash',field:'cash_account_id',label:'Bank / Cash',kind:'asset'},
@@ -14,10 +15,11 @@ const mapping=[
  {key:'tax',field:'tax_account_id',label:'Tax liability',kind:'liability'},
  {key:'expense',field:'expense_account_id',label:'Operating expenses',kind:'expense'},
 ] as const;
-export function AccountingIntegrationForms({accounts,settings}:{accounts:Account[];settings:Mapping|null}){
+export function AccountingIntegrationForms({accounts,settings,costSettings}:{accounts:Account[];settings:Mapping|null;costSettings:InventoryCostMapping|null}){
  const [state,action,busy]=useActionState(configureAccounting,initial);
  const [found,find,scanning]=useActionState(discoverAccountingSources,initial);
  const [processed,process,posting]=useActionState(processAccountingSources,initial);
+ const [costState,costAction,costBusy]=useActionState(configureInventoryCostAccounts,initial);
  return <div className="grid grid-2">
   <form action={action} className="tax-panel" style={{display:'grid',gap:13}}>
    <h3>Connect operational transactions</h3>
@@ -28,10 +30,25 @@ export function AccountingIntegrationForms({accounts,settings}:{accounts:Account
    </select></label>)}
    <label>Automatic journal posting <select name="enabled" defaultValue={settings?.enabled?'yes':'no'}><option value="no">Paused</option><option value="yes">Enabled for new transactions</option></select></label>
    <label style={{display:'flex',alignItems:'flex-start',gap:8}}><input type="checkbox" name="confirm_policy" value="yes"/>I have reviewed my accounts, the open period and the commercial invoice recognition policy.</label>
-   <p className="muted small">Ordinary invoices recognise sales and VAT. POS sales recognise revenue and VAT directly; issuing a POS invoice does not recognise the same sale twice. Receipts debit cash and credit receivables or customer advances. Confirmed POS refunds reverse sale revenue and output VAT against cash after the original sale has been posted. Paid expenses debit expenses and credit cash. Existing source journals cannot be remapped automatically.</p>
+   <p className="muted small">When tracked products are used, configure Inventory Asset and Cost of Goods Sold accounts below before enabling automatic posting. Ordinary invoices recognise sales and VAT. POS sales recognise revenue and VAT directly; issuing a POS invoice does not recognise the same sale twice. Receipts debit cash and credit receivables or customer advances. Confirmed POS refunds reverse sale revenue and output VAT against cash after the original sale has been posted. Paid expenses debit expenses and credit cash. Existing source journals cannot be remapped automatically.</p>
    <button type="submit" className="btn primary" disabled={busy||accounts.length<5}>Save accounting integration</button><Feedback value={state}/>
   </form>
   <section className="tax-panel" style={{display:'grid',gap:12,alignContent:'start'}}>
+   <h3>Stock valuation &amp; Cost of Goods Sold</h3>
+   <p className="small muted">Tracked POS sales credit the inventory asset and debit Cost of Goods Sold using the saved cost at checkout. Saleable restocked returns reverse that cost. Goods not restocked remain an expense.</p>
+   <p className="small muted">Before relying on inventory balances, record opening stock valuation and supplier purchases or inventory adjustments using reviewed accounting entries. The system does not automatically journal supplier receipts or stock count differences yet.</p>
+   <form action={costAction} style={{display:'grid',gap:12}}>
+    <label>Inventory asset <select name="inventory" required defaultValue={costSettings?.inventory_account_id||''}>
+     <option value="">Select inventory asset</option>
+     {accounts.filter(a=>a.class==='asset').map(a=><option key={a.id} value={a.id}>{a.code} · {a.name}</option>)}
+    </select></label>
+    <label>Cost of Goods Sold <select name="cogs" required defaultValue={costSettings?.cogs_account_id||''}>
+     <option value="">Select cost-of-sales expense</option>
+     {accounts.filter(a=>a.class==='expense').map(a=><option key={a.id} value={a.id}>{a.code} · {a.name}</option>)}
+    </select></label>
+    <label style={{display:'flex',gap:8,alignItems:'flex-start'}}><input type="checkbox" name="confirm_cost_policy" value="yes"/>I confirm these accounts match my stock valuation and historical cost policy.</label>
+    <button className="btn" type="submit" disabled={costBusy||!accounts.some(a=>a.class==='asset')||!accounts.some(a=>a.class==='expense')}>Save inventory cost accounts</button><Feedback value={costState}/>
+   </form>
    <h3>Reconciliation and historical records</h3>
    <p className="small muted">New ordinary invoices, POS sales, completed payments, confirmed POS refunds and paid expenses enter the posting queue. Existing transactions are not imported until you choose to review them.</p>
    <form action={find}><button className="btn" disabled={scanning}>Find existing transactions</button><Feedback value={found}/></form>

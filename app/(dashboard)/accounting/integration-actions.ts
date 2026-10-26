@@ -19,6 +19,15 @@ export async function configureAccounting(_:IntegrationResult,form:FormData):Pro
   const enabled=form.get('enabled')==='yes';
   if(enabled && form.get('confirm_policy')!=='yes')return failure('Confirm the posting policy before enabling automatic journals.');
   if(!(await premiumActionAllowed(access,'accounting','edit')))return failure('This accounting operation is not permitted for the plan or staff role.');
+  if(enabled){
+   const {count,error:productsError}=await access.client.from('products').select('id',{head:true,count:'exact'}).eq('business_id',access.businessId).eq('track_inventory',true);
+   if(productsError)return failure('Unable to verify tracked products. Please retry.');
+   if((count||0)>0){
+    const {data:stockSettings,error:stockError}=await access.client.from('gl_inventory_cost_settings')
+     .select('inventory_account_id,cogs_account_id').eq('business_id',access.businessId).maybeSingle();
+    if(stockError||!stockSettings)return failure('Configure Inventory Asset and Cost of Goods Sold accounts before enabling posting for a business with tracked stock.');
+   }
+  }
  const {error}=await access.client.rpc('gl_configure_integration',{
    p_business:access.businessId,p_enabled:enabled,
    p_cash:ids.cash,p_receivable:ids.receivable,p_advance:ids.advance,
@@ -28,6 +37,25 @@ export async function configureAccounting(_:IntegrationResult,form:FormData):Pro
   refresh();return {error:'',success:enabled?'Automatic posting enabled for new ordinary invoices, POS sales, payments, refunds and expenses.':'Automatic posting paused. Existing journals remain unchanged.'};
  }catch{return failure('Unable to save accounting integration settings.');}
 }
+export async function configureInventoryCostAccounts(_:IntegrationResult,form:FormData):Promise<IntegrationResult>{
+ try{
+  const access=await requireBusinessFeature('accounting');
+  if(!access.allowed)return failure(access.reason);
+  if(!['owner','manager','finance'].includes(access.role))return failure('Finance permission required.');
+  if(!(await premiumActionAllowed(access,'accounting','edit')))return failure('Accounting account mappings are not permitted for the plan or staff role.');
+  const inventory=String(form.get('inventory')||''),cogs=String(form.get('cogs')||'');
+  const uuid=/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i;
+  if(!uuid.test(inventory)||!uuid.test(cogs)||inventory===cogs)return failure('Choose separate, valid Inventory Asset and Cost of Goods Sold accounts.');
+  if(form.get('confirm_cost_policy')!=='yes')return failure('Please confirm your stock valuation and cost recording policy before saving.');
+  const {error}=await access.client.rpc('gl_configure_inventory_cost_accounts',{
+   p_business:access.businessId,p_inventory:inventory,p_cogs:cogs
+  });
+  if(error)return failure(friendlyServiceError('save inventory cost accounts',error));
+  refresh();
+  return {error:'',success:'Inventory Asset and Cost of Goods Sold accounts saved. Future tracked POS postings will use the cost recorded at sale.'};
+ }catch{return failure('Unable to configure the inventory cost accounts.');}
+}
+
 export async function discoverAccountingSources(_:IntegrationResult):Promise<IntegrationResult>{
  try{
   const access=await requireBusinessFeature('accounting');if(!access.allowed)return failure(access.reason);
