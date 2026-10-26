@@ -28,12 +28,12 @@ export function AccountingIntegrationForms({accounts,settings}:{accounts:Account
    </select></label>)}
    <label>Automatic journal posting <select name="enabled" defaultValue={settings?.enabled?'yes':'no'}><option value="no">Paused</option><option value="yes">Enabled for new transactions</option></select></label>
    <label style={{display:'flex',alignItems:'flex-start',gap:8}}><input type="checkbox" name="confirm_policy" value="yes"/>I have reviewed my accounts, the open period and the commercial invoice recognition policy.</label>
-   <p className="muted small">Invoices debit receivables and recognise sales. Receipts debit cash and credit receivables or advances. Paid expenses debit expenses and credit cash. Existing source journals cannot be remapped automatically.</p>
+   <p className="muted small">Ordinary invoices recognise sales and VAT. POS sales recognise revenue and VAT directly; issuing a POS invoice does not recognise the same sale twice. Receipts debit cash and credit receivables or customer advances. Confirmed POS refunds reverse sale revenue and output VAT against cash after the original sale has been posted. Paid expenses debit expenses and credit cash. Existing source journals cannot be remapped automatically.</p>
    <button type="submit" className="btn primary" disabled={busy||accounts.length<5}>Save accounting integration</button><Feedback value={state}/>
   </form>
   <section className="tax-panel" style={{display:'grid',gap:12,alignContent:'start'}}>
    <h3>Reconciliation and historical records</h3>
-   <p className="small muted">New invoices, completed payments and paid expenses enter the posting queue. Existing transactions are not imported until you choose to review them.</p>
+   <p className="small muted">New ordinary invoices, POS sales, completed payments, confirmed POS refunds and paid expenses enter the posting queue. Existing transactions are not imported until you choose to review them.</p>
    <form action={find}><button className="btn" disabled={scanning}>Find existing transactions</button><Feedback value={found}/></form>
    <p className="muted small">Review opening balances and previously entered manual journals with your accountant before posting historical records. The system cannot identify duplicates of manually posted entries.</p>
    <form action={process}><button className="btn primary" disabled={posting||!settings?.enabled}>Post next 20 pending entries</button><Feedback value={processed}/></form>

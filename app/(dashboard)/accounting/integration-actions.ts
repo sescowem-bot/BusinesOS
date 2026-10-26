@@ -25,7 +25,7 @@ export async function configureAccounting(_:IntegrationResult,form:FormData):Pro
    p_income:ids.income,p_delivery:ids.delivery,p_tax:ids.tax,p_expense:ids.expense,
   });
   if(error)return failure(friendlyServiceError('complete this request', error));
-  refresh();return {error:'',success:enabled?'Automatic posting enabled for new events.':'Automatic posting paused. Existing journals remain unchanged.'};
+  refresh();return {error:'',success:enabled?'Automatic posting enabled for new ordinary invoices, POS sales, payments, refunds and expenses.':'Automatic posting paused. Existing journals remain unchanged.'};
  }catch{return failure('Unable to save accounting integration settings.');}
 }
 export async function discoverAccountingSources(_:IntegrationResult):Promise<IntegrationResult>{
