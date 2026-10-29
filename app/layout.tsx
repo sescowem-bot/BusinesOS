@@ -5,7 +5,7 @@ import {CookiePreferences} from '@/components/cookie-preferences';
 import {WorkspaceLoadingBrandProvider} from '@/components/workspace-loading-brand';
 import './globals.css';
 import './brand-theme.css';
-// Branding renders from configured platform settings; customer workspace branding remains separate.
+// Branding renders from production settings; /favicon.svg is only a legacy direct-URL fallback.
 export const revalidate=60;
 export async function generateViewport():Promise<Viewport>{const b=await getPlatformBrand();return {width:'device-width',initialScale:1,themeColor:b.primary_color};}
 export async function generateMetadata():Promise<Metadata>{const b=await getPlatformBrand();return {title:`${b.name} — ${b.tagline}`,description:b.description,manifest:'/manifest.webmanifest',appleWebApp:{capable:true,title:b.short_name||b.name,statusBarStyle:'default'},icons:{icon:[{url:browserBrandIcon(b)}],shortcut:browserBrandIcon(b),apple:[{url:brandIconPath(b,180),sizes:'180x180',type:'image/png'}]}};}
