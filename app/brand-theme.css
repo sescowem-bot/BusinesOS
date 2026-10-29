@@ -1,0 +1,16 @@
+/* Derived theme tokens, following the existing --brand and --green properties set by RootLayout. */
+body{
+ --brand-2:color-mix(in srgb,var(--brand) 80%,#071522);
+ --brand-soft:color-mix(in srgb,var(--brand) 8%,white);
+ --brand-border:color-mix(in srgb,var(--brand) 24%,white);
+ --accent-soft:color-mix(in srgb,var(--green) 11%,white);
+}
+/* Some legacy System Owner surfaces used literal navy values and ignored the saved branding. */
+body .owner-console{--owner-navy:var(--brand);--owner-ink:#15263b}
+.owner-console .owner-sidebar{background:var(--brand)}
+.owner-console .owner-brand-row,.owner-console .owner-sidebar a:focus-visible{outline-color:var(--brand-border)}
+.owner-console .owner-management-card:hover{border-color:var(--brand-border)}
+.owner-console .owner-management-action{color:var(--brand)}
+.owner-console .owner-management-card svg{color:var(--brand)}
+/* Keep invoice/document content neutral; do not override client-specific business branding. */
+.bo-brand-form input:focus-visible,.bo-plan-studio input:focus-visible,.bo-plan-studio select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}

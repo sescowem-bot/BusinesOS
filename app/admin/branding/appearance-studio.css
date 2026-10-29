@@ -1,0 +1,42 @@
+/* Focused, responsive branding editor used only on System Owner branding. */
+.bo-brand-form-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(265px,.75fr);gap:23px;align-items:start}
+.bo-brand-form-fields{min-width:0}
+.bo-brand-form .form-grid{gap:14px}
+.bo-brand-form .admin-form-heading{margin-bottom:20px}
+.bo-brand-form .admin-form-heading p{max-width:600px}
+.bo-brand-palette{margin-top:22px}
+.bo-brand-palette h3{margin:0 0 5px;font-size:15px}
+.bo-brand-palette p{margin:0 0 12px}
+.bo-brand-preset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.bo-brand-preset{display:flex;gap:9px;align-items:center;text-align:left;border-radius:11px;border:1px solid #dce5ec;background:#fff;padding:12px;cursor:pointer;color:#31475c;font-size:11px;font-weight:800;min-width:0}
+.bo-brand-preset.is-selected{border:2px solid var(--brand);padding:11px;background:var(--brand-soft)}
+.bo-brand-preset-swatches{display:flex;gap:0;flex-shrink:0}
+.bo-brand-preset-swatches i{width:16px;height:25px;display:block;border:1px solid rgba(0,0,0,.08)}
+.bo-brand-preset-swatches i:first-child{border-radius:7px 0 0 7px}.bo-brand-preset-swatches i:last-child{border-radius:0 7px 7px 0}
+.bo-brand-selected{margin-left:auto;font-size:9px;color:var(--brand)}
+.bo-brand-colour-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:19px}
+.bo-brand-colour-input{display:flex;gap:8px;align-items:center}
+.bo-brand-colour-input input[type=color]{flex:0 0 46px;width:46px;height:42px;border-radius:9px;padding:2px;cursor:pointer}
+.bo-brand-colour-input input[type=text],.bo-brand-colour-input input:not([type]){flex:1;min-width:0;font-variant-numeric:tabular-nums}
+.bo-brand-live-preview{padding:18px;border:1px solid #e0e7ed;border-radius:15px;background:#f6f8fc;position:sticky;top:90px;min-width:0}
+.bo-brand-preview-header{font-size:10px;font-weight:800;letter-spacing:.12em;color:#677d8e;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.bo-brand-preview-indicator{width:7px;height:7px;border-radius:50%;background:var(--bo-preview-accent)}
+.bo-brand-preview-shell{border:1px solid #dce5ee;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 14px 35px rgba(23,53,76,.07)}
+.bo-brand-preview-nav{background:var(--bo-preview-primary);color:#fff;padding:13px;display:flex;align-items:center;gap:9px;font-size:11px}
+.bo-brand-preview-monogram{background:rgba(255,255,255,.2);color:#fff;width:28px;height:28px;display:grid;place-items:center;border-radius:7px;font-size:14px}
+.bo-brand-preview-content{padding:18px}
+.bo-brand-preview-overline{font-size:9px;font-weight:800;letter-spacing:.09em;color:var(--bo-preview-accent)}
+.bo-brand-preview-content h3{margin:8px 0 4px;color:#193246;font-size:16px}
+.bo-brand-preview-content>p{margin:0 0 15px;color:#738596;font-size:11px}
+.bo-brand-preview-tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:17px}
+.bo-brand-preview-tiles>div{background:#f5f8fb;border:1px solid #edf1f5;border-radius:9px;padding:13px;display:grid;gap:5px}
+.bo-brand-preview-tiles small{font-size:9px;color:#687e8c}
+.bo-brand-preview-tiles strong{font-size:14px;color:#203b4e}
+.bo-brand-preview-button{display:inline-block;padding:9px 12px;border-radius:8px;background:var(--bo-preview-primary);color:#fff;font-size:10px;font-weight:800}
+.bo-brand-preview-accent{display:block;color:var(--bo-preview-accent);font-weight:800;font-size:10px;margin-top:11px}
+.bo-brand-live-preview>p{margin:12px 0 0;font-size:10px;line-height:1.55}
+.bo-brand-save{margin-top:22px;align-items:center;gap:14px;flex-wrap:wrap}
+@media(max-width:1160px){.bo-brand-form-layout{grid-template-columns:1fr}.bo-brand-live-preview{position:static}}
+@media(max-width:620px){.bo-brand-preset-grid,.bo-brand-colour-grid{grid-template-columns:1fr}.bo-brand-form .form-grid{grid-template-columns:1fr}}
+.owner-brand-studio .bo-brand-studio-main{padding:27px}
+@media(max-width:620px){.owner-brand-studio .bo-brand-studio-main{padding:17px}}

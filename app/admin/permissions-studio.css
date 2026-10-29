@@ -1,0 +1,62 @@
+/* BusinessOS plan-management controls. Isolated to the System Owner plan studio. */
+.bo-plan-studio{max-width:1240px}
+.bo-plan-studio-header{align-items:flex-start;gap:18px}
+.bo-plan-studio-header h1{margin-top:12px}
+.bo-plan-studio-links{display:flex;flex-wrap:wrap;gap:8px}
+.bo-plan-switcher{display:flex;gap:10px;overflow-x:auto;padding:3px 2px 15px;scrollbar-width:thin;margin:14px 0 7px}
+.bo-plan-switcher-tab{min-width:148px;padding:15px 18px;display:grid;gap:5px;border:1px solid var(--line,#dce4ec);background:white;color:var(--text-strong,#19344a);border-radius:13px;text-decoration:none;transition:border-color .15s,background .15s}
+.bo-plan-switcher-tab strong{font-size:13px}
+.bo-plan-switcher-tab span{font-size:11px;color:var(--muted,#6b7c8c)}
+.bo-plan-switcher-tab.is-active{border:2px solid var(--brand,#123B63);padding:14px 17px;background:var(--brand-soft,#edf4fa)}
+.bo-plan-switcher-tab:focus-visible,.bo-role-edit:focus-visible,.bo-brand-preset:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.bo-plan-studio-summary{display:flex;justify-content:space-between;align-items:center;gap:20px;background:#fff;border:1px solid var(--line,#dce4ec);border-radius:16px;padding:25px;margin:10px 0 22px}
+.bo-plan-studio-summary h2{font-size:23px;letter-spacing:-.03em;margin:4px 0}
+.bo-plan-studio-summary p{color:var(--muted,#687789);margin:0 0 9px;font-size:13px}
+.bo-plan-studio-summary .btn{white-space:nowrap}
+.bo-plan-studio-advice{padding:13px 17px;border:1px solid #efdbb7;border-radius:11px;background:#fff9ec;color:#80551b;font-size:12px;line-height:1.6;margin-bottom:19px}
+.bo-plan-studio-section{background:#fff;border:1px solid var(--line,#dce4ec);border-radius:17px;margin:0 0 20px;padding:22px 24px}
+.bo-plan-studio-heading{margin-bottom:16px}
+.bo-plan-studio-heading h2{font-size:18px;margin:0 0 6px}
+.bo-plan-studio-heading p{font-size:12px;color:var(--muted,#64748b);margin:0;line-height:1.6}
+.bo-core-feature-row,.bo-feature-card{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid #edf1f5;padding:17px 0;min-width:0}
+.bo-core-feature-row:last-child,.bo-feature-group .bo-feature-card:last-child{border-bottom:0}
+.bo-core-feature-row>div:first-of-type,.bo-feature-text{flex:1;min-width:0}
+.bo-core-feature-row strong,.bo-feature-text>strong{display:block;color:#1c354c;font-size:13px}
+.bo-core-feature-row p,.bo-feature-text p{font-size:12px;color:#677b8e;line-height:1.55;margin:5px 0 0}
+.bo-core-feature-action{display:flex;gap:12px;align-items:center;justify-content:flex-end;min-width:142px}
+.bo-core-allowed,.bo-core-disabled{font-size:11px;font-weight:750}
+.bo-core-allowed{color:#14744f}.bo-core-disabled{color:#a04d42}
+.bo-core-feedback{flex-basis:100%;color:#46728b;font-size:12px;margin:0}
+.bo-feature-toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;padding:14px 17px;background:var(--brand-soft,#edf4fa);border-radius:11px;margin-bottom:20px}
+.bo-feature-toolbar p{margin:0;font-size:13px}
+.bo-feature-group{border:1px solid #e6edf3;border-radius:12px;padding:4px 16px;margin:12px 0}
+.bo-feature-group h3{font-size:11px;letter-spacing:.10em;color:#788b9b;text-transform:uppercase;margin:13px 0 4px}
+.bo-feature-actions{display:flex;gap:15px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.bo-switch-label{display:flex;align-items:center;gap:8px;min-width:107px;cursor:pointer;font-size:12px;font-weight:750}
+.bo-switch-label input{width:17px;height:17px;accent-color:var(--brand,#123B63)}
+.bo-switch-label input:disabled{cursor:not-allowed}
+.bo-role-edit{min-width:135px;white-space:nowrap}
+.bo-feature-save{position:relative;display:flex;gap:20px;align-items:center;justify-content:space-between;padding:20px 0 4px}
+.bo-feature-save>div{max-width:590px}.bo-feature-save strong{font-size:13px}.bo-feature-save p{margin:5px 0 0}
+.bo-plan-studio-footer{padding:4px 2px}
+.bo-role-dialog{padding:0;border:0;border-radius:18px;background:white;color:#1c3449;width:min(94vw,560px);max-height:min(88dvh,820px);box-shadow:0 26px 80px rgba(11,27,44,.25);overflow:auto}
+.bo-role-dialog::backdrop{background:rgba(17,30,47,.58)}
+.bo-role-dialog-body{padding:25px}
+.bo-role-dialog-top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:15px}
+.bo-role-dialog-top h2{font-size:21px;margin:4px 0 5px}
+.bo-role-dialog-top p{font-size:12px;color:#687c8c;margin:0}
+.bo-role-dialog-close{background:#f2f5f7;border:0;border-radius:8px;height:31px;min-width:31px;font-size:24px;line-height:1;cursor:pointer;color:#486074}
+.bo-role-dialog-owner{display:grid;gap:5px;padding:15px;background:var(--brand-soft,#edf4fa);border-radius:10px;border:1px solid color-mix(in srgb,var(--brand) 15%,white)}
+.bo-role-dialog-owner strong{font-size:13px}.bo-role-dialog-owner span{font-size:11px;color:#5a7183}
+.bo-role-choice-grid{border:1px solid #dce4ee;border-radius:11px;margin:19px 0;padding:16px}
+.bo-role-choice-grid legend{font-size:13px;font-weight:800;padding:0 6px}
+.bo-role-choice-grid-inner{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px}
+.bo-role-checkbox{display:flex;gap:9px;align-items:start;padding:12px;border:1px solid #e4eaf0;border-radius:9px;cursor:pointer}
+.bo-role-checkbox:has(input:checked){background:var(--brand-soft,#edf4fa);border-color:color-mix(in srgb,var(--brand) 35%,white)}
+.bo-role-checkbox input{accent-color:var(--brand,#123B63);width:16px;height:16px;margin:2px 0 0}
+.bo-role-checkbox span{display:grid;gap:5px}.bo-role-checkbox strong{font-size:12px}.bo-role-checkbox small{font-size:10px;color:#718395;line-height:1.4}
+.bo-role-dialog-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #e9eef3;padding-top:16px}
+.bo-role-dialog-footer p{max-width:275px}
+@media(max-width:850px){.bo-plan-studio-header,.bo-plan-studio-summary{flex-direction:column;align-items:stretch}.bo-plan-studio-summary .btn{align-self:flex-start}.bo-plan-studio-links{justify-content:flex-start}}
+@media(max-width:620px){.bo-plan-studio-section{padding:17px 15px}.bo-plan-studio-summary{padding:18px}.bo-core-feature-row,.bo-feature-card{align-items:flex-start;flex-direction:column}.bo-feature-actions,.bo-core-feature-action{justify-content:space-between;width:100%}.bo-core-feature-row{flex-wrap:wrap}.bo-role-choice-grid-inner{grid-template-columns:1fr}.bo-feature-save,.bo-role-dialog-footer{align-items:stretch;flex-direction:column}.bo-role-dialog-body{padding:20px}.bo-feature-toolbar{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){.bo-plan-studio *{transition:none!important}}
