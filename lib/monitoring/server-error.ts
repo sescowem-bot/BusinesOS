@@ -1,4 +1,3 @@
-import {randomUUID} from 'node:crypto';
 
 type SafeContext={routePath?:string;routerKind?:string};
 const safeName=(value:unknown)=>{
@@ -12,7 +11,7 @@ export function makeRedactedErrorEvent(error:unknown,context:SafeContext={}){
   /^\/[a-zA-Z0-9_\/\[\]().-]{0,180}$/.test(context.routePath)
    ?context.routePath:'/unknown';
  return {
-  event_id:randomUUID().replace(/-/g,''),
+  event_id:globalThis.crypto.randomUUID().replace(/-/g,''),
   timestamp:new Date().toISOString(),
   platform:'javascript',
   level:'error',

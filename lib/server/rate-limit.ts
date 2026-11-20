@@ -31,7 +31,8 @@ function policyFor(pathname:string,kind:'api'|'action'):Policy{
 function digest(secret:string,value:string){return createHmac('sha256',secret).update(value).digest('hex');}
 async function consume(bucketKey:string,policy:Policy){
  const db=getAdminClient();if(!db)return null;
- const {data,error}=await db.rpc('businessos_consume_rate_limit',{p_bucket_key:bucketKey,p_limit:policy.limit,p_window_seconds:policy.windowSeconds});
+ const rpcClient=db as unknown as {rpc:(name:'businessos_consume_rate_limit',args:{p_bucket_key:string;p_limit:number;p_window_seconds:number})=>Promise<{data:unknown;error:unknown}>};
+ const {data,error}=await rpcClient.rpc('businessos_consume_rate_limit',{p_bucket_key:bucketKey,p_limit:policy.limit,p_window_seconds:policy.windowSeconds});
  if(error||!Array.isArray(data)||!data[0])return null;
  const row=data[0] as {allowed?:boolean;remaining?:number;retry_after_seconds?:number};
  if(typeof row.allowed!=='boolean')return null;
