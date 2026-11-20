@@ -1,47 +1,40 @@
 import {createServerClient} from '@supabase/ssr';
 import {NextRequest,NextResponse} from 'next/server';
 import {authCookieOptions,DEVICE_SESSION_COOKIE} from '@/lib/auth-session-preference';
-
-/**
- * Refreshes the Supabase session in a request context that can write cookies.
- * Without this Next.js Server Components may read an expired session but be
- * unable to persist a refreshed one, resulting in intermittent login loops.
- * The proxy is NOT an authorization boundary. Protected pages and actions
- * must always verify the user, role and tenant on the server.
- */
+import {enforceRequestRateLimit} from '@/lib/server/rate-limit';
+const protectedPath=/^\/(admin|onboarding|dashboard|orders|customers|products|inventory|purchasing|pos|returns|payments|invoices|settings|tax-profile|tax-centre|tax-compliance|reports|insights|team|tasks|accounting|expenses|growth|communications|campaigns|automations|marketplace|partners|quotes|notifications|upgrade)(\/|$)/;
+function clientIp(request:NextRequest){
+ const real=request.headers.get('x-real-ip')?.trim();
+ if(real&&real.length<=64)return real;
+ const forwarded=request.headers.get('x-forwarded-for')||'';
+ const last=forwarded.split(',').map(value=>value.trim()).filter(Boolean).at(-1);
+ return last&&last.length<=64?last:'unknown';
+}
+function unavailable(retryAfter='60'){return NextResponse.json({error:'Security service temporarily unavailable. Please try again.'},{status:503,headers:{'Retry-After':retryAfter,'Cache-Control':'no-store'}});}
+function limited(retryAfter:string){return NextResponse.json({error:'Too many requests. Please wait before trying again.'},{status:429,headers:{'Retry-After':retryAfter,'Cache-Control':'no-store'}});}
 export async function proxy(request:NextRequest){
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
- const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
- if(!url||!key)return NextResponse.next({request});
- let response=NextResponse.next({request});
- const remembered=request.cookies.get(DEVICE_SESSION_COOKIE)?.value==='remember';
- const supabase=createServerClient(url,key,{
-  cookies:{
+ const pathname=request.nextUrl.pathname,isApi=pathname.startsWith('/api/'),isRouteHandler=isApi||pathname==='/auth/callback';
+ const isServerAction=request.method==='POST'&&request.headers.has('next-action'),shouldRefresh=protectedPath.test(pathname);
+ if(!isRouteHandler&&!isServerAction&&!shouldRefresh)return NextResponse.next({request});
+ const ipAddress=clientIp(request),kind=isRouteHandler?'api':'action';
+ if(isRouteHandler||isServerAction){
+  try{const d=await enforceRequestRateLimit({pathname,ipAddress,userId:null,kind});if(!d.configured)return unavailable(String(d.retryAfterSeconds));if(!d.allowed)return limited(String(d.retryAfterSeconds));}
+  catch{return unavailable();}
+ }
+ const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+ let response=NextResponse.next({request}),userId:string|null=null;
+ if(url&&key){
+  const remembered=request.cookies.get(DEVICE_SESSION_COOKIE)?.value==='remember';
+  const supabase=createServerClient(url,key,{cookies:{
    getAll(){return request.cookies.getAll();},
-   setAll(items){
-    for(const item of items)request.cookies.set(item.name,item.value);
-    response=NextResponse.next({request});
-    for(const item of items)response.cookies.set(item.name,item.value,authCookieOptions(item.options,remembered));
-   }
-  }
- });
- // Refresh only; do not trust the proxy as a role/tenant permission check.
- try{await supabase.auth.getUser();}
- catch{/* Let protected routes return an explicit authentication error if the provider is unavailable. */}
+   setAll(items){for(const item of items)request.cookies.set(item.name,item.value);response=NextResponse.next({request});for(const item of items)response.cookies.set(item.name,item.value,authCookieOptions(item.options,remembered));}
+  }});
+  try{const {data}=await supabase.auth.getUser();userId=data.user?.id||null;}catch{/* Authorization remains independent. */}
+ }
+ if((isRouteHandler||isServerAction)&&userId){
+  try{const d=await enforceRequestRateLimit({pathname,ipAddress,userId,kind,includeIpBucket:false});if(!d.configured)return unavailable(String(d.retryAfterSeconds));if(!d.allowed)return limited(String(d.retryAfterSeconds));}
+  catch{return unavailable();}
+ }
  return response;
 }
-
-export const config={
- matcher:[
-  // Avoid auth refresh on anonymous public and authentication pages.
-  '/admin/:path*','/onboarding/:path*','/dashboard/:path*',
-  '/orders/:path*','/customers/:path*','/products/:path*','/inventory/:path*',
-  '/purchasing/:path*','/pos/:path*','/returns/:path*','/payments/:path*',
-  '/invoices/:path*','/settings/:path*','/tax-profile/:path*','/tax-centre/:path*',
-  '/tax-compliance/:path*','/reports/:path*','/insights/:path*',
-  '/team/:path*','/tasks/:path*','/accounting/:path*','/expenses/:path*',
-  '/growth/:path*','/communications/:path*','/campaigns/:path*',
-  '/automations/:path*','/marketplace/:path*','/partners/:path*',
-  '/quotes/:path*','/notifications/:path*','/upgrade/:path*'
- ]
-};
+export const config={matcher:['/:path*']};

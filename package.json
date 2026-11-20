@@ -59,7 +59,8 @@
     "test:phase2": "node --experimental-strip-types --test tests/phase2/*.test.mjs",
     "check:phase2-registers": "node scripts/verify-phase2-registers.cjs",
     "verify:regressions": "node scripts/run-regression-checks.cjs",
-    "test:phase3": "node --experimental-strip-types --test tests/phase3/*.test.mjs"
+    "test:phase3": "node --experimental-strip-types --test tests/phase3/*.test.mjs",
+    "test:phase0": "node --experimental-strip-types --test tests/phase0-security.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

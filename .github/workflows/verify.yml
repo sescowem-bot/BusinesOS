@@ -21,6 +21,8 @@ jobs:
         run: npm run check:routes
       - name: Regression and security checks
         run: npm run verify:regressions
+      - name: Phase 0 security tests
+        run: npm run test:phase0
       - name: TypeScript
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run typecheck
@@ -37,3 +39,32 @@ jobs:
           deno-version: v2.x
       - name: Typecheck Supabase Auth Email Hook independently
         run: deno check --node-modules-dir=auto supabase/functions/send-email/index.ts
+
+  phase0-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: businessos_security
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d businessos_security"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute SQL 057 and 058 with real PostgreSQL roles
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: businessos_security
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_057_rls_execution.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_058_rate_limit_execution.sql
