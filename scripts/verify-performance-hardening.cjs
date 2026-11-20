@@ -4,9 +4,9 @@ const proxy=read('proxy.ts'),root=read('app/layout.tsx'),brand=read('lib/server/
 const cms=read('lib/server/public-cms.ts'),workspace=read('lib/server/workspace.ts');
 const home=read('app/page.tsx'),publicPage=read('app/(public)/[slug]/page.tsx'),pricing=read('app/pricing/page.tsx');
 let checked=0;const check=(v,m)=>{assert.ok(v,m);checked++};
-check(proxy.includes('const protectedPath=/^\\/('),'protected page refresh matcher missing');
+check(proxy.includes('protectedPath=/^\\/('),'protected page refresh matcher missing');
 for(const p of ['admin','onboarding','orders','pos','inventory','dashboard'])check(proxy.includes(p),'protected matcher '+p);
-check(proxy.includes("const isRouteHandler=isApi||pathname==='/auth/callback'"),'all Route Handlers must be covered');
+check(proxy.includes("isRouteHandler=isApi||pathname==='/auth/callback'"),'all Route Handlers must be covered');
 check(proxy.includes("request.method==='POST'&&request.headers.has('next-action')"),'all Server Action POSTs must be covered');
 check(proxy.includes('if(!isRouteHandler&&!isServerAction&&!shouldRefresh)return NextResponse.next({request})'),'public pages must skip auth refresh');
 check(!root.includes("dynamic='force-dynamic'"),'root forces dynamic rendering');
