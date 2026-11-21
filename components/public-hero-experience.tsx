@@ -1,51 +1,31 @@
 'use client';
-import {useRef,useState} from 'react';
-import type {PointerEvent,ReactNode} from 'react';
-import {ArrowUpRight,CheckCircle2,FileText,Layers3,UsersRound,Wallet} from 'lucide-react';
-
-const views=[
- {key:'customers',label:'Customers',title:'Keep every customer in context',copy:'Profiles, orders and follow-ups belong together.',icon:UsersRound},
- {key:'payments',label:'Payments',title:'Know what has been paid',copy:'Record collections and see the balance still outstanding.',icon:Wallet},
- {key:'records',label:'Records',title:'Make every transaction count',copy:'Bring invoices, expenses and daily activity into view.',icon:FileText},
-] as const;
-
-/** A responsive product-led hero. Deliberately GPU-light: no canvas, WebGL or JS animation loop. */
-export function PublicHeroExperience({children}:{children:ReactNode}){
- const [active,setActive]=useState(0);
- const root=useRef<HTMLDivElement>(null);
- const current=views[active];
- const Icon=current.icon;
- function move(event:PointerEvent<HTMLDivElement>){
-  if(event.pointerType!=='mouse'||typeof window==='undefined')return;
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.boMotion==='reduce')return;
-  const rect=event.currentTarget.getBoundingClientRect();
-  const px=(event.clientX-rect.left)/rect.width-.5,py=(event.clientY-rect.top)/rect.height-.5;
-  const node=root.current;
-  if(!node)return;
-  node.style.setProperty('--hero-tilt-y',(px*4).toFixed(2)+'deg');
-  node.style.setProperty('--hero-tilt-x',(-py*3).toFixed(2)+'deg');
+import {useEffect,useState} from 'react';
+import type {PointerEvent as ReactPointerEvent,ReactNode} from 'react';
+import {ArrowLeft,ArrowRight,BarChart3,CheckCircle2,ClipboardList,Layers3,Package,Pause,Play,ReceiptText,ShieldCheck,ShoppingBag,UsersRound,Wallet} from 'lucide-react';
+import {PublicWorkspacePreview} from '@/components/public-workspace-preview';
+const slides=[{key:'workspace',eyebrow:'ONE CONNECTED WORKSPACE',title:'Run your business with a clearer view.',copy:'Bring customers, sales, payments and everyday records together.',tag:'Everything working together'},{key:'sales',eyebrow:'SALES THAT MAKE SENSE',title:'Every order. Every payment. Accounted for.',copy:'Keep each sale close at hand, from the first order to the final balance.',tag:'Orders · Payments · Invoices'},{key:'control',eyebrow:'CONFIDENCE IN THE DETAILS',title:'Know what is happening across your business.',copy:'Organise stock, expenses, people and reports in one practical place.',tag:'Visibility · Control · Progress'}] as const;
+function SalesVisual(){return <div className='mp-hero-scene' role='img' aria-label='Sales workflow illustration'><div className='mp-scene-top'>SALES OVERVIEW <span>● LIVE WORKFLOW</span></div><div className='mp-scene-heading'><div><small>YOUR DAILY SALES</small><strong>One clear picture.</strong><span>Orders and collections, side by side.</span></div><ShoppingBag size={28}/></div><div className='mp-scene-metrics'><div><small>ORDERS</small><b>01</b><span>Recorded clearly</span></div><div><small>PAYMENTS</small><b>₦</b><span>Tracked as received</span></div><div><small>INVOICES</small><b>✓</b><span>Ready to share</span></div></div><div className='mp-scene-row'><ClipboardList/><span><b>Order details</b><small>Items, quantities and customer</small></span><em>IN ORDER</em></div><div className='mp-scene-row'><Wallet/><span><b>Payment activity</b><small>Full and part payments stay visible</small></span><CheckCircle2/></div><div className='mp-scene-float'><ReceiptText/> Invoice ready <CheckCircle2/></div></div>}
+function ControlVisual(){return <div className='mp-hero-scene' role='img' aria-label='Business operations illustration'><div className='mp-scene-top'>BUSINESS CONTROL <span>● CONNECTED</span></div><div className='mp-scene-heading'><div><small>YOUR OPERATIONS</small><strong>See the moving parts.</strong></div><Layers3 size={28}/></div><div className='mp-scene-tiles'><div><UsersRound/><b>Customers</b><small>People and activity</small></div><div><Package/><b>Inventory</b><small>Products and stock</small></div><div><Wallet/><b>Expenses</b><small>Business spending</small></div><div><BarChart3/><b>Reports</b><small>Useful summaries</small></div></div><div className='mp-scene-footer'><span><ShieldCheck/> Roles and access</span><span><CheckCircle2/> Organised records</span></div><div className='mp-scene-float'><Layers3/> One workspace</div></div>}
+const heroCss=".mp-home-hero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(76px,8vw,118px) 0 86px;background:linear-gradient(112deg,#fbfdff,#f4f8ff 52%,#edf4ff)!important}.mp-home-hero>.marketing-container{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);align-items:center;gap:clamp(28px,5vw,70px)}.mp-home-hero .site-hero-content h1{font-size:clamp(3rem,5.2vw,5.1rem);line-height:.99;letter-spacing:-.075em;font-weight:850;color:#101d32;text-wrap:balance}.mp-home-hero .site-hero-content>p{color:#53667e;font-size:clamp(15px,1.35vw,18px);line-height:1.8}.mp-home-hero .site-announcement{border:1px solid #dce7f7;border-radius:999px;background:#fff;color:#244f91}.mp-home-hero .marketing-btn-primary{background:#245bc5}.mp-home-hero .marketing-btn-outline{background:#ffffffb8;border-color:#cdd9ea;color:#203b61}.mp-home-hero .mp-hero-proof span{color:#52657e}.mp-home-hero .mp-hero-proof svg{color:#2864c8}.mp-hero-carousel{position:relative;isolation:isolate;padding:22px 23px 16px;border:1px solid #cad9ed;border-radius:27px;background:#ffffffc9;box-shadow:0 32px 80px #1b3f751f;overflow:hidden}.mp-carousel-top,.mp-scene-top{display:flex;justify-content:space-between;gap:10px;padding-bottom:14px;border-bottom:1px solid #e5edf8;color:#6a7c96;font-size:9px;font-weight:850;letter-spacing:.12em}.mp-carousel-slide{animation:mp-slide-in .5s ease both}.mp-slide-copy{display:grid;gap:6px;padding:16px 2px 14px}.mp-slide-copy>span{font-size:9px;color:#1d4e9c;font-weight:900;letter-spacing:.11em}.mp-slide-copy>b{font-size:17px;color:#172f50}.mp-slide-copy>small{font-size:10px;color:#72829a}.mp-slide-copy>em{font-style:normal;font-size:9px;color:#6d7e95}.mp-slide-visual{min-height:310px;display:grid;align-items:center}.mp-slide-visual>.site-stage{width:100%;transform:perspective(1200px) rotateY(var(--hero-tilt-y,0deg)) rotateX(var(--hero-tilt-x,0deg));transition:transform .4s ease}.mp-hero-scene{position:relative;min-height:310px;padding:21px;border:1px solid #dbe6f4;border-radius:19px;background:linear-gradient(145deg,#fff,#f4f8ff 70%,#edf4ff);box-shadow:0 20px 44px #1d41751a;overflow:hidden}.mp-scene-heading{display:flex;justify-content:space-between;align-items:center;padding:22px 0 17px;color:#2864c8}.mp-scene-heading>div{display:grid;gap:5px}.mp-scene-heading small{font-size:9px;color:#71839a}.mp-scene-heading strong{font-size:27px;color:#142c4e}.mp-scene-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.mp-scene-metrics>div{display:grid;gap:5px;padding:12px;border:1px solid #e3eaf5;border-radius:12px;background:#ffffffd9}.mp-scene-metrics small{font-size:8px;color:#75859a}.mp-scene-metrics b{font-size:21px;color:#1f559e}.mp-scene-metrics span{font-size:9px;color:#78879a}.mp-scene-row{display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px;border:1px solid #e1e9f4;border-radius:12px;background:#fff;color:#2a65c4}.mp-scene-row>span{display:grid;gap:3px;flex:1}.mp-scene-row b{font-size:10px;color:#1b3557}.mp-scene-row small{font-size:9px;color:#77889d}.mp-scene-row em{font-style:normal;font-size:8px;color:#2761ac}.mp-scene-float{position:absolute;right:12px;bottom:13px;display:flex;align-items:center;gap:7px;padding:9px 11px;border:1px solid #dce7f5;border-radius:11px;background:#fff;box-shadow:0 10px 22px #2044771f;color:#31557e;font-size:9px;animation:mp-float 5s ease-in-out infinite}.mp-scene-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.mp-scene-tiles>div{display:grid;grid-template-columns:34px 1fr;column-gap:9px;align-items:center;padding:12px;border:1px solid #e1e9f5;border-radius:13px;background:#ffffffdf;color:#3269c5}.mp-scene-tiles svg{grid-row:span 2;width:32px;height:32px;padding:7px;border-radius:10px;background:#eaf1ff}.mp-scene-tiles b{font-size:10px;color:#213b5d}.mp-scene-tiles small{font-size:9px;color:#78889d}.mp-scene-footer{display:flex;justify-content:space-between;gap:10px;padding-top:16px;color:#607894;font-size:9px}.mp-carousel-controls{display:flex;justify-content:space-between;align-items:center;padding-top:15px}.mp-carousel-dots,.mp-carousel-buttons{display:flex;align-items:center;gap:7px}.mp-carousel-dots button{width:8px;height:8px;padding:0;border:0;border-radius:20px;background:#c8d4e5}.mp-carousel-dots button.active{width:26px;background:#245bc5}.mp-carousel-buttons button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #d9e3f1;border-radius:50%;background:#fff;color:#254d8d}.mp-carousel-caption{display:flex;justify-content:space-between;gap:10px;padding-top:12px;color:#71839a;font-size:9px}@keyframes mp-slide-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes mp-float{50%{translate:0 -6px}}@media(max-width:1050px){.mp-home-hero>.marketing-container{grid-template-columns:1fr;gap:38px}.mp-hero-preview{max-width:760px;width:100%;margin:auto}}@media(max-width:640px){.mp-home-hero{padding:72px 0 56px}.mp-home-hero .site-hero-content h1{font-size:clamp(2.7rem,12vw,4rem)}.mp-hero-carousel{padding:15px 13px 13px}.mp-slide-visual,.mp-hero-scene{min-height:270px}.mp-hero-scene{padding:14px}.mp-scene-heading{padding:16px 0 12px}.mp-scene-heading strong{font-size:23px}.mp-scene-metrics{gap:6px}.mp-scene-metrics>div{padding:8px}.mp-scene-metrics span,.mp-scene-row small{font-size:8px}.mp-carousel-caption span:last-child{display:none}}@media(prefers-reduced-motion:reduce){.mp-carousel-slide,.mp-scene-float{animation:none!important}}";
+export function PublicHeroExperience({children}:{children?:ReactNode}){
+ const [active,setActive]=useState(0),[paused,setPaused]=useState(false),slide=slides[active];
+ useEffect(()=>{if(paused||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const timer=window.setInterval(()=>setActive(v=>(v+1)%slides.length),6200);return()=>window.clearInterval(timer)},[paused]);
+ const previous=()=>setActive(v=>(v+slides.length-1)%slides.length),next=()=>setActive(v=>(v+1)%slides.length);
+ function handlePointerMove(event:ReactPointerEvent<HTMLDivElement>){
+  if(event.pointerType!=='mouse'||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const rect=event.currentTarget.getBoundingClientRect(),px=(event.clientX-rect.left)/rect.width-.5,py=(event.clientY-rect.top)/rect.height-.5;
+  event.currentTarget.style.setProperty('--hero-tilt-y',(px*2.5)+'deg');
+  event.currentTarget.style.setProperty('--hero-tilt-x',(-py*2)+'deg');
  }
- function reset(){
-  root.current?.style.setProperty('--hero-tilt-y','0deg');
-  root.current?.style.setProperty('--hero-tilt-x','0deg');
+ function resetPointer(event:ReactPointerEvent<HTMLDivElement>){
+  event.currentTarget.style.setProperty('--hero-tilt-y','0deg');
+  event.currentTarget.style.setProperty('--hero-tilt-x','0deg');
  }
- return <div className="bo-showcase" ref={root} onPointerMove={move} onPointerLeave={reset} aria-label="BusinessOS workspace preview">
-  <div className="bo-showcase-atmosphere" aria-hidden="true">
-   <span className="bo-showcase-light bo-showcase-light-one"/>
-   <span className="bo-showcase-light bo-showcase-light-two"/>
-   <span className="bo-showcase-orbit bo-showcase-orbit-one"/>
-   <span className="bo-showcase-orbit bo-showcase-orbit-two"/>
-  </div>
-  <div className="bo-showcase-stage">{children}</div>
-  <div className="bo-showcase-insight" aria-live="polite">
-   <span className="bo-showcase-insight-icon"><Icon size={17} aria-hidden="true"/></span>
-   <span><strong>{current.title}</strong><small>{current.copy}</small></span>
-   <CheckCircle2 size={18} className="bo-showcase-insight-check" aria-hidden="true"/>
-  </div>
-  <div className="bo-showcase-choices" aria-label="Preview product capabilities">
-   <span className="bo-showcase-choices-label"><Layers3 size={14} aria-hidden="true"/> EXPLORE</span>
-   {views.map((view,index)=><button type="button" key={view.key} aria-pressed={active===index} className={active===index?'is-active':''} onClick={()=>setActive(index)}>{view.label}{active===index&&<ArrowUpRight size={12} aria-hidden="true"/>}</button>)}
-  </div>
-  <p className="bo-showcase-disclaimer">Illustrative product view · No customer information shown</p>
+ return <div className='mp-hero-carousel' onPointerMove={handlePointerMove} onPointerLeave={resetPointer} onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocus={()=>setPaused(true)} onBlur={()=>setPaused(false)} aria-label='BusinessOS product highlights'>
+  <style>{heroCss}</style><div className='mp-carousel-top'><span>● BUSINESSOS IN ACTION</span><span>0{active+1} / 0{slides.length}</span></div>
+  <div className='mp-carousel-slide' key={slide.key}><div className='mp-slide-copy'><span>{slide.eyebrow}</span><b>{slide.title}</b><small>{slide.copy}</small><em>{slide.tag}</em></div><div className='mp-slide-visual'>{active===0?(children||<PublicWorkspacePreview/>):active===1?<SalesVisual/>:<ControlVisual/>}</div></div>
+  <div className='mp-carousel-controls'><div className='mp-carousel-dots' role='group' aria-label='Choose a product slide'>{slides.map((item,i)=><button type='button' key={item.key} aria-label={'Show slide '+(i+1)+': '+item.eyebrow} aria-pressed={active===i} className={active===i?'active':''} onClick={()=>setActive(i)}/>)}</div>
+   <div className='mp-carousel-buttons'><button type='button' aria-label={paused?'Play slideshow':'Pause slideshow'} aria-pressed={paused} onClick={()=>setPaused(v=>!v)}>{paused?<Play size={15}/>:<Pause size={15}/>}</button><button type='button' aria-label='Previous slide' onClick={previous}><ArrowLeft size={16}/></button><button type='button' aria-label='Next slide' onClick={next}><ArrowRight size={16}/></button></div></div>
+  <div className='mp-carousel-caption'><span><CheckCircle2 size={14}/>{slide.eyebrow}</span><span>Designed for everyday business</span></div>
  </div>;
 }

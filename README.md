@@ -122,6 +122,8 @@ Current prices and available benefits are managed in the application, **not hard
 
 BusinessOS uses separate account, tenant and plan controls. Data access should always be checked on the server and in PostgreSQL. Financial posting, VAT evidence, returns, subscription upgrades and other sensitive operations must not be made production-active without relevant acceptance checks.
 
+**Current security review:** Phase 0 adds legacy-table RLS hardening (SQL 057), shared database-backed rate limiting for Route Handlers and Server Actions (SQL 058), restricted execution on internal SECURITY DEFINER functions (SQL 059, pending CI), CSP/HSTS and redacted server error reporting. SQL 057 and 058 have been applied to live Supabase; the website changes remain gated on PR merge and deployment. See [Phase 0 security guide](MD/PHASE_0_SECURITY_HARDENING.md).
+
 Legal content, retention procedures and vendor settings are managed separately and require the appropriate approvals. This README does **not** assert regulatory certification or lawyer approval.
 
 ### What is still being completed

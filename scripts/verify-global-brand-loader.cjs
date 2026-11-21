@@ -18,6 +18,7 @@ check(layout.includes('Promise.all'),'layout queries should run concurrently');
 check(read('lib/server/workspace.ts').includes('getWorkspace=cache('),'private workspace lookup should reuse React request cache');
 check(!loader.includes('unstable_cache'),'private loader must not cache workspace data');
 check(read('lib/server/workspace.ts').includes('BUSINESSOS_PERF_DIAGNOSTICS'),'opt-in server latency logging absent');
-check(!proxy.includes("matcher:['/:path*'"),'public route proxy refresh should remain excluded');
+check(proxy.includes("matcher:['/:path*']"),'global endpoint/action abuse guard must remain active');
+check(proxy.includes('if(!isRouteHandler&&!isServerAction&&!shouldRefresh)return NextResponse.next({request})'),'public page requests must still skip auth refresh');
 check(read('app/(dashboard)/expenses/page.tsx').includes('<Suspense'),'expense streaming must remain present');
 console.log(`Global branded loader and navigation speed checks passed (${n} assertions). No SQL changes or data caching.`);
