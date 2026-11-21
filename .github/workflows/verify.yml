@@ -58,7 +58,7 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
-      - name: Execute SQL 057 and 058 with real PostgreSQL roles
+      - name: Execute SQL 057–059 with real PostgreSQL roles
         env:
           PGHOST: localhost
           PGPORT: '5432'
@@ -68,3 +68,4 @@ jobs:
         run: |
           psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_057_rls_execution.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_058_rate_limit_execution.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/phase0_059_function_privileges.sql
